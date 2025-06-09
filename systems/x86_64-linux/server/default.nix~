@@ -1,0 +1,34 @@
+{
+  pkgs,
+  lib,
+  namespace,
+  ...
+}:
+
+with lib;
+with lib.${namespace};
+
+{
+  imports = [ ./hardware.nix ];
+
+  networking.hostName = "server";
+
+  homelab = {
+    config = {
+      user = {
+        name = "user";
+        extraGroups = [ "wheel" ];
+      };
+    };
+  };
+
+  swapDevices = [
+    {
+      device = "/var/lib/swapfile";
+      size = 16 * 1024;
+    }
+  ];
+
+  system.stateVersion = "24.05";
+}
+
