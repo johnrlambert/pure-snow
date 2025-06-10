@@ -55,7 +55,8 @@ First of all, watch your tone. Secondo of all, we don't need to get any actual w
 
 But, let's say you want to add a desktop environment (because you never learned how to whistle at 2600Hz into payphones in order to launch nuclear missiles. *a la* Mr. Kevin Mitnick. You would create something in the nixos directory. For organization we are leaning on the fact that Snowfall turns these paths into strings we can access later. So a file in `modules/nixos/roles/desktop/pantheon` will export a value for `homelab.roles.desktop.pantheon`
 
-```{ config, lib, pkgs, ... }:
+```nix 
+{ config, lib, pkgs, ... }:
 
 with lib;
 with lib.homelab;
