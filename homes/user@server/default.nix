@@ -2,11 +2,10 @@
   config,
   lib,
   osConfig,
-  namespace,
   ...
 }:
 with lib;
-with lib.${namespace};
+with lib.homelab;
 {
   snowfallorg.user.enable = true;
 

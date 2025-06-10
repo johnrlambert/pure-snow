@@ -1,8 +1,6 @@
 { config, lib, ... }:
-
-let
-  inherit (lib.${config._module.args.namespace}) mkOption types;
-in
+with lib;
+with lib.homelab;
 {
   options.homelab.config.users = mkOption {
     type = types.attrsOf (types.submodule {
