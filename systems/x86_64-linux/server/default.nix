@@ -13,6 +13,8 @@ with lib.homelab;
    
   networking.hostName = "server";
   system.stateVersion = "24.11";
+  homelab.roles.chrome = true;
+  homelab.roles.development = true;
   homelab.roles.desktop.pantheon = true;
   homelab.config.users.user = {
    isAdmin = true;

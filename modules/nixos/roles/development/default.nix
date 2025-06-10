@@ -9,7 +9,9 @@ in
   options.homelab.roles.development = mkEnableOption "Development goodies";
 
   config = mkIf enabled {
-    environment.systemPackages = with pkgs; [pkgs.git]
+    environment.systemPackages = with pkgs; 
+    [pkgs.git
+    pkgs.neovim];
   };
 }
 

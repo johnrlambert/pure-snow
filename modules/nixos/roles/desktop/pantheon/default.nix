@@ -14,10 +14,6 @@ in
     services.xserver.desktopManager.pantheon.enable = true;
 
     fonts.packages = with pkgs; [ dejavu_fonts ];
-    environment.systemPackages = with pkgs; [
-        pkgs.git
-        pkgs.google-chrome
-        ];
   };
 }
 

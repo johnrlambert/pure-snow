@@ -9,7 +9,8 @@ in
   options.homelab.roles.chrome = mkEnableOption "Google Chrome";
 
   config = mkIf enabled {
-    environment.systemPackages = with pkgs; [pkgs.google-chrome]
+    environment.systemPackages = with pkgs; 
+    [pkgs.google-chrome];
   };
 }
 

@@ -31,7 +31,7 @@
       lib = inputs.snowfall-lib.mkLib {
         inherit inputs;
         src = ./.;
-
+        options = import ./lib/options.nix;
         snowfall = {
           meta = {
             name = "homelab";
@@ -40,6 +40,7 @@
           namespace = "homelab";
         };
       };
+
     in
     lib.mkFlake {
       inherit inputs;
