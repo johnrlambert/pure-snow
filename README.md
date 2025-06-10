@@ -1,9 +1,11 @@
 # Baby's First snowfall
-I am writing this as a minimally useful example of a NixOS configuration (nay, a homelab configuration!) using Snowfall.
+I am writing this as a minimally useful example of a NixOS configuration (nay, a homelab configuration!) using [Snowfall.](https://snowfall.org/guides/lib/quickstart/).
 
 Snowfall has an interesting approach to its file structure and some well thought-out but rather opaque ways of doing things.
 
 There are some great snowfall configurations out there, but the type of person who is interested in Snowfall very quickly fills up a set of dotfiles in ways that become confusing/overwhelming for some.
+
+I don't know if you are fan of history (or if this is even true) but Charles De Gaulle once said "How can you govern a country which has two hundred and forty-six varieties of cheese?" This problem is quadratically worse for Linux users and their dotfiles. For instance you have emacs users and those who are wrong about things. But snowfall is opinionated enough I felt like there was a need for a more approachable repo to use as a template. 
 
 So I created this repo to give a starter for these configurations.
 
@@ -44,9 +46,9 @@ Snowfall assumes you follow a pretty specific workflow. First you create a syste
 
 So in order to create a new system in a folder with the hostname of your choice you will create your `default.nix` in that directory and run from there.
 
-Snowfall is also leaning pretty heavily on HomeManager (Which is great BTW.) 
+Snowfall is also leaning pretty heavily on HomeManager (Which is great BTW.) That means that you will be able to manage your home directory dotfiles in the same repo as your system configs. Honestly I would say that this was a bigger draw for me to NixOS than any other factor.  
 
-After you create your system with a default.nix in the corresponding directory, you will create another default.nix in a directory that lives in homes yourname@hostname. In this case I have created a user named john for a home directory in server.
+After you create your system with a default.nix in the corresponding directory, you will create another default.nix in a directory that lives in `homes/youruser'sname@hostname`. In this case I have created a user named `john` for a home directory in server.
 
 ### Adding actual functionality
 >"OK, John. That's great. Now how do I get actual work done?" - You (probably)
@@ -99,6 +101,6 @@ Now you just need to know how to build it.
 
 ### Building the homelab
 
-OK. So this next step is a little frustrating: If you are on a vanilla NixOS system you will need to make sure flakes are enabled, and get git. Only then can you enter the directory with the `flake.nix` and let out a mighty `sudo nixos-rebuild boot --flake .#myawesomemachine` and sprach into existence a kickass snowfall config.
+OK. So this next step is a little frustrating: If you are on a vanilla NixOS system you will need to make sure flakes are enabled, and get git. Only then can you enter the directory with the `flake.nix` and let out a mighty `sudo nixos-rebuild boot --flake .#myawesomemachine` and thus *sprach* into existence a kickass snowfall config.
 
 
