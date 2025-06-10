@@ -8,7 +8,7 @@ There are some great snowfall configurations out there, but the type of person w
 So I created this repo to give a starter for these configurations.
 
 Here is a quick run down of everything:
-
+```
 ├── flake.lock
 ├── flake.nix
 ├── homes
@@ -36,6 +36,8 @@ Here is a quick run down of everything:
         └── server
             ├── default.nix
             └── hardware.nix
+```
+
 ## Some Snowfall concepts
 ### Workflow
 Snowfall assumes you follow a pretty specific workflow. First you create a system in the directory corresponding to your architecture and platform. In this case I have created the systems client and server in the x86_64-linux directory. 
@@ -53,7 +55,7 @@ First of all, watch your tone. Secondo of all, we don't need to get any actual w
 
 But, let's say you want to add a desktop environment (because you never learned how to whistle at 2600Hz into payphones in order to launch nuclear missiles. *a la* Mr. Kevin Mitnick. You would create something in the nixos directory. For organization we are leaning on the fact that Snowfall turns these paths into strings we can access later. So a file in `modules/nixos/roles/desktop/pantheon` will export a value for `homelab.roles.desktop.pantheon`
 
-`{ config, lib, pkgs, ... }:
+```{ config, lib, pkgs, ... }:
 
 with lib;
 with lib.homelab;
@@ -71,7 +73,7 @@ in
     fonts.packages = with pkgs; [ dejavu_fonts ];
   };
 }
-`
+```
 
 One thing you might have noticed is the `with lib;` and `with lib.homelab;` options.
 
