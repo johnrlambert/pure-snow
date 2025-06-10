@@ -40,9 +40,9 @@ Here is a quick run down of everything:
 
 ## Some Snowfall concepts
 ### Workflow
-Snowfall assumes you follow a pretty specific workflow. First you create a system in the directory corresponding to your architecture and platform. In this case I have created the systems client and server in the x86_64-linux directory. 
+Snowfall assumes you follow a pretty specific workflow. First you create a system in the directory corresponding to your architecture and platform. In this case I have created the systems `client` and `server` in the `x86_64-linux` directory. 
 
-So in order to create a new system in a folder with the hostname of your choice you will create your default.nix in that directory and run from there.
+So in order to create a new system in a folder with the hostname of your choice you will create your `default.nix` in that directory and run from there.
 
 Snowfall is also leaning pretty heavily on HomeManager (Which is great BTW.) 
 
@@ -88,7 +88,17 @@ Anyway, now that we have created the basic skeleton of our role, we can go back 
 
 `homelab.roles.desktop.pantheon = true;` and all of a sudden that son-of-a-gun can use pantheon. (Especially if you saved it in `systems/platform/that-son-of-a-gun/default.nix`)
 
+>**ONE LAST THING:** This system assumes you have all of these fancy new `default.nix`es in version control. So frequently make some `git add .` calls to make sure you don't find yourself tracking down some missing functionality like a moron (ask me how I know...)
+
 So there you have it:
-    1) how to create systems
-    2) how to create a user for that system 
-    3) how to give that system capabilities that will distract you from the important work of trying out new dotfiles frameworks.  
+1. how to create systems
+2. how to create a user for that system 
+3. how to give that system capabilities that will distract you from the important work of trying out new dotfiles frameworks.  
+
+Now you just need to know how to build it. 
+
+### Building the homelab
+
+OK. So this next step is a little frustrating: If you are on a vanilla NixOS system you will need to make sure flakes are enabled, and get git. Only then can you enter the directory with the `flake.nix` and let out a mighty `sudo nixos-rebuild boot --flake .#myawesomemachine` and sprach into existence a kickass snowfall config.
+
+
