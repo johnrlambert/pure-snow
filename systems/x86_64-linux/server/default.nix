@@ -19,6 +19,10 @@ with lib.homelab;
    extraGroups = [ "networkmanager" ];
    hashedPassword = "$6$9X3coPdeSIaUth1C$CwHEy.Ot3idZi8Uqcwe7lhPj7Pf/oNIwnKEnvInxBenAPdB4SUHMffZ68dgwJ.PQ2p.ZggVvkBwEv0Ypv19jy.";
   };
-
+ homelab.config.users.john = {
+   isAdmin = true;
+   extraGroups = [ "networkmanager" ];
+   hashedPassword = "$6$9X3coPdeSIaUth1C$CwHEy.Ot3idZi8Uqcwe7lhPj7Pf/oNIwnKEnvInxBenAPdB4SUHMffZ68dgwJ.PQ2p.ZggVvkBwEv0Ypv19jy.";
+  };
 }
 

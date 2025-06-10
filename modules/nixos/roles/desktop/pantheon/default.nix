@@ -14,8 +14,6 @@ in
     services.xserver.desktopManager.pantheon.enable = true;
 
     fonts.packages = with pkgs; [ dejavu_fonts ];
-    sound.enable = true;
-    hardware.pulseaudio.enable = true;
   };
 }
 
