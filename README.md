@@ -66,6 +66,7 @@ in
   options.homelab.roles.desktop.pantheon = mkEnableOption "Pantheon desktop environment";
 
   config = mkIf enabled {
+    #Actual things get done here.
     services.xserver.enable = true;
     services.xserver.displayManager.lightdm.enable = true;
     services.xserver.desktopManager.pantheon.enable = true;
@@ -77,11 +78,16 @@ in
 
 One thing you might have noticed is the `with lib;` and `with lib.homelab;` options.
 
-These are super fucking important. In our `flake.nix` (the main entrypoint for everything BTW) we have created a namespace called `homelab`
+These are super fucking important. In our `flake.nix` (the main entrypoint for everything BTW) we have created a namespace called `homelab`. Homelab is the conduit between all of our objects. I am hardly a snowfall expert, but I have learned that if something doesn't work, just figure out a way to work `with lib.homelab` into it.
+
+Think of the nix code surrounding the things in `#Actual things get done here` as a big ole composability hug. If you see some vanilla nix configuration and want to add it to your own homelab, just pop it in there.  
 
 Anyway, now that we have created the basic skeleton of our role, we can go back to our system file and add it in like so:
 
 
-`homelab.roles.desktop.pantheon = true;` and all of a sudden that son-of-a-gun can use pantheon.
+`homelab.roles.desktop.pantheon = true;` and all of a sudden that son-of-a-gun can use pantheon. (Especially if you saved it in `systems/platform/that-son-of-a-gun/default.nix`)
 
-
+So there you have it:
+    1) how to create systems
+    2) how to create a user for that system 
+    3) how to give that system capabilities that will distract you from the important work of trying out new dotfiles frameworks.  
