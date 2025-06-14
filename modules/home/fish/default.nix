@@ -1,15 +1,13 @@
 # modules/home/fish/default.nix
-{ config, pkgs, lib, ... }:
+{ lib, config, pkgs, ... }:
 
-lib.mkIf config.homelab.fish.enable {
-  home.packages = with pkgs; [ fish eza bat ];
+let
+  enabled = config.homelab.fish.enable or false;
+in {
+  options.homelab.fish.enable = lib.mkEnableOption "Enable fish shell and tools";
 
-  programs.fish = {
-    enable = true;
-    shellAliases = {
-      ls = "eza -la";
-      cat = "bat";
-    };
+  config = lib.mkIf enabled {
+    home.packages = with pkgs; [ fish eza bat ];
   };
 }
 
