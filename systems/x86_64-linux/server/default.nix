@@ -13,8 +13,15 @@ with lib.homelab;
   networking.hostName = "server";
   system.stateVersion = "24.11";
   homelab.roles.chrome = true;
+  homelab.roles.dynamic_dns = true;
   homelab.roles.development = true;
   homelab.roles.fish = true;
+  homelab.roles."wg-easy" = {
+  	enable = true;
+	host = "witsendstables.duckdns.org";
+	exposeUi = true;
+	};
+  homelab.roles.homeassistant = true;
   homelab.roles.desktop.pantheon = true;
   homelab.config.users.user = {
    isAdmin = true;
