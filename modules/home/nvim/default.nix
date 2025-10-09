@@ -7,9 +7,39 @@
 
 let
   enabled = config.homelab.nvim.enable or false;
+
+  snacksNvim =
+    if pkgs.vimPlugins ? snacks-nvim then
+      pkgs.vimPlugins.snacks-nvim
+    else
+      pkgs.vimUtils.buildVimPlugin {
+        pname = "snacks.nvim";
+        version = "unstable-2025-10-01";
+        src = pkgs.fetchFromGitHub {
+          owner = "folke";
+          repo = "snacks.nvim";
+          rev = "main"; # pin a commit if you want
+          hash = "sha256-CRmpopzcLgEoWkAPlUlUa5nwkb2RBhNNAdOHv8eZQww=";
+        };
+      };
+
+  nvimAider =
+    if pkgs.vimPlugins ? nvim-aider then
+      pkgs.vimPlugins.nvim-aider
+    else
+      pkgs.vimUtils.buildVimPlugin {
+        pname = "nvim-aider";
+        version = "unstable-2025-10-01";
+        src = pkgs.fetchFromGitHub {
+          owner = "GeorgesAlkhouri";
+          repo = "nvim-aider";
+          rev = "main"; # pin a commit if you want
+          hash = "sha256-CRmpopzcLgEoWkAPlUlUa5nwkb2RBhNNAdOHv8eZQww="; # paste the printed sha256 on rebuild
+        };
+      };
 in
 {
-  options.homelab.nvim.enable = lib.mkEnableOption "Enable a minimal Neovim (your keymaps + Gruvbox + formatters for Python/Nix)";
+  options.homelab.nvim.enable = lib.mkEnableOption "Enable Neovim with nvim-aider";
 
   config = lib.mkIf enabled {
     programs.neovim = {
@@ -18,23 +48,17 @@ in
       vimAlias = true;
       defaultEditor = true;
 
-      # Only what we actually need: Gruvbox theme + Conform formatter orchestrator
+      # Keep your existing list, just add Snacks + nvim-aider + (optionally) devicons
       plugins = with pkgs.vimPlugins; [
         gruvbox-nvim
         conform-nvim
         nvim-tree-lua
-        nvim-web-devicons
+        nvim-web-devicons # icons (optional but nice)
+        snacksNvim
+        nvimAider
       ];
 
-      # Load the Lua config below (no plugin managers, very small)
       extraLuaConfig = builtins.readFile ./init.lua;
     };
-
-    # Only the formatters you asked for (Python + Nix)
-    home.packages = with pkgs; [
-      nixfmt-rfc-style # provides `nixfmt`
-      black # Python formatter
-      ruff # provides `ruff format`
-    ];
   };
 }

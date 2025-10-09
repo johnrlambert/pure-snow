@@ -103,4 +103,40 @@ pcall(function()
   -- vim.keymap.set("n", "<leader>fm", function() require("conform").format({ async = true }) end,
   --   { noremap = true, silent = true, desc = "Format buffer" })
 end)
+-- Snacks: no config needed, but this avoids warnings if a plugin checks for it
+pcall(function() require("snacks").setup({}) end)
 
+-- nvim-aider minimal
+pcall(function()
+  require("nvim_aider").setup({
+    -- sane defaults; nothing here touches your other mappings
+    -- leave empty to use built-ins
+  })
+
+  -- Core commands (from the plugin README):
+  -- :Aider           → open interactive command menu
+  -- :Aider toggle    → toggle aider terminal
+  -- :Aider send      → send text/selection
+  -- :Aider buffer    → send current buffer
+  -- :Aider add/drop  → add/drop file to session
+  -- :Aider reset     → clear session
+  -- :Aider health    → check plugin health
+
+  -- Your explicit keys (non-intrusive)
+  vim.keymap.set("n", "<leader>a/", "<cmd>Aider toggle<cr>", { silent = true, desc = "Aider: Toggle" })
+  vim.keymap.set({ "n", "v" }, "<leader>as", "<cmd>Aider send<cr>", { silent = true, desc = "Aider: Send" })
+  vim.keymap.set("n", "<leader>ab", "<cmd>Aider buffer<cr>", { silent = true, desc = "Aider: Send Buffer" })
+  vim.keymap.set("n", "<leader>a+", "<cmd>Aider add<cr>", { silent = true, desc = "Aider: Add File" })
+  vim.keymap.set("n", "<leader>a-", "<cmd>Aider drop<cr>", { silent = true, desc = "Aider: Drop File" })
+  vim.keymap.set("n", "<leader>aR", "<cmd>Aider reset<cr>", { silent = true, desc = "Aider: Reset" })
+
+  -- Optional: nvim-tree integration (plugin exposes these commands)
+  -- Only active when you're in the tree buffer
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "NvimTree",
+    callback = function()
+      vim.keymap.set("n", "<leader>a+", "<cmd>AiderTreeAddFile<cr>",  { buffer = true, silent = true, desc = "Aider: Add from tree" })
+      vim.keymap.set("n", "<leader>a-", "<cmd>AiderTreeDropFile<cr>", { buffer = true, silent = true, desc = "Aider: Drop from tree" })
+    end,
+  })
+end)
