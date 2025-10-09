@@ -1,4 +1,5 @@
-  {lib,
+{
+  lib,
   pkgs,
   inputs,
   config,
@@ -6,10 +7,14 @@
   ...
 }:
 with lib;
-with lib.homelab; 
-  
+with lib.homelab;
+
 {
-  homelab.fish.enable = true; 
+  homelab.fish.enable = true;
+  homelab.emacs.enable = true;
+  homelab.nvim.enable = true;
+  homelab.fonts.enable = true;
+  homelab.aider.enable = true;
   home.stateVersion = lib.mkDefault (osConfig.system.stateVersion or "24.11");
   programs.git = {
     enable = true;
@@ -39,6 +44,10 @@ with lib.homelab;
 
   programs.fish = {
     enable = true;
+    shellAliases = {
+      ls = "exa -lah";
+      vim = "nvim";
+    };
     interactiveShellInit = ''
       echo "Hello from HomeManager."
       source ~/OPENAI_API_KEY.env

@@ -1,0 +1,106 @@
+vim.keymap.set("n", "<C-j>", "<C-w>j", { noremap = true })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { noremap = true })
+vim.keymap.set("n", "<C-h>", "<C-w>h", { noremap = true })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { noremap = true })
+-- ===========================
+-- Minimal Neovim init.lua
+--   • absolute line numbers
+--   • Gruvbox colorscheme
+--   • nvim-tree auto-opens; reveals current file / sets root to file's dir
+--   • format-on-save for Python & Nix via Conform
+-- No telescope, no treesitter, no LSP.
+-- ===========================
+
+-- ----- baseline options -----
+vim.g.mapleader = " "
+vim.o.termguicolors = true
+vim.wo.number = true            -- absolute line numbers
+vim.wo.relativenumber = false   -- ensure NOT relative
+vim.o.signcolumn = "yes"
+vim.o.clipboard = "unnamedplus"
+vim.o.expandtab = true
+vim.o.shiftwidth = 2
+vim.o.tabstop = 2
+vim.o.smartindent = true
+vim.o.splitright = true
+vim.o.splitbelow = true
+vim.o.updatetime = 200
+vim.o.timeoutlen = 400
+
+-- ----- your own keymaps -----
+-- paste your i3-style remaps here (this config adds only <leader>e for tree)
+
+-- ----- Gruvbox -----
+pcall(function()
+  require("gruvbox").setup({
+    contrast = "hard",         -- "soft" | "medium" | "hard"
+    transparent_mode = false,
+  })
+  vim.cmd.colorscheme("gruvbox")
+end)
+
+-- ----- nvim-tree -----
+pcall(function()
+  require("nvim-tree").setup({
+    sync_root_with_cwd = true,
+    respect_buf_cwd = true,
+    update_focused_file = {
+      enable = true,
+      update_root = true,
+    },
+    view = {
+      width = 30,
+      preserve_window_proportions = true,
+    },
+    renderer = {
+      root_folder_label = false,
+    },
+    actions = {
+      change_dir = { enable = true, global = false, restrict_above_cwd = false },
+      open_file = { quit_on_open = false },
+    },
+    filters = {
+      dotfiles = false,
+    },
+  })
+
+  -- Toggle key (remove/change if you already use <leader>e)
+  vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { noremap = true, silent = true, desc = "Toggle file tree" })
+
+  -- Auto-open behavior on startup:
+  -- - If Neovim starts on a directory: cd into it and open the tree.
+  -- - If Neovim starts on a file: open the tree and reveal that file (do not steal focus).
+  local function open_tree_on_start(data)
+    -- no name, no file → just open the tree in cwd
+    if data.file == "" or data.file == nil then
+      require("nvim-tree.api").tree.open()
+      return
+    end
+
+    local realpath = vim.fn.fnamemodify(data.file, ":p")
+    if vim.fn.isdirectory(realpath) == 1 then
+      vim.cmd.cd(realpath)
+      require("nvim-tree.api").tree.open()
+    else
+      -- reveal current file; keep focus in the file window
+      require("nvim-tree.api").tree.find_file({ open = true, focus = false })
+    end
+  end
+
+  vim.api.nvim_create_autocmd("VimEnter", { callback = open_tree_on_start })
+end)
+
+-- ----- Conform: format-on-save (Python + Nix only) -----
+pcall(function()
+  require("conform").setup({
+    format_on_save = { timeout_ms = 2000, lsp_fallback = false },
+    formatters_by_ft = {
+      python = { "ruff_format", "black" },
+      nix    = { "nixfmt" },
+    },
+  })
+  -- Optional manual format binding:
+  -- vim.keymap.set("n", "<leader>fm", function() require("conform").format({ async = true }) end,
+  --   { noremap = true, silent = true, desc = "Format buffer" })
+end)
+
