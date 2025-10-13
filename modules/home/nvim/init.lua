@@ -27,7 +27,18 @@ vim.o.splitbelow = true
 vim.o.updatetime = 200
 vim.o.timeoutlen = 400
 
+-- Function to open a terminal with aider and add the current file
+local function open_aider_and_add_file()
+  -- Split the window and open a terminal running aider
+  vim.cmd("split | terminal aider --watch-files")
+  -- Add the current file to the Aider session
+  vim.cmd("Aider add")
+end
+
 -- ----- your own keymaps -----
+-- Bind F9 to open aider and add the current file
+vim.keymap.set("n", "<F9>", open_aider_and_add_file, { noremap = true, silent = true, desc = "Open Aider and add file" })
+
 -- paste your i3-style remaps here (this config adds only <leader>e for tree)
 
 -- ----- Gruvbox -----
@@ -104,7 +115,7 @@ pcall(function()
   --   { noremap = true, silent = true, desc = "Format buffer" })
 end)
 -- Snacks: no config needed, but this avoids warnings if a plugin checks for it
-pcall(function() require("snacks").setup({}) end)
+pcall(function() require("snacks").setup({opts={picker = {enable= true}}}) end)
 
 -- nvim-aider minimal
 pcall(function()
