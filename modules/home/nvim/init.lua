@@ -29,10 +29,10 @@ vim.o.timeoutlen = 400
 
 -- Function to open a terminal with aider and add the current file
 local function open_aider_and_add_file()
-  -- Split the window and open a terminal running aider
-  vim.cmd("split | terminal aider --watch-files")
-  -- Add all files from the current directory to the Aider session
-  vim.cmd("Aider add *")
+  -- Get the current file path
+  local current_file = vim.fn.expand("%:p")
+  -- Split the window and open a terminal running aider with the current file
+  vim.cmd("split | terminal aider --watch-files " .. current_file)
 end
 
 -- ----- your own keymaps -----
