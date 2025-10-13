@@ -31,8 +31,8 @@ vim.o.timeoutlen = 400
 local function open_aider_and_add_file()
   -- Split the window and open a terminal running aider
   vim.cmd("split | terminal aider --watch-files")
-  -- Add the current file to the Aider session
-  vim.cmd("Aider add")
+  -- Add all files from the current directory to the Aider session
+  vim.cmd("Aider add *")
 end
 
 -- ----- your own keymaps -----
