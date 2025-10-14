@@ -24,6 +24,7 @@ with lib.homelab;
   homelab.roles.homeassistant = true;
   homelab.roles.desktop.pantheon = true;
   homelab.roles.cockpit = true;
+  homelab.roles.ssh = true; # Enable the SSH role
   homelab.config.users.user = {
    isAdmin = true;
    extraGroups = [ "networkmanager" ];
