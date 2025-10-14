@@ -32,7 +32,7 @@ local function open_aider_and_add_file()
   -- Get the current file path
   local current_file = vim.fn.expand("%:p")
   -- Split the window and open a terminal running aider with the current file
-  vim.cmd("split | terminal aider --watch-files " .. current_file)
+  vim.cmd("split | terminal aider --watch-files --model gpt-5" .. current_file)
 end
 
 -- ----- your own keymaps -----

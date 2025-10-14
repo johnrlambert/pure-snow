@@ -9,8 +9,8 @@
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     ### Additional Inputs ###
-    inputs.snacks = { url = "github:folke/snacks.nvim"; flake = false; };
-    inputs.nvim-aider = { url = "github:GeorgesAlkhouri/nvim-aider"; flake = false; };
+    #inputs.snacks = { url = "github:folke/snacks.nvim"; flake = false; };
+    #inputs.nvim-aider = { url = "github:GeorgesAlkhouri/nvim-aider"; flake = false; };
     # Home Manager (release-24.05)
     home-manager = {
       url = "github:nix-community/home-manager/release-24.11";
