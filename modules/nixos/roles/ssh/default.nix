@@ -15,8 +15,8 @@ in
       port = 2222; # Change to a non-standard port
       permitRootLogin = "no"; # Disable root login
       passwordAuthentication = false; # Disable password authentication
-      allowUsers = [ "john" ]; # Replace with allowed usernames
       extraConfig = ''
+        AllowUsers john
         # Additional security settings
         MaxAuthTries 3
         LogLevel VERBOSE
