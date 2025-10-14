@@ -26,7 +26,6 @@ with lib.homelab;
       init.defaultBranch = "main";
       alias.lg = "log --oneline --graph --decorate";
     };
-  };
 
   programs.ssh = {
     enable = true;
@@ -38,7 +37,7 @@ with lib.homelab;
         identityFile = "~/id_ed25519";
       };
     };
-}
+  };
 
   services.ssh-agent.enable = true;
 
