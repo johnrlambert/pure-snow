@@ -1,15 +1,25 @@
 { config, lib, pkgs, ... }:
 
 with lib;
-with lib.homelab;
+
 let
-  enabled = config.homelab.roles.snowfall or false;
+  enabled = config.homelab.roles.cockpit or false;
 in
 {
-  options.homelab.roles.snowfall = mkEnableOption "Snowfall Cockpit Telemetry System";
+  options.homelab.roles.cockpit =
+    mkEnableOption "Cockpit Telemetry System";
 
   config = mkIf enabled {
-    environment.systemPackages = with pkgs; 
-    [pkgs.snowfall-cockpit-telemetry];
+    services.cockpit = {
+      enable = true;
+      port = 9090;
+      openFirewall = true; # If this option doesn't exist in your channel, see note below.
+      settings = {
+        WebService = {
+          AllowUnencrypted = true;
+        };
+      };
+    };
   };
 }
+
