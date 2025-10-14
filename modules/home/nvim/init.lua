@@ -32,7 +32,7 @@ local function open_aider_and_add_file()
   -- Get the current file path
   local current_file = vim.fn.expand("%:p")
   -- Split the window and open a terminal running aider with the current file
-  vim.cmd("split | terminal aider --watch-files --model gpt-5" .. current_file)
+  vim.cmd("split | terminal aider --watch-files " .. current_file)
 end
 
 -- ----- your own keymaps -----
@@ -79,6 +79,7 @@ pcall(function()
   vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { noremap = true, silent = true, desc = "Toggle file tree" })
 
   -- Auto-open behavior on startup:
+  --
   -- - If Neovim starts on a directory: cd into it and open the tree.
   -- - If Neovim starts on a file: open the tree and reveal that file (do not steal focus).
   local function open_tree_on_start(data)

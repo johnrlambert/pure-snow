@@ -12,7 +12,7 @@ in
   config = mkIf enabled {
     services.openssh = {
       enable = true;
-      port = 2222; # Change to a non-standard port
+      ports = [2222]; # Change to a non-standard port
       permitRootLogin = "no"; # Disable root login
       passwordAuthentication = false; # Disable password authentication
       extraConfig = ''
@@ -24,7 +24,7 @@ in
     };
 
     # Optionally, configure fail2ban for additional security
-    security.pam.services.sshd.fail2ban.enable = true;
+#    security.pam.services.sshd.fail2ban.enable = true;
   };
 }
 

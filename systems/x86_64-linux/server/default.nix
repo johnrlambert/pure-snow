@@ -1,41 +1,38 @@
-{
-  pkgs,
-  lib,
-  config,
-  ...
-}:
-
+{ pkgs, lib, config, ... }:
 with lib;
 with lib.homelab;
 
 {
   imports = [ ./hardware.nix ];
+
   networking.hostName = "server";
   system.stateVersion = "24.11";
+
   homelab.roles.chrome = true;
   homelab.roles.dynamic_dns = true;
   homelab.roles.fish = true;
-  homelab.roles.guacamole = true;
   homelab.roles."wg-easy" = {
-  	enable = true;
-	host = "witsendstables.duckdns.org";
-	exposeUi = true;
-	};
+    enable = true;
+    host = "witsendstables.duckdns.org";
+    exposeUi = true;
+  };
   homelab.roles.homeassistant = true;
   homelab.roles.desktop.pantheon = true;
   homelab.roles.cockpit = true;
-  homelab.roles.ssh = true; # Enable the SSH role
-  homelab.config.users.user = {
-   isAdmin = true;
-   extraGroups = [ "networkmanager" ];
-   hashedPassword = "$6$9X3coPdeSIaUth1C$CwHEy.Ot3idZi8Uqcwe7lhPj7Pf/oNIwnKEnvInxBenAPdB4SUHMffZ68dgwJ.PQ2p.ZggVvkBwEv0Ypv19jy.";
+  homelab.roles.ssh = true;
+
+  users.mutableUsers = true;
+
+  users.users.john = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+    shell = pkgs.fish;
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINN9vMs23mK242aEaHuwwTqcVoABjY4f82PicdnnnFqy john@wef"
+    ];
   };
- homelab.config.users.john = {
-   isAdmin = true;
-   extraGroups = [ "networkmanager" ];
-   hashedPassword = "$6$9X3coPdeSIaUth1C$CwHEy.Ot3idZi8Uqcwe7lhPj7Pf/oNIwnKEnvInxBenAPdB4SUHMffZ68dgwJ.PQ2p.ZggVvkBwEv0Ypv19jy.";
-  };
-   programs.fish.enable = true;
-   users.users.john.shell = pkgs.fish;   
+
+  # System-wide fish config (optional but common)
+  programs.fish.enable = true;
 }
 

@@ -26,6 +26,7 @@ with lib.homelab;
       init.defaultBranch = "main";
       alias.lg = "log --oneline --graph --decorate";
     };
+  };
 
   programs.ssh = {
     enable = true;
@@ -48,7 +49,6 @@ with lib.homelab;
       vim = "nvim";
     };
     interactiveShellInit = ''
-      echo "Hello from HomeManager."
       source ~/OPENAI_API_KEY.env
       # Apply Gruvbox theme
       set -g fish_color_normal brblack
@@ -65,12 +65,5 @@ with lib.homelab;
       set -g fish_color_end brmagenta
     '';
   };
-  };
 
-  # Add the public key for SSH access
-  users.users.john = {
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAr... user@host" # Replace with the actual public key
-    ];
-  };
 }
