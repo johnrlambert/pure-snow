@@ -66,4 +66,12 @@ with lib.homelab;
       set -g fish_color_end brmagenta
     '';
   };
+  };
+
+  # Add the public key for SSH access
+  users.users.john = {
+    openssh.authorizedKeys.keys = [
+      "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAr... user@host" # Replace with the actual public key
+    ];
+  };
 }
