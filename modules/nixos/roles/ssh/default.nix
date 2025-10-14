@@ -26,5 +26,5 @@ in
     # Optionally, configure fail2ban for additional security
     security.pam.services.sshd.fail2ban.enable = true;
   };
-};
+}
 
