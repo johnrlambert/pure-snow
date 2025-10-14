@@ -26,6 +26,7 @@ with lib.homelab;
       init.defaultBranch = "main";
       alias.lg = "log --oneline --graph --decorate";
     };
+  };
 
   programs.ssh = {
     enable = true;
