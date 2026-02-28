@@ -88,7 +88,7 @@
 (setq inhibit-startup-screen t)
 
 ;; Set a simple theme
-(load-theme 'gruvbox-dark-medium t)
+;(load-theme 'gruvbox-dark-medium t)
 
 ;; Enable line numbers
 (global-display-line-numbers-mode t)

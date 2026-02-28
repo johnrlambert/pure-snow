@@ -18,6 +18,7 @@ in
       viAlias = true;
       vimAlias = true;
       defaultEditor = true;
+      package = pkgs.neovim-unwrapped;
 
       # Keep your existing list, just add Snacks + nvim-aider + (optionally) devicons
       plugins = with pkgs.vimPlugins; [
@@ -25,6 +26,8 @@ in
         conform-nvim
         nvim-tree-lua
         nvim-web-devicons # icons (optional but nice)
+        vim-coffee-script
+        orgmode
       ];
 
       extraLuaConfig = builtins.readFile ./init.lua;

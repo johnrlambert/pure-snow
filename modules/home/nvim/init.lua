@@ -152,3 +152,37 @@ pcall(function()
     end,
   })
 end)
+
+vim.g.orgmode = vim.g.orgmode or {}
+require("orgmode").setup({
+  org_agenda_files = { "~/org/**/*" },
+  org_default_notes_file = "~/org/inbox.org",
+})
+
+
+-- Indent-based folding (great for CoffeeScript)
+vim.o.foldmethod = "indent"
+vim.o.foldenable = true
+
+-- Start with folds CLOSED when you open a file
+-- (0 = pretty aggressive; 1 = top-level open; tune if you like)
+vim.o.foldlevel = 0
+vim.o.foldlevelstart = 0
+
+-- Helper: detect if current line is the START of a fold
+local function is_fold_start(lnum)
+  local cur = vim.fn.foldlevel(lnum)
+  if cur <= 0 then return false end
+  if lnum <= 1 then return cur > 0 end
+  local prev = vim.fn.foldlevel(lnum - 1)
+  return cur > prev
+end
+
+-- Tab toggles fold ONLY on fold-start lines
+vim.keymap.set("n", "<Tab>", function()
+  local lnum = vim.fn.line(".")
+  if is_fold_start(lnum) then
+    vim.cmd("normal! za")  -- toggle fold at cursor
+  end
+end, { silent = true, desc = "Toggle fold (only on fold start)" })
+

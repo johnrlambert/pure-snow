@@ -14,7 +14,7 @@ in
 
   config = lib.mkIf enabled {
     home.packages = with pkgs; [
-      (nerdfonts.override { fonts = [ "NerdFontsSymbolsOnly" ]; })
+      nerd-fonts.symbols-only
 
       # If your nixpkgs doesn't support override above, try:
       # nerd-fonts-symbols
