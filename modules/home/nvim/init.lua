@@ -2,15 +2,6 @@ vim.keymap.set("n", "<C-j>", "<C-w>j", { noremap = true })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { noremap = true })
 vim.keymap.set("n", "<C-h>", "<C-w>h", { noremap = true })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { noremap = true })
--- ===========================
--- Minimal Neovim init.lua
---   • absolute line numbers
---   • Gruvbox colorscheme
---   • nvim-tree auto-opens; reveals current file / sets root to file's dir
---   • format-on-save for Python & Nix via Conform
--- No telescope, no treesitter, no LSP.
--- ===========================
-
 -- ----- baseline options -----
 vim.g.mapleader = " "
 vim.o.termguicolors = true
@@ -51,8 +42,7 @@ pcall(function()
 end)
 
 -- ----- nvim-tree -----
-pcall(function()
-  require("nvim-tree").setup({
+pcall(function() require("nvim-tree").setup({
     sync_root_with_cwd = true,
     respect_buf_cwd = true,
     update_focused_file = {
@@ -64,7 +54,7 @@ pcall(function()
       preserve_window_proportions = true,
     },
     renderer = {
-      root_folder_label = false,
+      root_folder_label = true,
     },
     actions = {
       change_dir = { enable = true, global = false, restrict_above_cwd = false },
@@ -77,31 +67,22 @@ pcall(function()
 
   -- Toggle key (remove/change if you already use <leader>e)
   vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { noremap = true, silent = true, desc = "Toggle file tree" })
-
-  -- Auto-open behavior on startup:
-  --
-  -- - If Neovim starts on a directory: cd into it and open the tree.
-  -- - If Neovim starts on a file: open the tree and reveal that file (do not steal focus).
-  local function open_tree_on_start(data)
-    -- no name, no file → just open the tree in cwd
-    if data.file == "" or data.file == nil then
-      require("nvim-tree.api").tree.open()
-      return
-    end
-
-    local realpath = vim.fn.fnamemodify(data.file, ":p")
-    if vim.fn.isdirectory(realpath) == 1 then
-      vim.cmd.cd(realpath)
-      require("nvim-tree.api").tree.open()
-    else
-      -- reveal current file; keep focus in the file window
-      require("nvim-tree.api").tree.find_file({ open = true, focus = false })
-    end
-  end
-
-  vim.api.nvim_create_autocmd("VimEnter", { callback = open_tree_on_start })
 end)
 
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function(data)
+    local directory = vim.fn.isdirectory(data.file) == 1
+
+    if directory then
+      vim.cmd.cd(data.file)
+    end
+
+    require("nvim-tree.api").tree.open({ current_window = false })
+    vim.schedule(function()
+      vim.cmd("wincmd p")
+    end)
+  end,
+})
 -- ----- Conform: format-on-save (Python + Nix only) -----
 pcall(function()
   require("conform").setup({
@@ -115,48 +96,11 @@ pcall(function()
   -- vim.keymap.set("n", "<leader>fm", function() require("conform").format({ async = true }) end,
   --   { noremap = true, silent = true, desc = "Format buffer" })
 end)
--- Snacks: no config needed, but this avoids warnings if a plugin checks for it
-pcall(function() require("snacks").setup({opts={picker = {enable= true}}}) end)
-
--- nvim-aider minimal
-pcall(function()
-  require("nvim_aider").setup({
-    -- sane defaults; nothing here touches your other mappings
-    -- leave empty to use built-ins
-  })
-
-  -- Core commands (from the plugin README):
-  -- :Aider           → open interactive command menu
-  -- :Aider toggle    → toggle aider terminal
-  -- :Aider send      → send text/selection
-  -- :Aider buffer    → send current buffer
-  -- :Aider add/drop  → add/drop file to session
-  -- :Aider reset     → clear session
-  -- :Aider health    → check plugin health
-
-  -- Your explicit keys (non-intrusive)
-  vim.keymap.set("n", "<leader>a/", "<cmd>Aider toggle<cr>", { silent = true, desc = "Aider: Toggle" })
-  vim.keymap.set({ "n", "v" }, "<leader>as", "<cmd>Aider send<cr>", { silent = true, desc = "Aider: Send" })
-  vim.keymap.set("n", "<leader>ab", "<cmd>Aider buffer<cr>", { silent = true, desc = "Aider: Send Buffer" })
-  vim.keymap.set("n", "<leader>a+", "<cmd>Aider add<cr>", { silent = true, desc = "Aider: Add File" })
-  vim.keymap.set("n", "<leader>a-", "<cmd>Aider drop<cr>", { silent = true, desc = "Aider: Drop File" })
-  vim.keymap.set("n", "<leader>aR", "<cmd>Aider reset<cr>", { silent = true, desc = "Aider: Reset" })
-
-  -- Optional: nvim-tree integration (plugin exposes these commands)
-  -- Only active when you're in the tree buffer
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = "NvimTree",
-    callback = function()
-      vim.keymap.set("n", "<leader>a+", "<cmd>AiderTreeAddFile<cr>",  { buffer = true, silent = true, desc = "Aider: Add from tree" })
-      vim.keymap.set("n", "<leader>a-", "<cmd>AiderTreeDropFile<cr>", { buffer = true, silent = true, desc = "Aider: Drop from tree" })
-    end,
-  })
-end)
 
 vim.g.orgmode = vim.g.orgmode or {}
 require("orgmode").setup({
-  org_agenda_files = { "~/org/**/*" },
-  org_default_notes_file = "~/org/inbox.org",
+  org_agenda_files = { "~/chronofile/**/*" },
+  org_default_notes_file = "~/chronofile/inbox.org",
 })
 
 

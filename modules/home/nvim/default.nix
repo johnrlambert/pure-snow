@@ -27,6 +27,7 @@ in
         nvim-tree-lua
         nvim-web-devicons # icons (optional but nice)
         vim-coffee-script
+        nvim-treesitter
         orgmode
       ];
 
