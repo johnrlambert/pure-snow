@@ -22,7 +22,10 @@
       url = "github:snowfallorg/lib";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -50,6 +53,13 @@
         allowUnfree = true;
         permittedInsecurePackages = [ ];
       };
+      systems.modules.nixos = with inputs; [
+        sops-nix.nixosModules.sops
+      ];
+
+      homes.modules = with inputs; [
+        sops-nix.homeManagerModules.sops
+      ];
 
     };
 }
