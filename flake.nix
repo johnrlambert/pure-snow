@@ -26,7 +26,7 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    secrets.url = "path:./secrets";
+      secrets.url = "git+file:///home/john/pure-snow/secrets";
   };
 
   outputs =
