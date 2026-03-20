@@ -11,7 +11,7 @@ in
     enable = lib.mkEnableOption "Enable aider";
     model  = lib.mkOption {
       type = lib.types.str;
-      default = "gpt-5.2";
+      default = "openai/gpt-5.3-chat-latest";
       description = "Default model string passed to aider (provider must support it).";
     };
   };
@@ -24,8 +24,6 @@ in
       model: ${cfg.model}
     '';
 
-    # Optional: keep your environment clean and explicit
-    # (you can set OPENAI_API_KEY elsewhere; see notes below)
     home.sessionVariables = {
       AIDER_MODEL = cfg.model;
       # OPENAI_API_KEY = "...";  # don't hardcode secrets in nix
