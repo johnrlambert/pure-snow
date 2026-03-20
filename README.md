@@ -103,4 +103,155 @@ Now you just need to know how to build it.
 
 OK. So this next step is a little frustrating: If you are on a vanilla NixOS system you will need to make sure flakes are enabled, and get git. Only then can you enter the directory with the `flake.nix` and let out a mighty `sudo nixos-rebuild boot --flake .#myawesomemachine` and thus *sprach* into existence a kickass snowfall config.
 
+## 🔐 Managing Secrets with `sops-nix`
+
+This repository uses a separate private `secrets` repo (as a flake input) combined with `sops-nix` for encrypted secret management.
+
+Because the `secrets` repo is a **flake input**, it is **pinned in `flake.lock`**. This means changes to secrets are **not automatically picked up** — you must explicitly update the lock file.
+
+---
+
+### ✏️ Editing a Secret
+
+To edit an existing secret:
+
+```bash
+cd secrets
+sops common.yaml
+```
+
+This will:
+
+* decrypt the file temporarily
+* open it in your editor
+* re-encrypt it on save/exit
+
+To view decrypted contents without editing:
+
+```bash
+sops -d common.yaml
+```
+
+---
+
+### ➕ Adding or Updating Values
+
+Secrets are stored as YAML key/value pairs:
+
+```yaml
+openai_api_key: sk-...
+```
+
+Just edit the file via `sops` and add/update keys as needed.
+
+---
+
+### 📦 Committing Changes (Secrets Repo)
+
+After editing:
+
+```bash
+cd ~/pure-snow/secrets
+git add common.yaml
+git commit -m "Update secret"
+git push
+```
+
+---
+
+### 🔁 Updating the Parent Flake
+
+Because the `secrets` repo is a **flake input**, the main repo is pinned to a specific commit.
+
+You **must update the lock file** to use the new secret:
+
+```bash
+cd ~/pure-snow
+nix flake lock --update-input secrets
+```
+
+Then commit the updated lock:
+
+```bash
+git add flake.lock
+git commit -m "Update secrets input"
+git push
+```
+
+---
+
+### 🏗️ Rebuilding Home Manager
+
+Apply the updated secrets:
+
+```bash
+home-manager switch --flake ~/pure-snow -b backup
+```
+
+---
+
+### ✅ Verifying the Secret
+
+Check the decrypted value:
+
+```bash
+cat ~/.config/sops-nix/secrets/openai_api_key
+```
+
+---
+
+### ⚠️ Common Gotcha
+
+If you see an **old secret value after editing**, it usually means:
+
+> You updated the secrets repo but did NOT update the flake input.
+
+Fix it with:
+
+```bash
+nix flake lock --update-input secrets
+home-manager switch --flake ~/pure-snow -b backup
+```
+
+---
+
+### 🧠 Mental Model
+
+* `secrets/common.yaml` → encrypted source of truth
+* `/nix/store/...` → immutable encrypted copy used by Nix
+* `~/.config/sops-nix/secrets/...` → decrypted runtime files
+* `flake.lock` → decides *which version* of secrets you are using
+
+---
+
+### 🔁 Full Workflow Summary
+
+```bash
+# 1. Edit secret
+cd secrets
+sops common.yaml
+
+# 2. Commit + push secrets repo
+git add common.yaml
+git commit -m "Update secret"
+git push
+
+# 3. Update flake input
+cd ..
+nix flake lock --update-input secrets
+git add flake.lock
+git commit -m "Update secrets input"
+git push
+
+# 4. Apply
+home-manager switch --flake ~/pure-snow -b backup
+```
+
+---
+
+This ensures:
+
+* secrets remain encrypted at rest
+* reproducibility via flake pinning
+* controlled rollout of secret changes
 
