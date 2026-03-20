@@ -48,6 +48,8 @@ with lib.homelab;
   };
 
   services.ssh-agent.enable = true;
+  home.sessionVariables.OPENAI_API_KEY_FILE =
+    config.sops.secrets.openai_api_key.path;
 
   programs.fish = {
     enable = true;
@@ -56,8 +58,8 @@ with lib.homelab;
       vim = "nvim";
     };
     interactiveShellInit = ''
-      source ~/OPENAI_API_KEY.env
       # Apply Gruvbox theme
+      set -gx OPENAI_API_KEY (cat $OPENAI_API_KEY_FILE)
       set -g fish_color_normal brblack
       set -g fish_color_command brgreen
       set -g fish_color_comment brblue
