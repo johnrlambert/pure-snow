@@ -72,5 +72,4 @@ with lib.homelab;
       set -g fish_color_end brmagenta
     '';
   };
-
 }
