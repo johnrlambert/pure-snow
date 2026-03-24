@@ -13,7 +13,23 @@ in
     services.xserver = {
       enable = true;
 
-      displayManager.lightdm.enable = true;
+      displayManager = {
+        lightdm.enable = true;
+
+        # This runs for every graphical session (including XMonad via LightDM)
+        sessionCommands = ''
+          # Kill existing polybar instances
+          ${pkgs.procps}/bin/killall -q polybar || true
+
+          # Set wallpaper if present
+          if [ -f "$HOME/wallpaper.jpg" ]; then
+            ${pkgs.feh}/bin/feh --bg-scale "$HOME/wallpaper.jpg"
+          fi
+
+          # Start polybar
+          ${pkgs.polybar}/bin/polybar example &
+        '';
+      };
 
       windowManager.xmonad = {
         enable = true;
