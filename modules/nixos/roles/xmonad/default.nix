@@ -15,7 +15,7 @@ in
 
       displayManager = {
         lightdm.enable = true;
-        defaultSession = "xmonad";
+        defaultSession = "none+xmonad";
 
         sessionCommands = ''
           ${pkgs.procps}/bin/killall -q polybar || true
@@ -39,8 +39,6 @@ in
     environment.systemPackages = with pkgs; [
       xorg.xinit
       xorg.xrandr
-      xmonad
-      xmonad-contrib
       dmenu
       alacritty
       polybar
