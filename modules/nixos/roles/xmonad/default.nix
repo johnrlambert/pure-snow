@@ -15,7 +15,7 @@ in
 
       displayManager = {
         lightdm.enable = true;
-        defaultSession = "xmonad";
+        defaultSession = "none+xmonad";
 
         sessionCommands = ''
           ${pkgs.procps}/bin/killall -q polybar || true
