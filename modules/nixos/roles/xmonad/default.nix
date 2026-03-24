@@ -38,7 +38,6 @@ in
     };
 
     services.picom.enable = true;
-    services.dunst.enable = true;
 
     environment.systemPackages = with pkgs; [
       xorg.xinit
