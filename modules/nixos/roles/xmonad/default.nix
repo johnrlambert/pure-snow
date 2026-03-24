@@ -54,6 +54,7 @@ in
       xterm
       polybar
       feh
+      ghc
     ];
   };
 }
