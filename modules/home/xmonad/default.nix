@@ -19,17 +19,16 @@ in
       };
 
       initExtra = ''
-        # Set wallpaper (change path as needed)
-        feh --bg-scale ~/wallpaper.jpg &
+        # Kill existing polybar instances (prevents duplicates on restart)
+        killall -q polybar || true
+
+        # Set wallpaper (only if file exists)
+        if [ -f "$HOME/wallpaper.jpg" ]; then
+          feh --bg-scale "$HOME/wallpaper.jpg"
+        fi
 
         # Start polybar
         polybar example &
-
-        # Ensure dunst is running
-        dunst &
-
-        # Start picom (if not already managed)
-        picom & disown
       '';
     };
 
