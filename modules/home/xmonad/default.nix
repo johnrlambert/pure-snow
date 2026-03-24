@@ -48,8 +48,9 @@ in
       tray-position = right
       tray-padding = 2
 
-      font-0 = "JetBrainsMono Nerd Font Mono:size=10;2"
+      font-0 = "Helvetica Neue LT Std:size=10;2"
       font-1 = "Symbols Nerd Font Mono:size=10;2"
+      font-2 = "JetBrainsMono Nerd Font Mono:size=10;2"
 
       modules-left = xworkspaces
       modules-center = xwindow
