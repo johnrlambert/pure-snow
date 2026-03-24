@@ -15,6 +15,7 @@ in
 
       displayManager = {
         lightdm.enable = true;
+        defaultSession = "none+xmonad";
 
         # This runs for every graphical session (including XMonad via LightDM)
         sessionCommands = ''
