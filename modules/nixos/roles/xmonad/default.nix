@@ -12,7 +12,8 @@ in
   config = mkIf enabled {
     services.xserver = {
       enable = true;
-      displayManager.startx.enable = true;
+
+      displayManager.lightdm.enable = true;
 
       windowManager.xmonad = {
         enable = true;
