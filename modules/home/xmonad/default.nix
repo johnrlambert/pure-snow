@@ -40,7 +40,7 @@ in
       date = %Y-%m-%d %H:%M
     '';
 
-    home.file.".xmonad/xmonad.hs".text = ''
+    home.file.".config/xmonad/xmonad.hs".text = ''
       import XMonad
 
       main :: IO ()
