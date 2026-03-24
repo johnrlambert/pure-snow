@@ -53,10 +53,10 @@ in
       alacritty
       xterm
       polybar
+      xmonad-with-packages
+      haskellPackages.xmonad-contrib
       feh
       ghc
-      haskellPackages.xmonad
-      haskellPackages.xmonad-contrib
     ];
   };
 }
