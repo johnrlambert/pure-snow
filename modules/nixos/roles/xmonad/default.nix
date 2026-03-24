@@ -55,6 +55,8 @@ in
       polybar
       feh
       ghc
+      haskellPackages.xmonad
+      haskellPackages.xmonad-contrib
     ];
   };
 }
