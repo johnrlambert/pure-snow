@@ -31,6 +31,13 @@ in
       windowManager.xmonad = {
         enable = true;
         enableContribAndExtras = true;
+
+        config = ''
+          import XMonad
+
+          main :: IO ()
+          main = xmonad def
+        '';
       };
     };
 
