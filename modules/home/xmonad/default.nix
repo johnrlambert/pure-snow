@@ -4,23 +4,18 @@ with lib;
 with lib.homelab;
 
 let
-  enabled = config.homelab.home.xmonad or false;
+  enabled = config.homelab.xmonad.enable or false;
 in
 {
-  options.homelab.home.xmonad = mkEnableOption "User XMonad configuration";
+  options.homelab.xmonad.enable = mkEnableOption "User XMonad configuration";
 
   config = mkIf enabled {
-    xsession = {
-      enable = false;
-    };
 
     home.packages = with pkgs; [
       dmenu
       alacritty
       polybar
       feh
-      haskellPackages.xmonad
-      haskellPackages.xmonad-contrib
     ];
 
     home.file.".config/polybar/config.ini".text = ''
