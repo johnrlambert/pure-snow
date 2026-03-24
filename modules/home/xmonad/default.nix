@@ -85,7 +85,7 @@ in
       type = custom/text
       content = ""
       content-foreground = ''${colors.yellow}
-      click-left = emacsclient -n -e "(progn (org-journal-new-entry) nil)"
+      click-left = emacsclient -c -a emacs "(progn (org-journal-new-entry) nil)"
 
       [module/cpu]
       type = internal/cpu
