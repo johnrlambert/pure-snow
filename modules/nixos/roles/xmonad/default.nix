@@ -21,6 +21,9 @@ in
       };
     };
 
+    services.picom.enable = true;
+    services.dunst.enable = true;
+
     environment.systemPackages = with pkgs; [
       xorg.xinit
       xorg.xrandr
@@ -28,6 +31,8 @@ in
       xmonad-contrib
       dmenu
       alacritty
+      polybar
+      feh
     ];
   };
 }
