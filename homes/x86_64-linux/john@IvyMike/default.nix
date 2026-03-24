@@ -16,6 +16,7 @@ with lib.homelab;
   homelab.nvim.enable = true;
   homelab.fonts.enable = true;
   homelab.aider.enable = true;
+  homelab.sops.enable = true;
   home.stateVersion = lib.mkDefault (osConfig.system.stateVersion or "25.11");
   programs.git = {
     enable = true;
@@ -47,6 +48,9 @@ with lib.homelab;
   };
 
   services.ssh-agent.enable = true;
+  home.sessionVariables.OPENAI_API_KEY_FILE =
+    config.sops.secrets.openai_api_key.path;
+  
 
   programs.fish = {
     enable = true;
@@ -55,8 +59,10 @@ with lib.homelab;
       vim = "nvim";
     };
     interactiveShellInit = ''
-      source ~/OPENAI_API_KEY.env
       # Apply Gruvbox theme
+      if set -q OPENAI_API_KEY_FILE; and test -f $OPENAI_API_KEY_FILE
+          set -gx OPENAI_API_KEY (cat $OPENAI_API_KEY_FILE)
+      end      
       set -g fish_color_normal brblack
       set -g fish_color_command brgreen
       set -g fish_color_comment brblue
