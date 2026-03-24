@@ -13,7 +13,7 @@ main :: IO ()
 main = xmonad $ docks def
   { terminal = "alacritty"
   , modMask = mod4Mask
-  , layoutHook = mySpacing 5 $ spiral (6/7)
+  , layoutHook = avoidStruts $ mySpacing 5 $ spiral (6/7)
   }
   `additionalKeys`
   [ ((mod1Mask, xK_Tab), windows W.focusDown)
