@@ -26,6 +26,8 @@ in
       background = #222222
       foreground = #ffffff
 
+      font-0 = "JetBrainsMono Nerd Font Mono:size=10;2"
+
       modules-left = xworkspaces
       modules-right = date
 
