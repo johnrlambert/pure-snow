@@ -37,14 +37,6 @@ in
       date = %Y-%m-%d %H:%M
     '';
 
-    home.file.".config/xmonad/xmonad.hs".text = ''
-      import XMonad
-
-      main :: IO ()
-      main = xmonad def
-        { terminal = "alacritty"
-        , modMask = mod4Mask
-        }
-    '';
+    home.file.".config/xmonad/xmonad.hs".source = ./xmonad.hs;
   };
 }
