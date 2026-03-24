@@ -17,7 +17,10 @@ with lib.homelab;
   homelab.fonts.enable = true;
   homelab.aider.enable = true;
   homelab.sops.enable = true;
+  homelab.home.xmonad = true;
+
   home.stateVersion = lib.mkDefault (osConfig.system.stateVersion or "25.11");
+
   programs.git = {
     enable = true;
     settings = {
@@ -48,9 +51,9 @@ with lib.homelab;
   };
 
   services.ssh-agent.enable = true;
+
   home.sessionVariables.OPENAI_API_KEY_FILE =
     config.sops.secrets.openai_api_key.path;
-  
 
   programs.fish = {
     enable = true;
@@ -77,5 +80,4 @@ with lib.homelab;
       set -g fish_color_end brmagenta
     '';
   };
-
 }
