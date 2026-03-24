@@ -54,7 +54,7 @@ in
 
       modules-left = xworkspaces
       modules-center = xwindow
-      modules-right = cpu memory date
+      modules-right = journal cpu memory date
 
       [module/xworkspaces]
       type = internal/xworkspaces
@@ -80,6 +80,12 @@ in
       [module/xwindow]
       type = internal/xwindow
       label =  %title:0:50:...%
+
+      [module/journal]
+      type = custom/text
+      content = ""
+      content-foreground = ''${colors.yellow}
+      click-left = emacsclient -n -e "(progn (org-journal-new-entry) nil)"
 
       [module/cpu]
       type = internal/cpu
