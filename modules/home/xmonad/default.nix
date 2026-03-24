@@ -20,14 +20,25 @@ in
     ];
 
     home.file.".config/polybar/config.ini".text = ''
+      [colors]
+      bg = #282828
+      bg-alt = #3c3836
+      fg = #ebdbb2
+      fg-dim = #a89984
+      yellow = #fabd2f
+      orange = #fe8019
+      red = #fb4934
+      green = #b8bb26
+      aqua = #8ec07c
+
       [bar/example]
       width = 100%
       height = 28
       offset-x = 0
       offset-y = 0
 
-      background = #222222
-      foreground = #ffffff
+      background = ${colors.bg}
+      foreground = ${colors.fg}
 
       padding-left = 2
       padding-right = 2
@@ -50,19 +61,19 @@ in
       enable-scroll = true
 
       label-active = %name%
-      label-active-foreground = #ffffff
-      label-active-background = #444444
+      label-active-foreground = ${colors.bg}
+      label-active-background = ${colors.yellow}
       label-active-padding = 1
 
       label-occupied = %name%
       label-occupied-padding = 1
 
       label-urgent = %name%!
-      label-urgent-background = #ff5555
+      label-urgent-background = ${colors.red}
       label-urgent-padding = 1
 
       label-empty = %name%
-      label-empty-foreground = #888888
+      label-empty-foreground = ${colors.fg-dim}
       label-empty-padding = 1
 
       [module/xwindow]
@@ -73,12 +84,14 @@ in
       type = internal/cpu
       interval = 2
       format-prefix = " "
+      format-prefix-foreground = ${colors.green}
       label = %percentage%%
 
       [module/memory]
       type = internal/memory
       interval = 2
       format-prefix = " "
+      format-prefix-foreground = ${colors.aqua}
       label = %percentage_used%%
 
       [module/date]
@@ -86,6 +99,7 @@ in
       interval = 5
       date = "%Y-%m-%d %H:%M"
       label = " %date%"
+      label-foreground = ${colors.orange}
     '';
 
     home.file.".config/xmonad/xmonad.hs".source = ./xmonad.hs;
