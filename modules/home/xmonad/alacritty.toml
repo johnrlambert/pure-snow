@@ -9,6 +9,9 @@ size = 11.0
 family = "JetBrainsMono Nerd Font Mono"
 style = "Regular"
 
+[selection]
+save_to_clipboard = true
+
 [colors.primary]
 background = "#282828"
 foreground = "#ebdbb2"
