@@ -1,8 +1,9 @@
 import XMonad
 import XMonad.Layout.Spiral
 import XMonad.Layout.Spacing (spacingRaw, Border(..), Spacing)
+import XMonad.Layout.LayoutModifier (ModifiedLayout)
 
-mySpacing :: Integer -> l a -> Spacing l a
+mySpacing :: Integer -> l a -> ModifiedLayout Spacing l a
 mySpacing i = spacingRaw True (Border i i i i) True (Border i i i i) True
 
 main :: IO ()
