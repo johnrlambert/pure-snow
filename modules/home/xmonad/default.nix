@@ -39,5 +39,7 @@ in
     '';
 
     home.file.".config/xmonad/xmonad.hs".source = ./xmonad.hs;
+
+    home.file.".config/alacritty/alacritty.toml".source = ./alacritty.toml;
   };
 }
