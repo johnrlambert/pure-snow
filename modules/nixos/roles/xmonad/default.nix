@@ -15,7 +15,7 @@ in
 
       displayManager = {
         lightdm.enable = true;
-        defaultSession = "none+xmonad";
+        defaultSession = "xmonad";
 
         sessionCommands = ''
           ${pkgs.procps}/bin/killall -q polybar || true
@@ -37,6 +37,9 @@ in
 
           main :: IO ()
           main = xmonad def
+            { terminal = "xterm"
+            , modMask = mod4Mask
+            }
         '';
       };
     };
@@ -48,6 +51,7 @@ in
       xorg.xrandr
       dmenu
       alacritty
+      xterm
       polybar
       feh
     ];
