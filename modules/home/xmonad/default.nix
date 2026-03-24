@@ -37,8 +37,8 @@ in
       offset-x = 0
       offset-y = 0
 
-      background = ${colors.bg}
-      foreground = ${colors.fg}
+      background = ''${colors.bg}
+      foreground = ''${colors.fg}
 
       padding-left = 2
       padding-right = 2
@@ -61,19 +61,19 @@ in
       enable-scroll = true
 
       label-active = %name%
-      label-active-foreground = ${colors.bg}
-      label-active-background = ${colors.yellow}
+      label-active-foreground = ''${colors.bg}
+      label-active-background = ''${colors.yellow}
       label-active-padding = 1
 
       label-occupied = %name%
       label-occupied-padding = 1
 
       label-urgent = %name%!
-      label-urgent-background = ${colors.red}
+      label-urgent-background = ''${colors.red}
       label-urgent-padding = 1
 
       label-empty = %name%
-      label-empty-foreground = ${colors.fg-dim}
+      label-empty-foreground = ''${colors.fg-dim}
       label-empty-padding = 1
 
       [module/xwindow]
@@ -84,14 +84,14 @@ in
       type = internal/cpu
       interval = 2
       format-prefix = " "
-      format-prefix-foreground = ${colors.green}
+      format-prefix-foreground = ''${colors.green}
       label = %percentage%%
 
       [module/memory]
       type = internal/memory
       interval = 2
       format-prefix = " "
-      format-prefix-foreground = ${colors.aqua}
+      format-prefix-foreground = ''${colors.aqua}
       label = %percentage_used%%
 
       [module/date]
@@ -99,7 +99,7 @@ in
       interval = 5
       date = "%Y-%m-%d %H:%M"
       label = " %date%"
-      label-foreground = ${colors.orange}
+      label-foreground = ''${colors.orange}
     '';
 
     home.file.".config/xmonad/xmonad.hs".source = ./xmonad.hs;
