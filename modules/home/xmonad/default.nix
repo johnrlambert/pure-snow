@@ -16,6 +16,7 @@ in
       alacritty
       polybar
       feh
+      haskellPackages.xmonad-contrib
     ];
 
     home.file.".config/polybar/config.ini".text = ''
