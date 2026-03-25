@@ -18,9 +18,7 @@ let
     aqua = "#8ec07c";
   };
 
-  polybarConfig = pkgs.substituteAll {
-    src = ./polybar_config.ini;
-
+  polybarConfig = pkgs.replaceVars ./polybar_config.ini {
     colors_bg = colors.bg;
     colors_bg_alt = colors.bg_alt;
     colors_fg = colors.fg;
