@@ -17,7 +17,7 @@ in {
       tree
       xsel
     ] ++ [
-      unstablePkgs.pi-coding-agent
+      unstablePkgs."pi-coding-agent"
     ];
 
     programs.fish = {
