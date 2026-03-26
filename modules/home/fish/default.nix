@@ -4,10 +4,7 @@
 let
   enabled = config.homelab.fish.enable or false;
 
-  unstablePkgs = import inputs.unstable {
-    inherit (pkgs) system;
-    config = pkgs.config;
-  };
+  unstablePkgs = inputs.unstable.legacyPackages.${pkgs.system};
 in {
   options.homelab.fish.enable = lib.mkEnableOption "Enable fish shell and tools";
 
