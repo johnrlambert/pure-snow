@@ -7,7 +7,15 @@ in {
   options.homelab.fish.enable = lib.mkEnableOption "Enable fish shell and tools";
 
   config = lib.mkIf enabled {
-    home.packages = with pkgs; [ emacs fish eza bat tree xsel ];
+    home.packages = with pkgs; [
+      emacs
+      fish
+      eza
+      bat
+      tree
+      xsel
+      unstable.pi-coding-agent
+    ];
 
     programs.fish = {
       enable = true;
