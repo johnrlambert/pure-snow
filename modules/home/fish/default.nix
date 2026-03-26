@@ -1,8 +1,13 @@
 # modules/home/fish/default.nix
-{ lib, config, pkgs, ... }:
+{ lib, config, pkgs, inputs, ... }:
 
 let
   enabled = config.homelab.fish.enable or false;
+
+  unstablePkgs = import inputs.unstable {
+    inherit (pkgs) system;
+    config = pkgs.config;
+  };
 in {
   options.homelab.fish.enable = lib.mkEnableOption "Enable fish shell and tools";
 
@@ -14,7 +19,8 @@ in {
       bat
       tree
       xsel
-      unstable.pi-coding-agent
+    ] ++ [
+      unstablePkgs.pi-coding-agent
     ];
 
     programs.fish = {
