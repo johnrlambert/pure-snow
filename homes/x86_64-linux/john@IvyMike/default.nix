@@ -17,7 +17,7 @@ with lib.homelab;
   homelab.fonts.enable = true;
   homelab.aider.enable = true;
   homelab.sops.enable = true;
-  homelab.home.xmonad = true;
+  homelab.xmonad.enable = true;
 
   home.stateVersion = lib.mkDefault (osConfig.system.stateVersion or "25.11");
 

@@ -18,6 +18,7 @@ in
     home.packages = with pkgs; [
       nerd-fonts.symbols-only
       nerd-fonts.jetbrains-mono
+      helvetica-neue-lt-std
 
       # If your nixpkgs doesn't support override above, try:
       # nerd-fonts-symbols

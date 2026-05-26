@@ -1,4 +1,4 @@
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, config, inputs, ... }:
 with lib;
 with lib.homelab;
 
@@ -13,11 +13,28 @@ with lib.homelab;
 
   homelab.roles.chrome = true;
   homelab.roles.fish = true;
+  homelab.roles.blender = true;
+  homelab.roles.arm_builder = true;
   homelab.roles.desktop.pantheon = true;
+  homelab.roles.xmonad = true;
   homelab.roles.ssh = true;
+  homelab.roles.tailscale.enable = true;
 
   users.mutableUsers = true;
+  services.printing.enable = true;
+  services.printing.drivers = [ pkgs.hplip ];
 
+  environment.systemPackages = with pkgs; [
+    sops
+    age
+    ssh-to-age
+  ];
+
+  sops = {
+    defaultSopsFile = "${inputs.secrets}/${config.networking.hostName}.yaml";
+    defaultSopsFormat = "yaml";
+    age.keyFile = "/home/john/.config/sops/age/keys.txt";
+  };
   users.users.john = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];

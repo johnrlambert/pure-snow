@@ -102,11 +102,10 @@
     },
     "secrets": {
       "locked": {
-        "lastModified": 1774030721,
-        "narHash": "sha256-ULYIRzHMT77NXSwcfU6rusL4WFyZ2M9SYQEuqmxtNlM=",
-        "ref": "refs/heads/main",
-        "rev": "fce51f99ec2f21cb42043ee02c3cb0873dc71fae",
-        "revCount": 4,
+        "lastModified": 1774282661,
+        "narHash": "sha256-jopRhIncJ68Hcgc0Kefc370RxkIO4hW2UOV0LfrMQvU=",
+        "rev": "d0ba2978c868cfb0e5d9bfed869eca258fb10b98",
+        "revCount": 5,
         "type": "git",
         "url": "file:///home/john/pure-snow/secrets"
       },

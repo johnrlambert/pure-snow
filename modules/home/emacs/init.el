@@ -123,7 +123,7 @@
          "* TODO %?\n  %i\n  %a")))
 
 ;; Org directory
-(setq org-directory "~/org")
+(setq org-directory "~/chronofile")
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 
 ;; Evil
