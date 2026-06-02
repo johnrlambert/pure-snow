@@ -1,5 +1,7 @@
 {
   "newLine": ["shift+enter", "ctrl+j"],
   "externalEditor": ["ctrl+g"],
-  "selectModel": ["ctrl+l"]
+  "selectModel": ["ctrl+l"],
+  "pageUp": ["pageUp", "alt+u"],
+  "pageDown": ["pageDown", "alt+d"]
 }

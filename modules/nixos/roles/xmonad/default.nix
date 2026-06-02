@@ -32,15 +32,7 @@ in
         enable = true;
         enableContribAndExtras = true;
 
-        config = ''
-          import XMonad
-
-          main :: IO ()
-          main = xmonad def
-            { terminal = "xterm"
-            , modMask = mod4Mask
-            }
-        '';
+        config = builtins.readFile ../../../home/xmonad/xmonad.hs;
       };
     };
 
@@ -50,7 +42,7 @@ in
       xorg.xinit
       xorg.xrandr
       dmenu
-      alacritty
+      kitty
       xterm
       polybar
       xmonad-with-packages

@@ -20,6 +20,7 @@ with lib.homelab;
   homelab.roles.desktop.pantheon = true;
   homelab.roles.cockpit = true;
   homelab.roles.ssh = true;
+  homelab.roles.tailscale.enable = true;
 
   users.mutableUsers = true;
 

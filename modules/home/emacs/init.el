@@ -1,38 +1,406 @@
-;; Initialize package sources
+# -*- mode: org; coding: utf-8; -*-
+#+title: Literate Emacs configuration
+#+author: John Lambert
+#+startup: overview
+#+property: header-args:emacs-lisp :tangle init.el :results none :comments no
+
+* Overview
+** Will the real init.el please stand up?
+:PROPERTIES:
+:ID:       01KT47Z8NX9E82FSJAMM1JC2AJ
+:END:
+
+After years of vim/neovim use I finally took the plunge and decided to switch to emacs. This was something I agonized over. (Seriously. I am a loser.) I have years and years of experience and muscle memory with vim. Even though I probably took advantage of very few of its advanced features I still made my brain fit its paradigm.
+
+What changed? Org-mode.
+
+Org-mode allows code to exist coherently alongside text, notes and task management. In the age of LLMs this is particularly important as it creates a kind of shared artifact for me and my silicon buddies.
+
+The most intriguing file to org-ify is the emacs configuration itself.
+
+That means the real =~/.emacs.d/init.el= is *generated* from this file during the
+Home Manager build. That gives me three nice properties at once:
+
+1. The configuration stays reproducible and Nix-friendly.
+2. The reasoning for each section can live right next to the code.
+3. The TODOs can live right alongside the code itself. That means that I can create something like:
+*** TODO Write a sample todo :nix-config: :example-todo:
+:PROPERTIES:
+:ID:       01KT4816KR4EVKS5Y1CZANCFA7
+:END:
+and it will just transparently live with the code /in situ/ but also be managed by globally by org-agenda.
+** Evil Mode   
+Luckily for vim refugees like myself there are all sorts of interesting ways to accomodate the years we spent trying to figure out how to exit it. Emacs provides the very appropriately named 'evil-mode' for this purpose.
+
+I am sure I have fallen into several anti patterns here. I will definitely always speak emacs with a Vimmy accent. But this isn't meant so much as an authoritative, *Do as I do... or else!* kind of thing, but rather as a monument to compromise with the One True and Right Way of Emacs. Mastery of idiom is an important part of learning a language and a culture. I am definitely not there yet, so bear with me. 
+** Note system
+I will be storing the majority of my notes in a directory I call ~/chronofile. This is an homage to the great [[https://en.wikipedia.org/wiki/Buckminster_Fuller][Buckminster Fuller]] and his 63 year project the [[https://en.wikipedia.org/wiki/Dymaxion_Chronofile][Dymaxion Chronofile.]]
+
+I hope that this will one day grow into a:
+- personal knowledge management system
+- technical writing publishing platform for a blog engine
+- agent prompting system
+- task management tool
+- autobiography
+- fiction and metafiction tool
+- homelab configuration 
+:PROPERTIES:
+:ID:       01KT488BAGJPRJQRHCQD6FY55H
+:END:
+
+Anyway, here's 'Wonderwall...'
+
+* Package bootstrap
+
+This first block does the minimum work needed to talk to Emacs package
+archives and to ensure =use-package= is available.
+
+One slightly frustrating thing is that emacs doesn't support this org and org-babel tangling business out of the box. So in order to make this somewhat intelligible to nix it has to lean on some preexisting customizations.
+
+Other than that, it follows a pretty common approach:
+
+- MELPA is used for fast-moving community packages.
+- Org ELPA is added so Org can be updated independently when desired.
+- GNU ELPA stays available for the usual core add-ons.
+- =package-initialize= turns on installed packages.
+- If archive metadata is missing, Emacs refreshes package contents.
+- =use-package= becomes the common declaration form for the rest of the file.
+
+Because this config is also deployed through Nix, this is a hybrid setup:
+Nix provides some packages declaratively, while Emacs package.el still pulls
+in others at runtime. That is a little "frankenstein", but it is a perfectly
+workable intermediate state.
+
+BTW kids I remember before we had all these fancy language specific repositories. I spent half of 2006 looking for a .dll. 
+
+#+begin_src emacs-lisp
+;; Initialize package sources.
 (require 'package)
 
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
                          ("elpa" . "https://elpa.gnu.org/packages/")))
+
 (setq-default word-wrap t)
+
 (package-initialize)
+
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; Install use-package for easier package management
+;; Install use-package for easier package management.
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
 (require 'use-package)
 (setq use-package-always-ensure t)
+#+end_src
 
-;; Function to display a banner message in the minibuffer for org-mode
+* Theme
+
+The theme choice is straightforward: load a Gruvbox variant and aggressively
+clear any previously enabled themes first.
+
+My read of this is:
+
+- =custom-safe-themes t= is here to avoid repeated safe-theme prompts.
+- Disabling all current themes before loading the new one prevents theme
+  stacking and weird face inheritance.
+- =gruvbox-dark-medium= is the preferred baseline.
+
+#+begin_src emacs-lisp
+(use-package gruvbox-theme
+  :config
+  (setq custom-safe-themes t)
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme 'gruvbox-dark-medium t))
+#+end_src
+* Org mode foundation
+
+This is the heart of the setup.
+
+The overall intent seems to be:
+
+- make Org comfortable for everyday writing,
+- make source blocks pleasant to edit,
+- make HTML export look presentable out of the box, and
+- make links easier to follow, especially with Evil in the mix.
+
+A few noteworthy choices:
+
+- =org-startup-indented= and hidden leading stars make files look cleaner.
+- =org-ellipsis= uses a custom fold marker.
+- =org-return-follows-link= makes =RET= more link-friendly.
+- source block settings make Babel editing behave more like a real code editor.
+- the HTML export header injects Bulma and some small custom CSS.
+
+#+begin_src emacs-lisp
 (defun my-org-mode-banner ()
   "Display a banner message in the minibuffer for org-mode."
   (message "Reminder: Toggle tasks with C-c C-t"))
 
-;; Org-mode setup
 (use-package org
   :ensure t
   :config
+  (require 'ox-html)
   (setq org-startup-indented t)
   (setq org-hide-leading-stars t)
-  (setq org-ellipsis " ▾"))
+  (setq org-ellipsis " ▾")
+  (setq org-return-follows-link t)
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-edit-src-content-indentation 0)
+  (setq org-cycle-hide-drawer-startup t)
+  (setq org-src-lang-modes
+        (append '(("nix" . nix)
+                  ("coffee" . coffee)
+                  ("js" . javascript)
+                  ("javascript" . javascript)
+                  ("sh" . shell)
+                  ("bash" . shell)
+                  ("elisp" . emacs-lisp))
+                org-src-lang-modes))
+  (setq org-export-with-toc t)
+  (setq org-export-with-section-numbers t)
+  (setq org-html-htmlize-output-type 'css)
+  (setq org-html-validation-link nil)
+  (setq org-html-head-include-default-style nil)
+  (setq org-html-head-include-scripts nil)
+  (setq org-html-head
+        (concat
+         "<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css\">\n"
+         "<style>\n"
+         "body { background: #fff; }\n"
+         "#content.content { max-width: 72ch; margin: 3rem auto; padding: 0 1.5rem; }\n"
+         "#table-of-contents { margin-bottom: 2rem; }\n"
+         ".title { margin-bottom: 0.75rem; }\n"
+         ".subtitle { color: #666; }\n"
+         "pre.src { overflow-x: auto; padding: 1rem; }\n"
+         "code { white-space: pre-wrap; }\n"
+         "</style>")))
 
-;; Add the banner function to org-mode-hook
+(use-package htmlize
+  :ensure t)
+
+(use-package ob-nix
+  :ensure t)
+
+(use-package coffee-mode
+  :ensure t)
+
+(use-package ob-coffee
+  :ensure t
+  :config
+  (setq org-babel-coffee-command "coffee"))
+#+end_src
+
+* Indentation policy
+
+This section standardizes indentation across a handful of languages.
+
+The intent seems practical rather than ideological:
+
+- use 4 spaces for most programming languages,
+- use 2 spaces for CoffeeScript,
+- keep Evil shift width aligned with mode indentation so << and >> do what
+  you expect.
+
+#+begin_src emacs-lisp
+(defun my/set-indent-4 ()
+  "Use 4 spaces for indentation in the current buffer."
+  (setq-local indent-tabs-mode nil)
+  (setq-local tab-width 4)
+  (setq-local standard-indent 4)
+  (setq-local evil-shift-width 4))
+
+(defun my/set-coffee-indent-2 ()
+  "Use 2 spaces for indentation in CoffeeScript buffers."
+  (setq-local indent-tabs-mode nil)
+  (setq-local tab-width 2)
+  (setq-local standard-indent 2)
+  (setq-local coffee-tab-width 2)
+  (setq-local evil-shift-width 2))
+
+(add-hook 'emacs-lisp-mode-hook #'my/set-indent-4)
+(add-hook 'js-mode-hook #'my/set-indent-4)
+(add-hook 'js-ts-mode-hook #'my/set-indent-4)
+(add-hook 'python-mode-hook
+          (lambda ()
+            (my/set-indent-4)
+            (setq-local python-indent-offset 4)))
+(add-hook 'sh-mode-hook
+          (lambda ()
+            (my/set-indent-4)
+            (setq-local sh-basic-offset 4
+                        sh-indentation 4)))
+(add-hook 'nix-mode-hook #'my/set-indent-4)
+(add-hook 'coffee-mode-hook #'my/set-coffee-indent-2)
+#+end_src
+
+* ULID support for Org headings
+
+This is one of the more distinctive custom pieces.
+
+The idea is to assign stable IDs to Org headings, but to do it with ULIDs
+instead of the more common random UUIDs or Org's own =org-id= helpers.
+
+Why might this exist?
+
+- ULIDs are sortable by time.
+- They are shorter and friendlier than many UUID renderings.
+- Stable heading IDs make linking and refiling safer over time.
+
+The code below:
+
+- defines a Crockford Base32 alphabet,
+- generates a time-sortable ULID-ish identifier,
+- adds an =ID= property to new headings,
+- stamps headings when pressing =org-return=, and
+- provides a whole-buffer repair command for backfilling missing IDs.
+
+The note in the docstring is important: this is *not strictly monotonic*
+within the same millisecond, but for personal notes that is usually fine.
+
+#+begin_src emacs-lisp
+(defconst my/ulid-alphabet "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+  "Crockford Base32 alphabet used by ULIDs.")
+
+(random t)
+
+(defun my/ulid--encode-base32 (num len)
+  "Encode NUM in Crockford Base32, left-padded to LEN characters."
+  (let ((out (make-string len ?0)))
+    (dotimes (i len out)
+      (aset out (- len 1 i)
+            (aref my/ulid-alphabet (% num 32)))
+      (setq num (/ num 32)))))
+
+(defun my/generate-ulid ()
+  "Generate a ULID string.
+
+This implementation is time-sortable, but not strictly monotonic when
+multiple IDs are created within the same millisecond."
+  (let* ((time-ms (floor (* 1000 (float-time))))
+         (r1 (random (expt 2 20)))
+         (r2 (random (expt 2 20)))
+         (r3 (random (expt 2 20)))
+         (r4 (random (expt 2 20)))
+         (rand80 (+ (lsh r1 60)
+                    (lsh r2 40)
+                    (lsh r3 20)
+                    r4)))
+    (concat (my/ulid--encode-base32 time-ms 10)
+            (my/ulid--encode-base32 rand80 16))))
+
+(defun my/org-add-id-to-new-heading ()
+  "Add a ULID-backed ID property to the current Org heading if missing."
+  (when (derived-mode-p 'org-mode)
+    (save-excursion
+      (org-back-to-heading t)
+      (unless (org-entry-get (point) "ID")
+        (org-entry-put (point) "ID" (my/generate-ulid))))))
+
+(defun my/org-add-id-at-point-if-heading ()
+  "Add a ULID-backed ID to the heading at point, if there is one."
+  (when (and (derived-mode-p 'org-mode)
+             (org-at-heading-p))
+    (my/org-add-id-to-new-heading)))
+
+(defun my/org-return-stamp-id-before (&rest _)
+  "Stamp the current Org heading with a ULID-backed ID before `org-return'."
+  (my/org-add-id-at-point-if-heading))
+
+(defun my/org-ulidize-buffer ()
+  "Add ULID-backed ID properties to headings in the current Org buffer.
+
+Existing IDs are preserved."
+  (interactive)
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Current buffer is not in Org mode"))
+  (let ((count 0))
+    (org-map-entries
+     (lambda ()
+       (unless (org-entry-get (point) "ID")
+         (org-entry-put (point) "ID" (my/generate-ulid))
+         (setq count (1+ count))))
+     nil
+     'file)
+    (message "Added ULID IDs to %d heading%s"
+             count
+             (if (= count 1) "" "s"))))
+#+end_src
+
+* Org export and Babel execution
+
+This configuration treats Org as both a writing format and an executable
+notebook format.
+
+The export helper writes HTML output into a local =exports/= directory next to
+its source file and opens the result in a browser. That is a pleasant workflow
+for publishing one-off notes or drafts without having to configure a full site.
+
+The Babel section enables a modest set of languages:
+
+- Emacs Lisp
+- shell
+- Python
+- Nix
+- JavaScript
+- CoffeeScript
+
+Given the repository, the Nix support is especially relevant.
+
+#+begin_src emacs-lisp
+(defun my/org-export-to-html ()
+  "Export the current Org buffer to HTML in an exports directory and open it."
+  (interactive)
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Current buffer is not in Org mode"))
+  (let* ((source-file (or (buffer-file-name)
+                          (expand-file-name "untitled.org" default-directory)))
+         (export-dir (expand-file-name "exports" (file-name-directory source-file)))
+         (output-file (expand-file-name
+                       (concat (file-name-base source-file) ".html")
+                       export-dir))
+         (org-export-show-temporary-export-buffer nil))
+    (make-directory export-dir t)
+    (org-export-to-file 'html output-file)
+    (browse-url-of-file output-file)
+    (message "Exported HTML to %s" output-file)))
+
+(with-eval-after-load 'org
+  (setq org-babel-python-command "python3")
+  (setq org-babel-js-cmd "node")
+  (add-hook 'org-insert-heading-hook #'my/org-add-id-to-new-heading)
+  (advice-add 'org-return :before #'my/org-return-stamp-id-before)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (shell . t)
+     (python . t)
+     (nix . t)
+     (js . t)
+     (coffee . t))))
+
 (add-hook 'org-mode-hook 'my-org-mode-banner)
+#+end_src
 
-;; Install and configure gptel
+* AI helpers
+
+This section pulls in a small collection of AI-adjacent packages.
+
+The shape of the config suggests a few things:
+
+- =gptel= is the lightest-weight chat integration.
+- =aidermacs= is for repo-aware editing assistance.
+- =pi-coding-agent= is installed via Nix and treated as a first-class tool.
+- model names and API keys are driven by environment variables where needed.
+
+I am preserving the exact behavior here rather than trying to rationalize it.
+In particular, several of these packages overlap conceptually, but that may be
+intentional experimentation.
+
+#+begin_src emacs-lisp
 (use-package gptel
   :ensure t
   :config
@@ -41,7 +409,6 @@
 
 (use-package elysium)
 
-;; Keybindings for gptel with evil-mode
 (with-eval-after-load 'evil
   (define-key evil-normal-state-map (kbd "C-c g") 'gptel))
 
@@ -52,30 +419,52 @@
   :bind (("C-c a" . aidermacs-transient-menu)))
 
 (global-set-key (kbd "C-c g c") 'gptel-start-chat)
+#+end_src
 
-;; Enable windmove (built-in)
+* Window movement and in-buffer discoverability
+
+These bindings repurpose =C-h/j/k/l= for pane movement.
+
+That is a very Vim/Evil-shaped choice, and it explains why default Emacs help
+commands feel displaced elsewhere. Because =C-h= normally starts Help, the
+config also puts Help on =C-c h=.
+
+This is likely the source of some of the earlier confusion around =describe-key=
+not being reachable via the stock Emacs help prefix.
+
+#+begin_src emacs-lisp
 (windmove-default-keybindings)
 
-;; Rebind navigation
 (global-set-key (kbd "C-h") 'windmove-left)
 (global-set-key (kbd "C-j") 'windmove-down)
 (global-set-key (kbd "C-k") 'windmove-up)
 (global-set-key (kbd "C-l") 'windmove-right)
 (global-set-key (kbd "C-c h") 'help-command)
+#+end_src
 
-;; Packages
+* General packages
+
+This is the miscellaneous toolbox section.
+
+- =org-bullets= prettifies Org headings.
+- =neotree= provides a file sidebar that feels familiar to users coming from
+  tools like NERDTree.
+- =which-key= improves discoverability by showing possible key continuations.
+- =magit= is the Git workhorse.
+- =nix-mode= is essential in this repository.
+- =eat= is a terminal emulator installed through Nix rather than MELPA.
+- =pi-coding-agent= is also installed declaratively and merely configured here.
+
+#+begin_src emacs-lisp
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
 
-(use-package treemacs
+(use-package neotree
   :ensure t
-  :init)
-
-(use-package treemacs-evil
-  :after (treemacs)
-  :ensure t)
-
-(treemacs-start-on-boot)
+  :config
+  (setq neo-smart-open t)
+  (setq neo-show-hidden-files t)
+  (global-set-key (kbd "<f8>") #'neotree-toggle))
 
 (use-package which-key
   :config
@@ -87,55 +476,244 @@
 (use-package nix-mode
   :mode "\\.nix\\'")
 
-;; Org-journal setup
+(use-package eat
+  :ensure nil
+  :commands (eat)
+  :config
+  (setq eat-kill-buffer-on-exit t))
+
+(use-package pi-coding-agent
+  :ensure nil
+  :commands (pi-coding-agent pi-coding-agent-toggle pi-coding-agent-install-grammars)
+  :init
+  (defalias 'pi 'pi-coding-agent))
+#+end_src
+
+* Local terminal helper
+
+This helper opens Eat in the current project root when possible.
+
+That means terminal sessions start in the place where work is actually being
+performed instead of some unrelated default directory. In a project-oriented
+workflow, that is almost always the desired behavior.
+
+#+begin_src emacs-lisp
+(defun my/eat-here ()
+  "Open Eat in the current project root, or `default-directory'."
+  (interactive)
+  (require 'project)
+  (let ((default-directory
+          (or (when-let ((proj (project-current nil)))
+                (project-root proj))
+              default-directory)))
+    (eat)))
+#+end_src
+
+* Journal and note capture
+This repository strongly suggests that =~/chronofile= is the main note store, so the journal is rooted there as well.
+:PROPERTIES:
+:ID:       01KT47B1EER41R967Q1JPZMFX1
+:END:
+
+The journal configuration is intentionally minimal:
+
+- daily files under =~/chronofile/journal/=
+- ISO-like file names
+- human-readable date headings
+- a global key to create a new entry quickly
+
+#+begin_src emacs-lisp
 (use-package org-journal
   :ensure t
   :config
-  (setq org-journal-dir "~/org/journal/")
+  (setq org-journal-dir "~/chronofile/journal/")
   (setq org-journal-file-format "%Y-%m-%d.org")
   (setq org-journal-date-format "%A, %d %B %Y"))
 
 (global-set-key (kbd "C-c j") 'org-journal-new-entry)
+#+end_src
 
-;; Basic UI settings
+* Basic UI defaults
+
+These are the expected quality-of-life defaults for a keyboard-first setup:
+
+- disable menu/tool/scroll bars,
+- skip the startup screen,
+- show line numbers,
+- use a slightly larger default font,
+- auto-revert buffers when files change on disk,
+- wrap long visual lines.
+
+#+begin_src emacs-lisp
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (setq inhibit-startup-screen t)
 
-;; Enable line numbers
 (global-display-line-numbers-mode t)
 
-;; Set default font size
 (set-face-attribute 'default nil :height 110)
 
-;; Enable auto-revert mode
 (global-auto-revert-mode t)
 
-;; Key bindings
+(global-visual-line-mode t)
+#+end_src
+
+* Chronofile-centric Org workflow
+
+This section is where the Emacs configuration and the repository's larger
+personal knowledge management story really meet.
+
+The intention is clear and good:
+
+- treat =~/chronofile= as the canonical Org directory,
+- discover agenda files recursively,
+- exclude obvious transient junk,
+- provide convenience commands for agenda and todo views,
+- capture new tasks into =~/chronofile/inbox.org=.
+
+This is a nice match for an Org-first workflow without requiring a large extra
+framework such as Org-roam.
+
+#+begin_src emacs-lisp
 (global-set-key (kbd "C-x g") 'magit-status)
-(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c a") #'my/org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c e t") #'my/eat-here)
+(global-set-key (kbd "C-c e h") #'my/org-export-to-html)
+(global-set-key (kbd "C-c p i") #'pi-coding-agent)
 
-;; Org capture templates (journal removed)
-(setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/org/todo.org" "Tasks")
-         "* TODO %?\n  %i\n  %a")))
-
-;; Org directory
 (setq org-directory "~/chronofile")
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 
-;; Evil
+(defun my/org-chronofile-files ()
+  "Return usable Org files under `org-directory'."
+  (seq-filter
+   (lambda (path)
+     (let ((base (file-name-nondirectory path)))
+       (and (file-regular-p path)
+            (not (string-prefix-p ".#" base))
+            (not (and (string-prefix-p "#" base)
+                      (string-suffix-p "#" base)))
+            (not (string-match-p "/node_modules/" path)))))
+   (directory-files-recursively (expand-file-name org-directory) "\\.org\\'")))
+
+(defun my/org-refresh-agenda-files ()
+  "Refresh `org-agenda-files' from `org-directory'."
+  (setq org-agenda-files (my/org-chronofile-files)))
+
+(defun my/org-agenda ()
+  "Open `org-agenda' using all Org files in `~/chronofile'."
+  (interactive)
+  (my/org-refresh-agenda-files)
+  (call-interactively #'org-agenda))
+
+(defun my/org-chronofile-todos ()
+  "Show all TODO items from Org files under `~/chronofile'."
+  (interactive)
+  (my/org-refresh-agenda-files)
+  (org-todo-list))
+
+(my/org-refresh-agenda-files)
+
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline "~/chronofile/inbox.org" "Tasks")
+         "* TODO %?\n  %i\n  %a")))
+#+end_src
+
+* Evil mode
+
+This is the modal editing section.
+
+The configuration does a few careful things here:
+
+- ensures Evil is installed even in a package.el world,
+- enables Evil globally,
+- reinforces =C-h/j/k/l= window movement inside Evil states,
+- gives Org buffers sane normal-state bindings for folding and link opening,
+- makes special-purpose buffers start in the most natural state.
+
+That last part matters. Chat views, agenda screens, transient popups, and
+terminal-like prompts all want different default modes if Evil is enabled.
+The hooks below encode those preferences.
+
+#+begin_src emacs-lisp
 (unless (package-installed-p 'evil)
   (package-install 'evil))
 
 (require 'evil)
 (evil-mode 1)
 
-(evil-define-key 'normal org-mode-map "<tab" 'org-cycle)
+(dolist (state '(normal motion visual))
+  (evil-global-set-key state (kbd "C-h") #'windmove-left)
+  (evil-global-set-key state (kbd "C-j") #'windmove-down)
+  (evil-global-set-key state (kbd "C-k") #'windmove-up)
+  (evil-global-set-key state (kbd "C-l") #'windmove-right))
 
-;; ChatGPT keybinding
+(with-eval-after-load 'org
+  (dolist (state '(normal motion))
+    (evil-define-key state org-mode-map (kbd "TAB") #'org-cycle)
+    (evil-define-key state org-mode-map (kbd "<tab>") #'org-cycle)
+    (evil-define-key state org-mode-map (kbd "S-TAB") #'org-shifttab)
+    (evil-define-key state org-mode-map (kbd "<backtab>") #'org-shifttab)
+    (evil-define-key state org-mode-map (kbd "RET") #'org-open-at-point)))
+
+(with-eval-after-load 'evil
+  (evil-ex-define-cmd "org-agenda" #'my/org-agenda)
+  (evil-ex-define-cmd "todos" #'my/org-chronofile-todos)
+  (evil-ex-define-cmd "org-todos" #'my/org-chronofile-todos))
+
+(with-eval-after-load 'pi-coding-agent
+  (evil-set-initial-state 'pi-coding-agent-chat-mode 'normal)
+  (evil-set-initial-state 'pi-coding-agent-input-mode 'insert)
+  (add-hook 'pi-coding-agent-chat-mode-hook #'evil-normal-state)
+  (add-hook 'pi-coding-agent-input-mode-hook #'evil-insert-state))
+
+(with-eval-after-load 'transient
+  (evil-set-initial-state 'transient-mode 'normal))
+
+(with-eval-after-load 'aidermacs-backend-comint
+  (evil-set-initial-state 'aidermacs-comint-mode 'insert)
+  (add-hook 'aidermacs-comint-mode-hook #'evil-insert-state))
+
+(with-eval-after-load 'aidermacs-backend-vterm
+  (add-hook 'aidermacs-vterm-mode-hook #'evil-insert-state))
+
+(with-eval-after-load 'aidermacs-output
+  (evil-set-initial-state 'aidermacs-file-diff-selection-mode 'normal)
+  (add-hook 'aidermacs-file-diff-selection-mode-hook #'evil-normal-state))
+
+(with-eval-after-load 'org-agenda
+  (evil-set-initial-state 'org-agenda-mode 'normal)
+  (add-hook 'org-agenda-mode-hook #'evil-normal-state)
+  (evil-define-key 'normal org-agenda-mode-map
+    (kbd "j") #'org-agenda-next-line
+    (kbd "k") #'org-agenda-previous-line
+    (kbd "gr") #'org-agenda-redo
+    (kbd "RET") #'org-agenda-switch-to
+    (kbd "TAB") #'org-agenda-goto
+    (kbd "t") #'org-agenda-todo
+    (kbd "q") #'org-agenda-quit))
+#+end_src
+
+* Final global bindings
+
+This last bit is tiny, but it is worth leaving separate because it reads like
+"top-level finish work": a dedicated key for sending the current gptel prompt.
+
+#+begin_src emacs-lisp
 (global-set-key (kbd "<f9>") 'gptel-send)
+#+end_src
 
-(global-visual-line-mode t)
+* Notes for future cleanup
+
+A few things could be rationalized later if desired:
+
+- more of the Emacs package set could be moved fully into Nix,
+- package.el bootstrapping could shrink once enough packages are declarative,
+- the write-protected init warning is usually a sign that Customize wants its
+  own writable =custom-file=,
+- some overlapping AI packages may eventually consolidate.
+
+But for now the point of this file is not ideological purity. The point is to
+make the current setup readable, explainable, and tanglable.

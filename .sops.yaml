@@ -1,4 +1,4 @@
 creation_rules:
   - path_regex: .*\.(yaml|yml)$
-    age: >-
-      age100j3yeqr5yzjp6hw4fcr72wtex64dtphf3rm4nzggc7a0kste9rsnz9y0k
+    age: 
+      - age100j3yeqr5yzjp6hw4fcr72wtex64dtphf3rm4nzggc7a0kste9rsnz9y0k

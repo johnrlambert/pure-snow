@@ -1,11 +1,9 @@
 # modules/home/fish/default.nix
-{ lib, config, pkgs, inputs, ... }:
+{ lib, config, pkgs, ... }:
 
 let
   enabled = config.homelab.fish.enable or false;
 
-  system = pkgs.stdenv.hostPlatform.system;
-  unstablePkgs = inputs.unstable.packages.${system};
 in {
   options.homelab.fish.enable = lib.mkEnableOption "Enable fish shell and tools";
 
@@ -15,10 +13,9 @@ in {
       fish
       eza
       bat
+      figlet
       tree
       xsel
-    ] ++ [
-      unstablePkgs."pi-coding-agent"
     ];
 
     programs.fish = {

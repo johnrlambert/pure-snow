@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 
 with lib;
 with lib.homelab;
@@ -10,5 +10,6 @@ in
 
   config = mkIf enabled {
     boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+    environment.systemPackages = [ pkgs.qemu_full ];
   };
 }

@@ -16,7 +16,9 @@ with lib.homelab;
   homelab.nvim.enable = true;
   homelab.fonts.enable = true;
   homelab.aider.enable = true;
+  homelab.pi.enable = true;
   homelab.sops.enable = true;
+
   home.stateVersion = lib.mkDefault (osConfig.system.stateVersion or "25.11");
   programs.git = {
     enable = true;

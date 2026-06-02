@@ -3,6 +3,10 @@ pi user configuration lives here.
 Managed by:
 - modules/home/pi/default.nix
 
+The live files in ~/.pi/agent/ are symlinked back to this repo, so you can edit either:
+- the files under modules/home/pi/
+- or the matching files under ~/.pi/agent/
+
 Edit these repo files to change your global pi setup:
 - modules/home/pi/settings.json     -> general pi settings
 - modules/home/pi/keybindings.json -> keyboard shortcuts

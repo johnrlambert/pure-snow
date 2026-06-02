@@ -1,3 +1,13 @@
 .aider*
 .#*
+\#*\#
+*~
+*.swp
+*.swo
 flake.lock
+result
+result-*
+*.img
+*.img.zst
+*.qcow2
+*-efi-vars.fd

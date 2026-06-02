@@ -102,16 +102,14 @@
     },
     "secrets": {
       "locked": {
-        "lastModified": 1774282661,
-        "narHash": "sha256-jopRhIncJ68Hcgc0Kefc370RxkIO4hW2UOV0LfrMQvU=",
-        "rev": "d0ba2978c868cfb0e5d9bfed869eca258fb10b98",
-        "revCount": 5,
-        "type": "git",
-        "url": "file:///home/john/pure-snow/secrets"
+        "lastModified": 1774657147,
+        "narHash": "sha256-AT+Lb3p5wKVq4BrstedTTzABetRS5KGso1m60Yhu0BE=",
+        "path": "/home/john/pure-snow/secrets",
+        "type": "path"
       },
       "original": {
-        "type": "git",
-        "url": "file:///home/john/pure-snow/secrets"
+        "path": "/home/john/pure-snow/secrets",
+        "type": "path"
       }
     },
     "snowfall-lib": {
@@ -173,11 +171,11 @@
     },
     "unstable": {
       "locked": {
-        "lastModified": 1759831965,
-        "narHash": "sha256-vgPm2xjOmKdZ0xKA6yLXPJpjOtQPHfaZDRtH+47XEBo=",
+        "lastModified": 1774386573,
+        "narHash": "sha256-4hAV26quOxdC6iyG7kYaZcM3VOskcPUrdCQd/nx8obc=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "c9b6fb798541223bbb396d287d16f43520250518",
+        "rev": "46db2e09e1d3f113a13c0d7b81e2f221c63b8ce9",
         "type": "github"
       },
       "original": {

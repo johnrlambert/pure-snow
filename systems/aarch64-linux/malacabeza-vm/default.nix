@@ -13,6 +13,8 @@ with lib.homelab;
 
   system.stateVersion = "25.11";
 
+  homelab.roles.homeassistant = true;
+
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 
   image = {
@@ -40,7 +42,7 @@ with lib.homelab;
     forwardPorts = [
       {
         from = "host";
-        host.port = 2222;
+        host.port = 2223;
         guest.port = 22;
       }
     ];
@@ -69,6 +71,17 @@ with lib.homelab;
   };
 
   programs.fish.enable = true;
+
+  # Keep the VM image lean and avoid spending time building manual/docs
+  # artifacts such as man-db during fast QEMU iteration.
+  documentation = {
+    enable = false;
+    man.enable = false;
+    info.enable = false;
+    doc.enable = false;
+    nixos.enable = false;
+    man.generateCaches = lib.mkForce false;
+  };
 
   environment.systemPackages = with pkgs; [
     gitMinimal

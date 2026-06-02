@@ -160,20 +160,26 @@ without needing to flash an SD card for every change.
 Build the VM disk image from the repo root:
 
 ```bash
-nix build .#nixosConfigurations.malacabeza-vm.config.system.build.image
+./systems/aarch64-linux/malacabeza-vm/build-image.sh
 ```
 
 That produces a QEMU-friendly qcow2 image rather than a Pi SD image.
 
-To build and boot it with the helper script:
+Then boot the already-built image with the helper script:
 
 ```bash
 ./systems/aarch64-linux/malacabeza-vm/run-qemu-system-aarch64.sh
 ```
 
-The script will:
+The build script will:
 
 - build `.#nixosConfigurations.malacabeza-vm.config.system.build.image`
+- refresh the `result-malacabeza-vm-image` link by default
+- copy the qcow2 from the Nix store to a writable local disk at `./malacabeza-vm.qcow2`
+
+The run script will:
+
+- use the already-built writable disk from `./malacabeza-vm.qcow2`
 - create a writable local EFI vars file on first run
 - boot the image with `qemu-system-aarch64` on the generic `virt` machine
 - forward host port `2222` to guest SSH on port `22`
@@ -184,8 +190,10 @@ Once the guest is up:
 ssh -p 2222 john@127.0.0.1
 ```
 
-Useful environment overrides for the script:
+Useful environment overrides for the scripts:
 
+- `IMAGE_LINK=/some/path/result-malacabeza-vm-image`
+- `DISK_IMAGE=/some/path/malacabeza-vm.qcow2`
 - `SSH_PORT=2223`
 - `MEMORY_MIB=4096`
 - `CORES=8`
