@@ -1,9 +1,10 @@
 { config, lib, pkgs, ... }:
 
 with lib;
+with lib.homelab;
 
 let
-  enabled = config.homelab.roles.cockpit or false;
+  enabled = hasRole "cockpit" config.homelab.roles;
 in
 {
   options.homelab.roles.cockpit =

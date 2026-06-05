@@ -3,7 +3,7 @@
 with lib;
 with lib.homelab;
 let
-  enabled = config.homelab.roles.arm_builder or false;
+  enabled = hasRole "arm_builder" config.homelab.roles;
 in
 {
   options.homelab.roles.arm_builder = mkEnableOption "Enable multi-arch builds for ARM targets via binfmt/QEMU";

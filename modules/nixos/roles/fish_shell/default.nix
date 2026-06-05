@@ -3,7 +3,7 @@
 with lib;
 with lib.homelab;
 let
-  enabled = config.homelab.roles.fish or false;
+  enabled = hasRole "fish" config.homelab.roles;
 in
 {
   options.homelab.roles.fish = mkEnableOption "Fish shell enabled";

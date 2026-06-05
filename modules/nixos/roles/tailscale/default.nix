@@ -4,6 +4,7 @@ with lib;
 with lib.homelab;
 let
   cfg = config.homelab.roles.tailscale;
+  enabled = hasRole "tailscale" config.homelab.roles;
   hostSopsFile = "${inputs.secrets}/${config.networking.hostName}.yaml";
   defaultSopsFile =
     if builtins.pathExists hostSopsFile
@@ -70,7 +71,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf enabled {
     sops.secrets."${authKeySecret}" = {
       sopsFile = if cfg.sopsFile != null then cfg.sopsFile else defaultSopsFile;
       owner = "root";

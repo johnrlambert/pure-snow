@@ -3,7 +3,7 @@
 with lib;
 with lib.homelab;
 let
-  enabled = config.homelab.roles.dynamic_dns or false;
+  enabled = hasRole "dynamic_dns" config.homelab.roles;
 in
 {
   options.homelab.roles.dynamic_dns = mkEnableOption "Dynamic DNS";

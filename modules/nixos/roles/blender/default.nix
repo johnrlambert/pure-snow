@@ -3,7 +3,7 @@
 with lib;
 with lib.homelab;
 let
-  enabled = config.homelab.roles.blender or false;
+  enabled = hasRole "blender" config.homelab.roles;
 in
 {
   options.homelab.roles.blender = mkEnableOption "Blender";

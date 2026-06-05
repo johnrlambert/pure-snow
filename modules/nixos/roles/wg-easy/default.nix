@@ -5,7 +5,7 @@ with lib.homelab;
 
 let
   cfg = config.homelab.roles."wg-easy";
-  enabled = cfg.enable or false;
+  enabled = hasRole "wg-easy" config.homelab.roles;
   uiBind = if cfg.exposeUi then "0.0.0.0" else "127.0.0.1";
 in
 {

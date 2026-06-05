@@ -3,7 +3,7 @@
 with lib;
 with lib.homelab;
 let
-  enabled = config.homelab.roles.chrome or false;
+  enabled = hasRole "chrome" config.homelab.roles;
 in
 {
   options.homelab.roles.chrome = mkEnableOption "Google Chrome";

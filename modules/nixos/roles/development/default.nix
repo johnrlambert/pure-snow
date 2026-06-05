@@ -3,7 +3,7 @@
 with lib;
 with lib.homelab;
 let
-  enabled = config.homelab.roles.development or false;
+  enabled = hasRole "development" config.homelab.roles;
 in
 {
   options.homelab.roles.development = mkEnableOption "Development goodies";

@@ -1,0 +1,1073 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-06-05 Fri 16:13 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Literate Emacs configuration</title>
+<meta name="author" content="John Lambert" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+<style>
+body { background: #fff; }
+#content.content { max-width: 72ch; margin: 3rem auto; padding: 0 1.5rem; }
+#table-of-contents { margin-bottom: 2rem; }
+.title { margin-bottom: 0.75rem; }
+.subtitle { color: #666; }
+pre.src { overflow-x: auto; padding: 1rem; }
+code { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Literate Emacs configuration</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orge47eab4">1. Overview</a>
+<ul>
+<li><a href="#org20af236">1.1. Will the real init.org please stand up?</a>
+<ul>
+<li><a href="#orge7b5d5b">1.1.1. <span class="todo TODO">TODO</span> Write a sample todo :nix-config: :example-todo:</a></li>
+</ul>
+</li>
+<li><a href="#org8e484cb">1.2. Evil Mode</a></li>
+<li><a href="#orga834c32">1.3. Note system</a></li>
+</ul>
+</li>
+<li><a href="#orge3958e0">2. Package bootstrap</a></li>
+<li><a href="#org9303beb">3. Theme</a></li>
+<li><a href="#org07e9fb7">4. Org mode foundation</a></li>
+<li><a href="#org9087f6e">5. Indentation policy</a></li>
+<li><a href="#org68ef6d7">6. ULID support for Org headings</a></li>
+<li><a href="#org58f5da8">7. Org export and Babel execution</a></li>
+<li><a href="#org542264c">8. AI helpers</a></li>
+<li><a href="#org4c51a81">9. Window movement and in-buffer discoverability</a></li>
+<li><a href="#orgbd97ef1">10. General packages</a></li>
+<li><a href="#org42c9905">11. Local terminal helper</a></li>
+<li><a href="#org4c63dc7">12. Journal and note capture</a></li>
+<li><a href="#org5587451">13. Basic UI defaults</a></li>
+<li><a href="#org16aee04">14. Undo / redo sanity</a></li>
+<li><a href="#org8ce93b4">15. Chronofile-centric Org workflow</a></li>
+<li><a href="#org9ef1382">16. Evil mode</a></li>
+<li><a href="#orge9e8084">17. Final global bindings</a></li>
+<li><a href="#org86a7ce1">18. Notes for future cleanup</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge47eab4" class="outline-2">
+<h2 id="orge47eab4"><span class="section-number-2">1.</span> Overview</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org20af236" class="outline-3">
+<h3 id="org20af236"><span class="section-number-3">1.1.</span> Will the real init.org please stand up?</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+After years of vim/neovim use I finally took the plunge and decided to switch to emacs. This was something I agonized over. (Seriously. I am a loser.) I have years and years of experience and muscle memory with vim. Even though I probably took advantage of very few of its advanced features I still made my brain fit its paradigm.
+</p>
+
+<p>
+What changed? Org-mode.
+</p>
+
+<p>
+Org-mode allows code to exist coherently alongside text, notes and task management. In the age of LLMs this is particularly important as it creates a kind of shared artifact for me and my silicon buddies.
+</p>
+
+<p>
+The most intriguing file to org-ify is the emacs configuration itself.
+</p>
+
+<p>
+That means the real <code>~/.emacs.d/init.el</code> is <b>generated</b> from this file during the
+Home Manager build. That gives me three nice properties at once:
+</p>
+
+<ol class="org-ol">
+<li>The configuration stays reproducible and Nix-friendly.</li>
+<li>The reasoning for each section can live right next to the code.</li>
+<li>The TODOs can live right alongside the code itself. That means that I can create something like:</li>
+</ol>
+</div>
+<div id="outline-container-orge7b5d5b" class="outline-4">
+<h4 id="orge7b5d5b"><span class="section-number-4">1.1.1.</span> <span class="todo TODO">TODO</span> Write a sample todo :nix-config: :example-todo:</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+and it will just transparently live with the code <i>in situ</i> but also be managed by globally by org-agenda.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org8e484cb" class="outline-3">
+<h3 id="org8e484cb"><span class="section-number-3">1.2.</span> Evil Mode</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Luckily for vim refugees like myself there are all sorts of interesting ways to accomodate the years we spent trying to figure out how to exit it. Emacs provides the very appropriately named 'evil-mode' for this purpose.
+</p>
+
+<p>
+I am sure I have fallen into several anti patterns here. I will definitely always speak emacs with a Vimmy accent. But this isn't meant so much as an authoritative, <b>Do as I do&#x2026; or else!</b> kind of thing, but rather as a monument to compromise with the One True and Right Way of Emacs. Mastery of idiom is an important part of learning a language and a culture. I am definitely not there yet, so bear with me. 
+</p>
+</div>
+</div>
+<div id="outline-container-orga834c32" class="outline-3">
+<h3 id="orga834c32"><span class="section-number-3">1.3.</span> Note system</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+I will be storing the majority of my notes in a directory I call ~/chronofile. This is an homage to the great <a href="https://en.wikipedia.org/wiki/Buckminster_Fuller">Buckminster Fuller</a> and his 63 year project the <a href="https://en.wikipedia.org/wiki/Dymaxion_Chronofile">Dymaxion Chronofile.</a>
+</p>
+
+<p>
+I hope that this will one day grow into a:
+</p>
+<ul class="org-ul">
+<li>personal knowledge management system</li>
+<li>technical writing publishing platform for a blog engine</li>
+<li>agent prompting system</li>
+<li>task management tool</li>
+<li>autobiography</li>
+<li>fiction and metafiction tool</li>
+<li>homelab configuration</li>
+</ul>
+<p>
+:ID:       01KT488BAGJPRJQRHCQD6FY55H
+</p>
+
+<p>
+Anyway, here's 'Wonderwall&#x2026;'
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orge3958e0" class="outline-2">
+<h2 id="orge3958e0"><span class="section-number-2">2.</span> Package bootstrap</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+This first block does the minimum work needed to talk to Emacs package
+archives and to ensure <code>use-package</code> is available.
+</p>
+
+<p>
+One slightly frustrating thing is that emacs doesn't support this org and org-babel tangling business out of the box. So in order to make this somewhat intelligible to nix it has to lean on some preexisting customizations.
+</p>
+
+<p>
+Other than that, it follows a pretty common approach:
+</p>
+
+<ul class="org-ul">
+<li>MELPA is used for fast-moving community packages.</li>
+<li>Org ELPA is added so Org can be updated independently when desired.</li>
+<li>GNU ELPA stays available for the usual core add-ons.</li>
+<li><code>package-initialize</code> turns on installed packages.</li>
+<li>If archive metadata is missing, Emacs refreshes package contents.</li>
+<li><code>use-package</code> becomes the common declaration form for the rest of the file.</li>
+</ul>
+
+<p>
+Because this config is also deployed through Nix, this is a hybrid setup:
+Nix provides some packages declaratively, while Emacs package.el still pulls
+in others at runtime. That is a little "frankenstein", but it is a perfectly
+workable intermediate state.
+</p>
+
+<p>
+BTW kids I remember before we had all these fancy language specific repositories. I spent half of 2006 looking for a .dll. 
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span class="org-comment-delimiter">;; </span><span class="org-comment">Initialize package sources.
+</span>(<span class="org-keyword">require</span> '<span class="org-constant">package</span>)
+
+(<span class="org-keyword">setq</span> package-archives '((<span class="org-string">"melpa"</span> . <span class="org-string">"https://melpa.org/packages/"</span>)
+                         (<span class="org-string">"org"</span> . <span class="org-string">"https://orgmode.org/elpa/"</span>)
+                         (<span class="org-string">"elpa"</span> . <span class="org-string">"https://elpa.gnu.org/packages/"</span>)))
+
+(<span class="org-keyword">setq-default</span> word-wrap t)
+
+(package-initialize)
+
+(<span class="org-keyword">unless</span> package-archive-contents
+  (package-refresh-contents))
+
+<span class="org-comment-delimiter">;; </span><span class="org-comment">Install use-package for easier package management.
+</span>(<span class="org-keyword">unless</span> (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(<span class="org-keyword">require</span> '<span class="org-constant">use-package</span>)
+(<span class="org-keyword">setq</span> use-package-always-ensure t)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9303beb" class="outline-2">
+<h2 id="org9303beb"><span class="section-number-2">3.</span> Theme</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The theme choice is straightforward: load a Gruvbox variant and aggressively
+clear any previously enabled themes first.
+</p>
+
+<p>
+My read of this is:
+</p>
+
+<ul class="org-ul">
+<li><code>custom-safe-themes t</code> is here to avoid repeated safe-theme prompts.</li>
+<li>Disabling all current themes before loading the new one prevents theme
+stacking and weird face inheritance.</li>
+<li><code>gruvbox-dark-medium</code> is the preferred baseline.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">use-package</span> gruvbox-theme
+  <span class="org-builtin">:config</span>
+  (<span class="org-keyword">setq</span> custom-safe-themes t)
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme 'gruvbox-dark-medium t))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org07e9fb7" class="outline-2">
+<h2 id="org07e9fb7"><span class="section-number-2">4.</span> Org mode foundation</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+This is the heart of the setup.
+</p>
+
+<p>
+The overall intent seems to be:
+</p>
+
+<ul class="org-ul">
+<li>make Org comfortable for everyday writing,</li>
+<li>make source blocks pleasant to edit,</li>
+<li>make HTML export look presentable out of the box, and</li>
+<li>make links easier to follow, especially with Evil in the mix.</li>
+</ul>
+
+<p>
+A few noteworthy choices:
+</p>
+
+<ul class="org-ul">
+<li><code>org-startup-indented</code> and hidden leading stars make files look cleaner.</li>
+<li><code>org-ellipsis</code> uses a custom fold marker.</li>
+<li><code>org-return-follows-link</code> makes <code>RET</code> more link-friendly.</li>
+<li>a small GTD-ish TODO workflow gives tasks a little more structure than a
+single <code>TODO/DONE</code> pair.</li>
+<li>logging completion / cancellation into drawers keeps historical metadata
+without cluttering the visible outline too badly.</li>
+<li>source block settings make Babel editing behave more like a real code editor.</li>
+<li>the HTML export header injects Bulma and some small custom CSS.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">defun</span> <span class="org-function-name">my-org-mode-banner</span> ()
+  <span class="org-doc">"Display a banner message in the minibuffer for org-mode."</span>
+  (message <span class="org-string">"Reminder: Toggle tasks with C-c C-t"</span>))
+
+(<span class="org-keyword">use-package</span> org
+  <span class="org-builtin">:ensure</span> t
+  <span class="org-builtin">:config</span>
+  (<span class="org-keyword">require</span> '<span class="org-constant">ox-html</span>)
+  (<span class="org-keyword">setq</span> org-startup-indented t)
+  (<span class="org-keyword">setq</span> org-hide-leading-stars t)
+  (<span class="org-keyword">setq</span> org-ellipsis <span class="org-string">" &#9662;"</span>)
+  (<span class="org-keyword">setq</span> org-return-follows-link t)
+  (<span class="org-keyword">setq</span> org-todo-keywords
+        '((sequence <span class="org-string">"TODO(t)"</span> <span class="org-string">"NEXT(n)"</span> <span class="org-string">"PROJECT(p)"</span> <span class="org-string">"WAITING(w@/!)"</span> <span class="org-string">"SOMEDAY(s)"</span> <span class="org-string">"|"</span> <span class="org-string">"DONE(d!)"</span> <span class="org-string">"CANCELLED(c@)"</span>)))
+  (<span class="org-keyword">setq</span> org-log-done 'time)
+  (<span class="org-keyword">setq</span> org-log-into-drawer t)
+  (<span class="org-keyword">setq</span> org-src-fontify-natively t)
+  (<span class="org-keyword">setq</span> org-src-tab-acts-natively t)
+  (<span class="org-keyword">setq</span> org-edit-src-content-indentation 0)
+  (<span class="org-keyword">setq</span> org-cycle-hide-drawer-startup t)
+  (<span class="org-keyword">setq</span> org-src-lang-modes
+        (append '((<span class="org-string">"nix"</span> . nix)
+                  (<span class="org-string">"coffee"</span> . coffee)
+                  (<span class="org-string">"js"</span> . javascript)
+                  (<span class="org-string">"javascript"</span> . javascript)
+                  (<span class="org-string">"sh"</span> . shell)
+                  (<span class="org-string">"bash"</span> . shell)
+                  (<span class="org-string">"elisp"</span> . emacs-lisp))
+                org-src-lang-modes))
+  (<span class="org-keyword">setq</span> org-export-with-toc t)
+  (<span class="org-keyword">setq</span> org-export-with-section-numbers t)
+  (<span class="org-keyword">setq</span> org-html-htmlize-output-type 'css)
+  (<span class="org-keyword">setq</span> org-html-validation-link nil)
+  (<span class="org-keyword">setq</span> org-html-head-include-default-style nil)
+  (<span class="org-keyword">setq</span> org-html-head-include-scripts nil)
+  (<span class="org-keyword">setq</span> org-html-head
+        (concat
+         <span class="org-string">"&lt;link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css\"&gt;\n"</span>
+         <span class="org-string">"&lt;style&gt;\n"</span>
+         <span class="org-string">"body { background: #fff; }\n"</span>
+         <span class="org-string">"#content.content { max-width: 72ch; margin: 3rem auto; padding: 0 1.5rem; }\n"</span>
+         <span class="org-string">"#table-of-contents { margin-bottom: 2rem; }\n"</span>
+         <span class="org-string">".title { margin-bottom: 0.75rem; }\n"</span>
+         <span class="org-string">".subtitle { color: #666; }\n"</span>
+         <span class="org-string">"pre.src { overflow-x: auto; padding: 1rem; }\n"</span>
+         <span class="org-string">"code { white-space: pre-wrap; }\n"</span>
+         <span class="org-string">"&lt;/style&gt;"</span>)))
+
+(<span class="org-keyword">use-package</span> htmlize
+  <span class="org-builtin">:ensure</span> t)
+
+(<span class="org-keyword">use-package</span> ob-nix
+  <span class="org-builtin">:ensure</span> t)
+
+(<span class="org-keyword">use-package</span> coffee-mode
+  <span class="org-builtin">:ensure</span> t)
+
+(<span class="org-keyword">use-package</span> ob-coffee
+  <span class="org-builtin">:ensure</span> t
+  <span class="org-builtin">:config</span>
+  (<span class="org-keyword">setq</span> org-babel-coffee-command <span class="org-string">"coffee"</span>))
+
+(<span class="org-keyword">use-package</span> ob-mermaid
+  <span class="org-builtin">:ensure</span> t
+  <span class="org-builtin">:config</span>
+  (<span class="org-keyword">setq</span> ob-mermaid-cli-path <span class="org-string">"mmdc"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9087f6e" class="outline-2">
+<h2 id="org9087f6e"><span class="section-number-2">5.</span> Indentation policy</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+This section standardizes indentation across a handful of languages.
+</p>
+
+<p>
+The intent seems practical rather than ideological:
+</p>
+
+<ul class="org-ul">
+<li>use 4 spaces for most programming languages,</li>
+<li>use 2 spaces for CoffeeScript,</li>
+<li>keep Evil shift width aligned with mode indentation so &lt;&lt; and &gt;&gt; do what
+you expect.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">defun</span> <span class="org-function-name">my/set-indent-4</span> ()
+  <span class="org-doc">"Use 4 spaces for indentation in the current buffer."</span>
+  (<span class="org-keyword">setq-local</span> indent-tabs-mode nil)
+  (<span class="org-keyword">setq-local</span> tab-width 4)
+  (<span class="org-keyword">setq-local</span> standard-indent 4)
+  (<span class="org-keyword">setq-local</span> evil-shift-width 4))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/set-coffee-indent-2</span> ()
+  <span class="org-doc">"Use 2 spaces for indentation in CoffeeScript buffers."</span>
+  (<span class="org-keyword">setq-local</span> indent-tabs-mode nil)
+  (<span class="org-keyword">setq-local</span> tab-width 2)
+  (<span class="org-keyword">setq-local</span> standard-indent 2)
+  (<span class="org-keyword">setq-local</span> coffee-tab-width 2)
+  (<span class="org-keyword">setq-local</span> evil-shift-width 2))
+
+(add-hook 'emacs-lisp-mode-hook #'my/set-indent-4)
+(add-hook 'js-mode-hook #'my/set-indent-4)
+(add-hook 'js-ts-mode-hook #'my/set-indent-4)
+(add-hook 'python-mode-hook
+          (<span class="org-keyword">lambda</span> ()
+            (my/set-indent-4)
+            (<span class="org-keyword">setq-local</span> python-indent-offset 4)))
+(add-hook 'sh-mode-hook
+          (<span class="org-keyword">lambda</span> ()
+            (my/set-indent-4)
+            (<span class="org-keyword">setq-local</span> sh-basic-offset 4
+                        sh-indentation 4)))
+(add-hook 'nix-mode-hook #'my/set-indent-4)
+(add-hook 'coffee-mode-hook #'my/set-coffee-indent-2)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org68ef6d7" class="outline-2">
+<h2 id="org68ef6d7"><span class="section-number-2">6.</span> ULID support for Org headings</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+This is one of the more distinctive custom pieces.
+</p>
+
+<p>
+The idea is to assign stable IDs to Org headings, but to do it with ULIDs
+instead of the more common random UUIDs or Org's own <code>org-id</code> helpers.
+</p>
+
+<p>
+Why might this exist?
+</p>
+
+<ul class="org-ul">
+<li>ULIDs are sortable by time.</li>
+<li>They are shorter and friendlier than many UUID renderings.</li>
+<li>Stable heading IDs make linking and refiling safer over time.</li>
+</ul>
+
+<p>
+The code below:
+</p>
+
+<ul class="org-ul">
+<li>defines a Crockford Base32 alphabet,</li>
+<li>generates a time-sortable ULID-ish identifier,</li>
+<li>adds an <code>ID</code> property to new headings,</li>
+<li>stamps headings when pressing <code>org-return</code>, and</li>
+<li>provides a whole-buffer repair command for backfilling missing IDs.</li>
+</ul>
+
+<p>
+The note in the docstring is important: this is <b>not strictly monotonic</b>
+within the same millisecond, but for personal notes that is usually fine.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">defconst</span> <span class="org-variable-name">my/ulid-alphabet</span> <span class="org-string">"0123456789ABCDEFGHJKMNPQRSTVWXYZ"</span>
+  <span class="org-doc">"Crockford Base32 alphabet used by ULIDs."</span>)
+
+(random t)
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/ulid--encode-base32</span> (num len)
+  <span class="org-doc">"Encode NUM in Crockford Base32, left-padded to LEN characters."</span>
+  (<span class="org-keyword">let</span> ((out (make-string len ?0)))
+    (<span class="org-keyword">dotimes</span> (i len out)
+      (aset out (- len 1 i)
+            (aref my/ulid-alphabet (% num 32)))
+      (<span class="org-keyword">setq</span> num (/ num 32)))))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/generate-ulid</span> ()
+  <span class="org-doc">"Generate a ULID string.
+
+This implementation is time-sortable, but not strictly monotonic when
+multiple IDs are created within the same millisecond."</span>
+  (<span class="org-keyword">let*</span> ((time-ms (floor (* 1000 (float-time))))
+         (r1 (random (expt 2 20)))
+         (r2 (random (expt 2 20)))
+         (r3 (random (expt 2 20)))
+         (r4 (random (expt 2 20)))
+         (rand80 (+ (lsh r1 60)
+                    (lsh r2 40)
+                    (lsh r3 20)
+                    r4)))
+    (concat (my/ulid--encode-base32 time-ms 10)
+            (my/ulid--encode-base32 rand80 16))))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-add-id-to-new-heading</span> ()
+  <span class="org-doc">"Add a ULID-backed ID property to the current Org heading if missing."</span>
+  (<span class="org-keyword">when</span> (derived-mode-p 'org-mode)
+    (<span class="org-keyword">save-excursion</span>
+      (org-back-to-heading t)
+      (<span class="org-keyword">unless</span> (org-entry-get (point) <span class="org-string">"ID"</span>)
+        (org-entry-put (point) <span class="org-string">"ID"</span> (my/generate-ulid))))))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-add-id-at-point-if-heading</span> ()
+  <span class="org-doc">"Add a ULID-backed ID to the heading at point, if there is one."</span>
+  (<span class="org-keyword">when</span> (<span class="org-keyword">and</span> (derived-mode-p 'org-mode)
+             (org-at-heading-p))
+    (my/org-add-id-to-new-heading)))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-return-stamp-id-before</span> (<span class="org-type">&amp;rest</span> _)
+  <span class="org-doc">"Stamp the current Org heading with a ULID-backed ID before `</span><span class="org-doc"><span class="org-constant">org-return</span></span><span class="org-doc">'."</span>
+  (my/org-add-id-at-point-if-heading))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-ulidize-buffer</span> ()
+  <span class="org-doc">"Add ULID-backed ID properties to headings in the current Org buffer.
+
+Existing IDs are preserved."</span>
+  (<span class="org-keyword">interactive</span>)
+  (<span class="org-keyword">unless</span> (derived-mode-p 'org-mode)
+    (<span class="org-warning">user-error</span> <span class="org-string">"Current buffer is not in Org mode"</span>))
+  (<span class="org-keyword">let</span> ((count 0))
+    (org-map-entries
+     (<span class="org-keyword">lambda</span> ()
+       (<span class="org-keyword">unless</span> (org-entry-get (point) <span class="org-string">"ID"</span>)
+         (org-entry-put (point) <span class="org-string">"ID"</span> (my/generate-ulid))
+         (<span class="org-keyword">setq</span> count (1+ count))))
+     nil
+     'file)
+    (message <span class="org-string">"Added ULID IDs to %d heading%s"</span>
+             count
+             (<span class="org-keyword">if</span> (= count 1) <span class="org-string">""</span> <span class="org-string">"s"</span>))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org58f5da8" class="outline-2">
+<h2 id="org58f5da8"><span class="section-number-2">7.</span> Org export and Babel execution</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+This configuration treats Org as both a writing format and an executable
+notebook format.
+</p>
+
+<p>
+The export helper writes HTML output into a local <code>exports/</code> directory next to
+its source file and opens the result in a browser. That is a pleasant workflow
+for publishing one-off notes or drafts without having to configure a full site.
+</p>
+
+<p>
+The Babel section enables a modest set of languages:
+</p>
+
+<ul class="org-ul">
+<li>Emacs Lisp</li>
+<li>shell</li>
+<li>Python</li>
+<li>Nix</li>
+<li>JavaScript</li>
+<li>CoffeeScript</li>
+</ul>
+
+<p>
+Given the repository, the Nix support is especially relevant.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-export-asset-files</span> ()
+  <span class="org-doc">"Collect local file assets referenced by the current Org buffer."</span>
+  (<span class="org-keyword">let</span> ((base-dir (file-name-directory (<span class="org-keyword">or</span> (buffer-file-name) default-directory)))
+        assets)
+    (org-element-map (org-element-parse-buffer) 'link
+      (<span class="org-keyword">lambda</span> (link)
+        (<span class="org-keyword">when</span> (string= (org-element-property <span class="org-builtin">:type</span> link) <span class="org-string">"file"</span>)
+          (<span class="org-keyword">let*</span> ((path (org-link-unescape (org-element-property <span class="org-builtin">:path</span> link)))
+                 (file (expand-file-name path base-dir)))
+            (<span class="org-keyword">when</span> (file-regular-p file)
+              (<span class="org-keyword">push</span> file assets))))))
+    (org-element-map (org-element-parse-buffer) 'src-block
+      (<span class="org-keyword">lambda</span> (src)
+        (<span class="org-keyword">let*</span> ((params (org-babel-parse-header-arguments (<span class="org-keyword">or</span> (org-element-property <span class="org-builtin">:parameters</span> src) <span class="org-string">""</span>)))
+               (path (cdr (assq <span class="org-builtin">:file</span> params)))
+               (file (<span class="org-keyword">and</span> path (expand-file-name path base-dir))))
+          (<span class="org-keyword">when</span> (<span class="org-keyword">and</span> file (file-regular-p file))
+            (<span class="org-keyword">push</span> file assets)))))
+    (delete-dups assets)))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-copy-export-assets</span> (export-dir)
+  <span class="org-doc">"Copy local Org asset files into EXPORT-DIR, preserving relative paths when possible."</span>
+  (<span class="org-keyword">let</span> ((base-dir (file-name-directory (<span class="org-keyword">or</span> (buffer-file-name) default-directory))))
+    (<span class="org-keyword">dolist</span> (file (my/org-export-asset-files))
+      (<span class="org-keyword">let*</span> ((relative (file-relative-name file base-dir))
+             (target (expand-file-name
+                      (<span class="org-keyword">if</span> (string-prefix-p <span class="org-string">"../"</span> relative)
+                          (file-name-nondirectory file)
+                        relative)
+                      export-dir)))
+        (make-directory (file-name-directory target) t)
+        (copy-file file target t)))))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-render-mermaid-blocks</span> ()
+  <span class="org-doc">"Render all Mermaid source blocks in the current Org buffer."</span>
+  (<span class="org-keyword">require</span> '<span class="org-constant">ob-mermaid</span>)
+  (<span class="org-keyword">org-babel-map-src-blocks</span> nil
+    (<span class="org-keyword">let*</span> ((info (org-babel-get-src-block-info 'light))
+           (lang (car info))
+           (params (nth 2 info))
+           (file (cdr (assq <span class="org-builtin">:file</span> params))))
+      (<span class="org-keyword">when</span> (string= lang <span class="org-string">"mermaid"</span>)
+        (<span class="org-keyword">when</span> file
+          (make-directory (file-name-directory (expand-file-name file default-directory)) t))
+        (org-babel-execute-src-block)))))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-export-to-html</span> ()
+  <span class="org-doc">"Export the current Org buffer to HTML in an exports directory and open it."</span>
+  (<span class="org-keyword">interactive</span>)
+  (<span class="org-keyword">unless</span> (derived-mode-p 'org-mode)
+    (<span class="org-warning">user-error</span> <span class="org-string">"Current buffer is not in Org mode"</span>))
+  (<span class="org-keyword">let*</span> ((source-file (<span class="org-keyword">or</span> (buffer-file-name)
+                          (expand-file-name <span class="org-string">"untitled.org"</span> default-directory)))
+         (export-dir (expand-file-name <span class="org-string">"exports"</span> (file-name-directory source-file)))
+         (output-file (expand-file-name
+                       (concat (file-name-base source-file) <span class="org-string">".html"</span>)
+                       export-dir))
+         (org-export-show-temporary-export-buffer nil)
+         (org-confirm-babel-evaluate nil))
+    (make-directory export-dir t)
+    (my/org-render-mermaid-blocks)
+    (my/org-copy-export-assets export-dir)
+    (org-export-to-file 'html output-file)
+    (browse-url-of-file output-file)
+    (message <span class="org-string">"Exported HTML to %s"</span> output-file)))
+
+(<span class="org-keyword">with-eval-after-load</span> 'org
+  (<span class="org-keyword">require</span> '<span class="org-constant">ob-mermaid</span>)
+  (<span class="org-keyword">setq</span> org-babel-python-command <span class="org-string">"python3"</span>)
+  (<span class="org-keyword">setq</span> org-babel-js-cmd <span class="org-string">"node"</span>)
+  (add-hook 'org-insert-heading-hook #'my/org-add-id-to-new-heading)
+  (advice-add 'org-return <span class="org-builtin">:before</span> #'my/org-return-stamp-id-before)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (shell . t)
+     (python . t)
+     (nix . t)
+     (js . t)
+     (coffee . t)
+     (mermaid . t))))
+
+(add-hook 'org-mode-hook 'my-org-mode-banner)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org542264c" class="outline-2">
+<h2 id="org542264c"><span class="section-number-2">8.</span> AI helpers</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+This section pulls in a small collection of AI-adjacent packages.
+</p>
+
+<p>
+The shape of the config suggests a few things:
+</p>
+
+<ul class="org-ul">
+<li><code>gptel</code> is the lightest-weight chat integration.</li>
+<li><code>aidermacs</code> is for repo-aware editing assistance.</li>
+<li><code>pi-coding-agent</code> is installed via Nix and treated as a first-class tool.</li>
+<li>model names and API keys are driven by environment variables where needed.</li>
+</ul>
+
+<p>
+I am preserving the exact behavior here rather than trying to rationalize it.
+In particular, several of these packages overlap conceptually, but that may be
+intentional experimentation.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">use-package</span> gptel
+  <span class="org-builtin">:ensure</span> t
+  <span class="org-builtin">:config</span>
+  (<span class="org-keyword">setq</span> gptel-api-key (getenv <span class="org-string">"OPENAI_API_KEY"</span>))
+  (<span class="org-keyword">setq</span> gptel-default-model <span class="org-string">"gpt-4o"</span>))
+
+(<span class="org-keyword">use-package</span> elysium)
+
+(<span class="org-keyword">with-eval-after-load</span> 'evil
+  (define-key evil-normal-state-map (kbd <span class="org-string">"C-c g"</span>) 'gptel))
+
+(<span class="org-keyword">use-package</span> aidermacs
+  <span class="org-builtin">:config</span>
+  (<span class="org-keyword">setq</span> aidermacs-api-key (getenv <span class="org-string">"OPENAI_API_KEY"</span>))
+  (<span class="org-keyword">setq</span> aidermacs-default-model <span class="org-string">"gpt-4o"</span>)
+  <span class="org-builtin">:bind</span> ((<span class="org-string">"C-c a"</span> . aidermacs-transient-menu)))
+
+(global-set-key (kbd <span class="org-string">"C-c g c"</span>) 'gptel-start-chat)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4c51a81" class="outline-2">
+<h2 id="org4c51a81"><span class="section-number-2">9.</span> Window movement and in-buffer discoverability</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+These bindings repurpose <code>C-h/j/k/l</code> for pane movement.
+</p>
+
+<p>
+That is a very Vim/Evil-shaped choice, and it explains why default Emacs help
+commands feel displaced elsewhere. Because <code>C-h</code> normally starts Help, the
+config also puts Help on <code>C-c h</code>.
+</p>
+
+<p>
+This is likely the source of some of the earlier confusion around <code>describe-key</code>
+not being reachable via the stock Emacs help prefix.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(windmove-default-keybindings)
+
+(global-set-key (kbd <span class="org-string">"C-h"</span>) 'windmove-left)
+(global-set-key (kbd <span class="org-string">"C-j"</span>) 'windmove-down)
+(global-set-key (kbd <span class="org-string">"C-k"</span>) 'windmove-up)
+(global-set-key (kbd <span class="org-string">"C-l"</span>) 'windmove-right)
+(global-set-key (kbd <span class="org-string">"C-c h"</span>) 'help-command)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbd97ef1" class="outline-2">
+<h2 id="orgbd97ef1"><span class="section-number-2">10.</span> General packages</h2>
+<div class="outline-text-2" id="text-10">
+<p>
+This is the miscellaneous toolbox section.
+</p>
+
+<ul class="org-ul">
+<li><code>org-bullets</code> prettifies Org headings.</li>
+<li><code>neotree</code> provides a file sidebar that feels familiar to users coming from
+tools like NERDTree.</li>
+<li><code>which-key</code> improves discoverability by showing possible key continuations.</li>
+<li><code>magit</code> is the Git workhorse.</li>
+<li><code>nix-mode</code> is essential in this repository.</li>
+<li><code>eat</code> is a terminal emulator installed through Nix rather than MELPA.</li>
+<li><code>pi-coding-agent</code> is also installed declaratively and merely configured here.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">use-package</span> org-bullets
+  <span class="org-builtin">:hook</span> (org-mode . org-bullets-mode))
+
+(<span class="org-keyword">use-package</span> neotree
+  <span class="org-builtin">:ensure</span> t
+  <span class="org-builtin">:config</span>
+  (<span class="org-keyword">setq</span> neo-smart-open t)
+  (<span class="org-keyword">setq</span> neo-show-hidden-files t)
+  (global-set-key (kbd <span class="org-string">"&lt;f8&gt;"</span>) #'neotree-toggle))
+
+(<span class="org-keyword">use-package</span> which-key
+  <span class="org-builtin">:config</span>
+  (which-key-mode))
+
+(<span class="org-keyword">use-package</span> magit
+  <span class="org-builtin">:commands</span> magit-status)
+
+(<span class="org-keyword">use-package</span> nix-mode
+  <span class="org-builtin">:mode</span> <span class="org-string">"\\.nix\\'"</span>)
+
+(<span class="org-keyword">use-package</span> eat
+  <span class="org-builtin">:ensure</span> nil
+  <span class="org-builtin">:commands</span> (eat)
+  <span class="org-builtin">:config</span>
+  (<span class="org-keyword">setq</span> eat-kill-buffer-on-exit t))
+
+(<span class="org-keyword">use-package</span> pi-coding-agent
+  <span class="org-builtin">:ensure</span> nil
+  <span class="org-builtin">:commands</span> (pi-coding-agent pi-coding-agent-toggle pi-coding-agent-install-grammars)
+  <span class="org-builtin">:init</span>
+  (<span class="org-keyword">defalias</span> '<span class="org-function-name">pi</span> 'pi-coding-agent))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org42c9905" class="outline-2">
+<h2 id="org42c9905"><span class="section-number-2">11.</span> Local terminal helper</h2>
+<div class="outline-text-2" id="text-11">
+<p>
+This helper opens Eat in the current project root when possible.
+</p>
+
+<p>
+That means terminal sessions start in the place where work is actually being
+performed instead of some unrelated default directory. In a project-oriented
+workflow, that is almost always the desired behavior.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">defun</span> <span class="org-function-name">my/eat-here</span> ()
+  <span class="org-doc">"Open Eat in the current project root, or `</span><span class="org-doc"><span class="org-constant">default-directory</span></span><span class="org-doc">'."</span>
+  (<span class="org-keyword">interactive</span>)
+  (<span class="org-keyword">require</span> '<span class="org-constant">project</span>)
+  (<span class="org-keyword">let</span> ((default-directory
+          (<span class="org-keyword">or</span> (<span class="org-keyword">when-let</span> ((proj (project-current nil)))
+                (project-root proj))
+              default-directory)))
+    (eat)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4c63dc7" class="outline-2">
+<h2 id="org4c63dc7"><span class="section-number-2">12.</span> Journal and note capture</h2>
+<div class="outline-text-2" id="text-12">
+<p>
+This repository strongly suggests that <code>~/chronofile</code> is the main note store, so the journal is rooted there as well.
+</p>
+<p>
+:ID:       01KT47B1EER41R967Q1JPZMFX1
+</p>
+
+<p>
+The journal configuration is intentionally minimal:
+</p>
+
+<ul class="org-ul">
+<li>daily files under <code>~/chronofile/journal/</code></li>
+<li>ISO-like file names</li>
+<li>human-readable date headings</li>
+<li>a global key to create a new entry quickly</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">use-package</span> org-journal
+  <span class="org-builtin">:ensure</span> t
+  <span class="org-builtin">:config</span>
+  (<span class="org-keyword">setq</span> org-journal-dir <span class="org-string">"~/chronofile/journal/"</span>)
+  (<span class="org-keyword">setq</span> org-journal-file-format <span class="org-string">"%Y-%m-%d.org"</span>)
+  (<span class="org-keyword">setq</span> org-journal-date-format <span class="org-string">"%A, %d %B %Y"</span>))
+
+(global-set-key (kbd <span class="org-string">"C-c j"</span>) 'org-journal-new-entry)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org5587451" class="outline-2">
+<h2 id="org5587451"><span class="section-number-2">13.</span> Basic UI defaults</h2>
+<div class="outline-text-2" id="text-13">
+<p>
+These are the expected quality-of-life defaults for a keyboard-first setup:
+</p>
+
+<ul class="org-ul">
+<li>disable menu/tool/scroll bars,</li>
+<li>skip the startup screen,</li>
+<li>show line numbers,</li>
+<li>use a slightly larger default font,</li>
+<li>auto-revert buffers when files change on disk,</li>
+<li>wrap long visual lines.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(<span class="org-keyword">setq</span> inhibit-startup-screen t)
+
+(global-display-line-numbers-mode t)
+
+(set-face-attribute 'default nil <span class="org-builtin">:height</span> 110)
+
+(global-auto-revert-mode t)
+
+(global-visual-line-mode t)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org16aee04" class="outline-2">
+<h2 id="org16aee04"><span class="section-number-2">14.</span> Undo / redo sanity</h2>
+<div class="outline-text-2" id="text-14">
+<p>
+Emacs absolutely does ship with undo, but the default ergonomics are eccentric
+enough that it can feel like it does not. Since this setup is already heavily
+Evil-flavored, it makes sense to be explicit here.
+</p>
+
+<p>
+This keeps two worlds reasonably sane:
+</p>
+<ul class="org-ul">
+<li>in Evil buffers, use Emacs' built-in modern undo/redo backend so <code>u</code> and
+<code>C-r</code> behave more like a Vim refugee would hope,</li>
+<li>in non-Evil / Emacs-style contexts, make <code>C-/</code> undo and <code>C-?</code> redo.</li>
+</ul>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(global-set-key (kbd <span class="org-string">"C-/"</span>) #'undo-only)
+(global-set-key (kbd <span class="org-string">"C-?"</span>) #'undo-redo)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org8ce93b4" class="outline-2">
+<h2 id="org8ce93b4"><span class="section-number-2">15.</span> Chronofile-centric Org workflow</h2>
+<div class="outline-text-2" id="text-15">
+<p>
+This section is where the Emacs configuration and the repository's larger
+personal knowledge management story really meet.
+</p>
+
+<p>
+The intention is clear and good:
+</p>
+
+<ul class="org-ul">
+<li>treat <code>~/chronofile</code> as the canonical Org directory,</li>
+<li>discover agenda files recursively,</li>
+<li>exclude obvious transient junk,</li>
+<li>provide convenience commands for agenda and todo views,</li>
+<li>capture new tasks into <code>~/chronofile/inbox.org</code>.</li>
+</ul>
+
+<p>
+This is a nice match for an Org-first workflow without requiring a large extra
+framework such as Org-roam.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(global-set-key (kbd <span class="org-string">"C-x g"</span>) 'magit-status)
+(global-set-key (kbd <span class="org-string">"C-c a"</span>) #'my/org-agenda)
+(global-set-key (kbd <span class="org-string">"C-c c"</span>) 'org-capture)
+(global-set-key (kbd <span class="org-string">"C-c e t"</span>) #'my/eat-here)
+(global-set-key (kbd <span class="org-string">"C-c e h"</span>) #'my/org-export-to-html)
+(global-set-key (kbd <span class="org-string">"C-c p i"</span>) #'pi-coding-agent)
+
+(<span class="org-keyword">setq</span> org-directory <span class="org-string">"~/chronofile"</span>)
+(<span class="org-keyword">setq</span> org-default-notes-file (concat org-directory <span class="org-string">"/notes.org"</span>))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-chronofile-files</span> ()
+  <span class="org-doc">"Return usable Org files under `</span><span class="org-doc"><span class="org-constant">org-directory</span></span><span class="org-doc">'."</span>
+  (seq-filter
+   (<span class="org-keyword">lambda</span> (path)
+     (<span class="org-keyword">let</span> ((base (file-name-nondirectory path)))
+       (<span class="org-keyword">and</span> (file-regular-p path)
+            (not (string-prefix-p <span class="org-string">".#"</span> base))
+            (not (<span class="org-keyword">and</span> (string-prefix-p <span class="org-string">"#"</span> base)
+                      (string-suffix-p <span class="org-string">"#"</span> base)))
+            (not (string-match-p <span class="org-string">"/node_modules/"</span> path)))))
+   (directory-files-recursively (expand-file-name org-directory) <span class="org-string">"\\.org\\'"</span>)))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-refresh-agenda-files</span> ()
+  <span class="org-doc">"Refresh `</span><span class="org-doc"><span class="org-constant">org-agenda-files</span></span><span class="org-doc">' from `</span><span class="org-doc"><span class="org-constant">org-directory</span></span><span class="org-doc">'."</span>
+  (<span class="org-keyword">setq</span> org-agenda-files (my/org-chronofile-files)))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-agenda</span> ()
+  <span class="org-doc">"Open `</span><span class="org-doc"><span class="org-constant">org-agenda</span></span><span class="org-doc">' using all Org files in `</span><span class="org-doc"><span class="org-constant">~/chronofile</span></span><span class="org-doc">'."</span>
+  (<span class="org-keyword">interactive</span>)
+  (my/org-refresh-agenda-files)
+  (call-interactively #'org-agenda))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-chronofile-todos</span> ()
+  <span class="org-doc">"Show all TODO items from Org files under `</span><span class="org-doc"><span class="org-constant">~/chronofile</span></span><span class="org-doc">'."</span>
+  (<span class="org-keyword">interactive</span>)
+  (my/org-refresh-agenda-files)
+  (org-todo-list))
+
+(my/org-refresh-agenda-files)
+
+(<span class="org-keyword">setq</span> org-capture-templates
+      '((<span class="org-string">"t"</span> <span class="org-string">"Todo"</span> entry (file+headline <span class="org-string">"~/chronofile/inbox.org"</span> <span class="org-string">"Tasks"</span>)
+         <span class="org-string">"* TODO %?\n  %i\n  %a"</span>)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9ef1382" class="outline-2">
+<h2 id="org9ef1382"><span class="section-number-2">16.</span> Evil mode</h2>
+<div class="outline-text-2" id="text-16">
+<p>
+This is the modal editing section.
+</p>
+
+<p>
+The configuration does a few careful things here:
+</p>
+
+<ul class="org-ul">
+<li>ensures Evil is installed even in a package.el world,</li>
+<li>tells Evil to use Emacs' built-in undo/redo backend,</li>
+<li>enables Evil globally,</li>
+<li>reinforces <code>C-h/j/k/l</code> window movement inside Evil states,</li>
+<li>gives Org buffers sane normal-state bindings for folding and link opening,</li>
+<li>makes special-purpose buffers start in the most natural state.</li>
+</ul>
+
+<p>
+That last part matters. Chat views, agenda screens, transient popups, and
+terminal-like prompts all want different default modes if Evil is enabled.
+The hooks below encode those preferences.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">unless</span> (package-installed-p 'evil)
+  (package-install 'evil))
+
+(<span class="org-keyword">require</span> '<span class="org-constant">evil</span>)
+(<span class="org-keyword">setq</span> evil-undo-system 'undo-redo)
+(evil-mode 1)
+
+(<span class="org-keyword">dolist</span> (state '(normal motion visual))
+  (evil-global-set-key state (kbd <span class="org-string">"C-h"</span>) #'windmove-left)
+  (evil-global-set-key state (kbd <span class="org-string">"C-j"</span>) #'windmove-down)
+  (evil-global-set-key state (kbd <span class="org-string">"C-k"</span>) #'windmove-up)
+  (evil-global-set-key state (kbd <span class="org-string">"C-l"</span>) #'windmove-right))
+
+(<span class="org-keyword">with-eval-after-load</span> 'org
+  (<span class="org-keyword">dolist</span> (state '(normal motion))
+    (<span class="org-keyword">evil-define-key</span> state org-mode-map (kbd <span class="org-string">"TAB"</span>) #'org-cycle)
+    (<span class="org-keyword">evil-define-key</span> state org-mode-map (kbd <span class="org-string">"&lt;tab&gt;"</span>) #'org-cycle)
+    (<span class="org-keyword">evil-define-key</span> state org-mode-map (kbd <span class="org-string">"S-TAB"</span>) #'org-shifttab)
+    (<span class="org-keyword">evil-define-key</span> state org-mode-map (kbd <span class="org-string">"&lt;backtab&gt;"</span>) #'org-shifttab)
+    (<span class="org-keyword">evil-define-key</span> state org-mode-map (kbd <span class="org-string">"RET"</span>) #'org-open-at-point)))
+
+(<span class="org-keyword">with-eval-after-load</span> 'evil
+  (<span class="org-keyword">evil-ex-define-cmd</span> <span class="org-string">"org-agenda"</span> #'my/org-agenda)
+  (<span class="org-keyword">evil-ex-define-cmd</span> <span class="org-string">"todos"</span> #'my/org-chronofile-todos)
+  (<span class="org-keyword">evil-ex-define-cmd</span> <span class="org-string">"org-todos"</span> #'my/org-chronofile-todos))
+
+(<span class="org-keyword">with-eval-after-load</span> 'pi-coding-agent
+  (evil-set-initial-state 'pi-coding-agent-chat-mode 'normal)
+  (evil-set-initial-state 'pi-coding-agent-input-mode 'insert)
+  (add-hook 'pi-coding-agent-chat-mode-hook #'evil-normal-state)
+  (add-hook 'pi-coding-agent-input-mode-hook #'evil-insert-state))
+
+(<span class="org-keyword">with-eval-after-load</span> 'transient
+  (evil-set-initial-state 'transient-mode 'normal))
+
+(<span class="org-keyword">with-eval-after-load</span> 'aidermacs-backend-comint
+  (evil-set-initial-state 'aidermacs-comint-mode 'insert)
+  (add-hook 'aidermacs-comint-mode-hook #'evil-insert-state))
+
+(<span class="org-keyword">with-eval-after-load</span> 'aidermacs-backend-vterm
+  (add-hook 'aidermacs-vterm-mode-hook #'evil-insert-state))
+
+(<span class="org-keyword">with-eval-after-load</span> 'aidermacs-output
+  (evil-set-initial-state 'aidermacs-file-diff-selection-mode 'normal)
+  (add-hook 'aidermacs-file-diff-selection-mode-hook #'evil-normal-state))
+
+(<span class="org-keyword">with-eval-after-load</span> 'org-agenda
+  (evil-set-initial-state 'org-agenda-mode 'normal)
+  (add-hook 'org-agenda-mode-hook #'evil-normal-state)
+  (<span class="org-keyword">evil-define-key</span> 'normal org-agenda-mode-map
+    (kbd <span class="org-string">"j"</span>) #'org-agenda-next-line
+    (kbd <span class="org-string">"k"</span>) #'org-agenda-previous-line
+    (kbd <span class="org-string">"gr"</span>) #'org-agenda-redo
+    (kbd <span class="org-string">"RET"</span>) #'org-agenda-switch-to
+    (kbd <span class="org-string">"TAB"</span>) #'org-agenda-goto
+    (kbd <span class="org-string">"t"</span>) #'org-agenda-todo
+    (kbd <span class="org-string">"q"</span>) #'org-agenda-quit))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orge9e8084" class="outline-2">
+<h2 id="orge9e8084"><span class="section-number-2">17.</span> Final global bindings</h2>
+<div class="outline-text-2" id="text-17">
+<p>
+This last bit is tiny, but it is worth leaving separate because it reads like
+"top-level finish work": a dedicated key for sending the current gptel prompt.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(global-set-key (kbd <span class="org-string">"&lt;f9&gt;"</span>) 'gptel-send)
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org86a7ce1" class="outline-2">
+<h2 id="org86a7ce1"><span class="section-number-2">18.</span> Notes for future cleanup</h2>
+<div class="outline-text-2" id="text-18">
+<p>
+A few things could be rationalized later if desired:
+</p>
+
+<ul class="org-ul">
+<li>more of the Emacs package set could be moved fully into Nix,</li>
+<li>package.el bootstrapping could shrink once enough packages are declarative,</li>
+<li>the write-protected init warning is usually a sign that Customize wants its
+own writable <code>custom-file</code>,</li>
+<li>some overlapping AI packages may eventually consolidate.</li>
+</ul>
+
+<p>
+But for now the point of this file is not ideological purity. The point is to
+make the current setup readable, explainable, and tanglable.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: John Lambert</p>
+<p class="date">Created: 2026-06-05 Fri 16:13</p>
+</div>
+</body>
+</html>

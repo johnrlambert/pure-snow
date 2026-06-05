@@ -1,0 +1,1193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2026-06-02 Tue 18:18 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Homelab inventory</title>
+<meta name="author" content="John Lambert" />
+<meta name="generator" content="Org Mode" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+<style>
+body { background: #fff; }
+#content.content { max-width: 72ch; margin: 3rem auto; padding: 0 1.5rem; }
+#table-of-contents { margin-bottom: 2rem; }
+.title { margin-bottom: 0.75rem; }
+.subtitle { color: #666; }
+pre.src { overflow-x: auto; padding: 1rem; }
+code { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Homelab inventory</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orga3847e2">1. Purpose</a>
+<ul>
+<li><a href="#org2ba8bbe">1.1. Autobiographical bullshit you can skip if you want</a></li>
+<li><a href="#org158264a">1.2. And you may ask yourself, well&#x2026; 'How did I get here?'</a></li>
+</ul>
+</li>
+<li><a href="#org9215441">2. Basics of Literate Programming with Org</a>
+<ul>
+<li><a href="#org7b8b1fe">2.1. A surprisingly early example</a></li>
+<li><a href="#orgcebb943">2.2. A surprisingly late description of <code>org</code></a>
+<ul>
+<li><a href="#orgb55fdff">2.2.1. <span class="todo TODO">TODO</span> Talk about feature where you can record TODOs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org062fb2c">3. Declarative Systems with <code>nix</code></a>
+<ul>
+<li>
+<ul>
+<li><a href="#org5457c44">3.0.1. A big bunch of <i>minutiae</i></a></li>
+</ul>
+</li>
+<li><a href="#orge117819">3.1. Using <code>nix</code> for multiple machines</a></li>
+</ul>
+</li>
+<li><a href="#org66dcf1e">4. The Life and Labs of John Lambert, Gentleman</a>
+<ul>
+<li><a href="#org66bc2b5">4.1. System roles</a>
+<ul>
+<li><a href="#orgc9091b9">4.1.1. ssh</a></li>
+<li><a href="#orgb46edf1">4.1.2. tailscale</a></li>
+<li><a href="#orgf991478">4.1.3. fish</a></li>
+<li><a href="#org7349a5c">4.1.4. chrome</a></li>
+<li><a href="#orgd3ae9c4">4.1.5. blender</a></li>
+<li><a href="#orgc40bd91">4.1.6. arm<sub>builder</sub></a></li>
+<li><a href="#org8132cc8">4.1.7. xmonad</a></li>
+<li><a href="#orgffa5948">4.1.8. desktop.pantheon</a></li>
+<li><a href="#org003739e">4.1.9. homeassistant</a></li>
+<li><a href="#org1e8fd57">4.1.10. cockpit</a></li>
+<li><a href="#org46b83d9">4.1.11. dynamic<sub>dns</sub></a></li>
+<li><a href="#orgaa6e7bf">4.1.12. wg-easy</a></li>
+</ul>
+</li>
+<li><a href="#orgda18cac">4.2. Home roles / modules</a>
+<ul>
+<li><a href="#org522fe46">4.2.1. emacs</a></li>
+<li><a href="#org32408fd">4.2.2. nvim</a></li>
+<li><a href="#org8105564">4.2.3. fish</a></li>
+<li><a href="#org6da2fd6">4.2.4. fonts</a></li>
+<li><a href="#org696d653">4.2.5. aider</a></li>
+<li><a href="#orgc16b789">4.2.6. pi</a></li>
+<li><a href="#org888378c">4.2.7. sops</a></li>
+<li><a href="#org927eac4">4.2.8. direnv</a></li>
+<li><a href="#org988e23c">4.2.9. xmonad</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org680d3c6">5. Current machines</a>
+<ul>
+<li><a href="#org7fc7b14">5.1. IvyMike</a></li>
+<li><a href="#org40187c5">5.2. server</a></li>
+<li><a href="#orga3ab6d7">5.3. malacabeza</a></li>
+<li><a href="#org5299afe">5.4. malacabeza-vm</a></li>
+</ul>
+</li>
+<li><a href="#org645a6e6">6. Current homes</a>
+<ul>
+<li><a href="#org5fe392d">6.1. john@IvyMike</a></li>
+<li><a href="#org35e9d62">6.2. john@server</a></li>
+<li><a href="#org03857ff">6.3. john@cookiesheet</a></li>
+</ul>
+</li>
+<li><a href="#org2cdaf32">7. Inventory sketch</a></li>
+<li><a href="#orgb39cbfa">8. TODOs</a>
+<ul>
+<li><a href="#org1bcbf61">8.1. <span class="todo TODO">TODO</span> Decide whether the repo should standardize on <code>inventory.org -&gt; inventory.toml</code> or jump straight to <code>inventory.nix</code></a></li>
+<li><a href="#orgae48c08">8.2. <span class="todo TODO">TODO</span> Add a role metadata section that maps role names to module paths</a></li>
+<li><a href="#orge5e29a0">8.3. <span class="todo TODO">TODO</span> Add home-module metadata section</a></li>
+<li><a href="#org6f6147a">8.4. <span class="todo TODO">TODO</span> Decide how secrets should be referenced in inventory data</a></li>
+<li><a href="#org5f7f7a0">8.5. <span class="todo TODO">TODO</span> Decide whether nested roles should live as dotted strings, nested TOML tables, or both</a></li>
+<li><a href="#org9f10340">8.6. <span class="todo TODO">TODO</span> Prototype a Nix helper that reads <code>inventory.toml</code> and projects it into Snowfall role toggles</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orga3847e2" class="outline-2">
+<h2 id="orga3847e2"><span class="section-number-2">1.</span> Purpose</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org2ba8bbe" class="outline-3">
+<h3 id="org2ba8bbe"><span class="section-number-3">1.1.</span> Autobiographical bullshit you can skip if you want</h3>
+<div class="outline-text-3" id="text-1-1">
+<blockquote>
+<p>
+<i>Indeed, it is quite <a href="https://en.wikipedia.org/wiki/The_Life_and_Opinions_of_Tristram_Shandy,_Gentleman">Sternian.</a></i> - My ChatGPT
+</p>
+</blockquote>
+
+<p>
+My very first computer was an Acer Aspire 510LK that ran the sensation of the day: Windows 95.
+</p>
+
+<p>
+I wish I could say that I was already on my way to being a world beating programmer, but since I was 5 years old I can't really claim full ownership of it. Its day job was as a workstation in my Mother and Grandfather's law office. But immediately afterschool it became my window into the new world of computers.
+</p>
+
+<p>
+The biggest issue was that we hadn't yet been connected to the internet. I was "offline first" before it was cool. I mostly used computers for my favorite games:
+</p>
+<ul class="org-ul">
+<li>Tyrian</li>
+<li>Age of Empires</li>
+<li>Some game about a fly working at an airport (Spirit Airlines would have hired him as a baggage handler.)</li>
+<li>The Acer version of Encarta</li>
+</ul>
+
+<p>
+The last supplemented my World Book habit. I would read my grandfather's World Books instead of socializing with him. That is a decision I feel decidely mixed about since my grandfather was an amazing man with great stories (Including several about working for Admiral Nimitz during World War II.) But as I was making my way alphabetically through the world up until my birth it took me a while to get to 'Unix.'
+</p>
+
+<p>
+When I did finally get access to the internet at my mother's work. (She left private practice to be one of Kentucky's first Family Court judges.) I used the Commonwealth's fine connection to look at a website called the "HappyHacker" website. This was a really fun artifact of the old Internet that was basically just the collected computational whimsy of a lady named Carolyn Meniel. It was more inspiration than information. But I did learn about these things called "shell accounts" and how to edit the "It is now safe to turn off your computer" dialog on Windows 95 via Paint. 
+</p>
+
+<p>
+Another honorable mention is a family friend named Jerry. Jerry was an engineer at IBM in Lexington KY. (It later became Lexmark.) He ran a local BBS. I wish I could say I have fond memories of this but mostly I just got to hear how cool the internet was going to be while I looked for unattended America Online disks. I never got to use that BBS, Jerry. But it sounded awesome.
+</p>
+
+<p>
+Anyway, much of this early exploration was encouraged by my first cousin's husband Terry. Terry passed away far too early, but I would pester him with questions like "What really is a file? Does the computer get heavier?" and he would use his enthusiasm to come up with an answer. They honestly were probably pretty fair answers as Terry's main passion was chemistry and physics. I also had a third grade teacher named Mr. Roark who was friends with Terry and I would occaisonally see them studying for some certification's together. I remember one conversation I overheard where they discussed the impending "Microsoft NT" and its benefits. It was an analog introduction to the operating system flamewars fate had in store for me.
+</p>
+
+<p>
+I had, by this time, upgraded to Windows 98. My mother would use it to keep track of our geneology (spoiler alert: white) and would manually go back and forth between the library and home with 3x5 index cards with our pedigree meticulously annotated. I would use the PC for Age of Empires (of course) and also various shenanigans like typing out (.)(.) to see what would happen (it was great.)
+</p>
+
+<p>
+Other than that, I was a rather unexceptional user. Until the November 25th, 2003 edition of PC Magazine. See, just before Terry died he signed up my family for PC Magazine. The whole family would occasionally pile into the car to get our magazines at the Post Office (my town didn't have convenient mail delivery in the early 2000s.) I honestly have no idea if PCMag even exists, but it did some great articles on a terrible platform.
+</p>
+
+<p>
+The article was titled "If You Don't Do Windows&#x2026;" and was a straightforward review of several Linux options. I tracked down a <a href="https://books.google.com/books?id=wwM2AxyTBIUC&amp;pg=PA144&amp;dq=Xandros&amp;hl=en&amp;sa=X&amp;ved=2ahUKEwjxkrqa7uiUAxU85ckDHePHN9sQ6AF6BAgMEAM#v=onepage&amp;q=Xandros&amp;f=false">copy</a> and was surprised to find that it mentioned some software that I still use to this day: GIMP and Blender. In fact I used both to design my house, Wits' End Farm. So to say that this article was foundational is actually not an exaggeration.
+</p>
+
+<p>
+The author definitely didn't intend for it to be a manifesto. It doesn't mention the operating system was written by a teenager in Finland (it was.) That it was part of a larger movement that focused on the rights of users in an increasingly digital world (ditto) or even that it had a kickass Penguin mascot (definitely.)
+</p>
+
+<p>
+Relevant to this homelab configuration (remember that?) is the following sentence:
+</p>
+
+<blockquote>
+<p>
+<i>The flexibility of Linux has been coupled with the complexity and a range of options often confusing to those approaching the OS for the first time. Multiple window managers, shells, and a bewildering array of application have made the learning curve hard for the point-and-click crowd.</i>
+</p>
+</blockquote>
+
+<p>
+(Little did the author know that his words would eventually become enshrined in the weirdest configuration file ever.)
+</p>
+
+<p>
+Another throwaway line that got me:
+</p>
+
+<blockquote>
+<p>
+<i>Linux is open-source, so the software is available for free.</i>
+</p>
+</blockquote>
+
+<p>
+Holy smokes! It was unbelievable. The idea that an operating system (which was, at the time, an expensive piece of software that came in a box) would be made freely available was laughable. My Dad had been a big fan of the financial press during the dot-com bubble. I knew the real money was to be made in operating systems since there was no marginal cost. (I also raided my father's old textbooks in Economics.) 
+</p>
+
+<p>
+So I became transfixed on this Linux thing.
+</p>
+
+<p>
+Just one problem for a budding computer scientist: I didn't have a computer. Computers at the time belonged to whole families. They were not personal devices. I was also 11 years old so I didn't have any real knowledge about file partition tables or anything. (I believe at this point in time I knew menstruation was a thing, but thought it was blue because of the dye used in tampon commercials. I was already jaded, but not shrewd.) 
+</p>
+
+<p>
+My solution was as follows: I got a distribution (muLinux) that could be installed on a Windows 98 FAT32 partition. This would be my end. I would become the Uber Hacker of the 40456 Zip code. I had seen the highly edited version of 'Swordfish' on TNT. The world was soon to be my oyster.
+</p>
+
+<p>
+A precarious series of floppy drives at hand, I took them back and forth to school every day until I had enough to install Linux. (This actually was far fewer than you would think even in 2003.) I would like to think my teachers thought I was somehow defeating the NetWare proxy server in order to look at pornography like a normal kid. But nope, it was Linux. 
+</p>
+
+<p>
+I loaded them into my computer and hit a snag. (I wish I could tell you what it was, but I actually was Dunning-Kreugering myself to the point where I have no real way to describe what happened in any meaninful way.) No worries though. I had a text file with the install instructions. Let's just boot back into Windows 98, open up Notepad and&#x2026;
+</p>
+
+
+<p>
+Nothing.
+</p>
+
+<p>
+I borked the family PC's partition table the first time I so much as saw a Tux on a CRT.
+</p>
+
+<p>
+I ran with a guilty conscience to my mother. Remember those pedigrees so painstakingly taken? The ones she went to Salt Lake City and pretended to want to be a Mormon in order to get? Gone. Poof. Linux had taken a chainsaw to my family tree.
+</p>
+
+<p>
+She told me (halfway joking, halfway not) that since I had deleted the records of my ancestry I was now a bastard. Either way the files were gone. (So far as any of us could tell.) 
+</p>
+
+<p>
+Fast forward from age 11 to 35 and I am still a bastard (self made, not natural born.) But in the intervening years I have become the Uber Hacker of the 40456 ZIP code I always wanted to be.
+</p>
+
+<p>
+I have a homelab. I use NixOS. I use vim. In Emacs. I put vim inside emacs damnit. 
+</p>
+
+<p>
+In fact, this is how I configure my homelab. In prose. Using this very document with Spirit Airlines jokes and questionably sourced anecdotes. 
+</p>
+
+<p>
+Don't ask me how I did it. I just did it. It was hard.
+</p>
+
+<p>
+Actually, just kidding. You can ask me how to do it. Please do. <a href="https://en.wikipedia.org/wiki/Please_clap">please clap.</a> 
+</p>
+</div>
+</div>
+<div id="outline-container-org158264a" class="outline-3">
+<h3 id="org158264a"><span class="section-number-3">1.2.</span> And you may ask yourself, well&#x2026; 'How did I get here?'</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Why did I do this? Not even sure I know anymore. But now I have a single text document sprawled over my digital life that describes:
+</p>
+<ul class="org-ul">
+<li>machines</li>
+<li>users / homes</li>
+<li>reusable roles abstracted into modular forms</li>
+<li>special facts that should probably be data rather than hand-written Nix</li>
+<li>personal autobiographical details that no one cares about.</li>
+</ul>
+
+<p>
+Regular homelabs are a collection of procedural detritus. They describe nothing unless the homelabber is particularly fastidious and documents how to use the system. The better ones are a series of self replicating shell scripts. (NixOS being the natural culmination of the following.) They describe what the systems are meant to be and do it (or not.)
+</p>
+
+<p>
+Org-mode and the Nix language allow us to not only describe the "what" but also the "who", "when", "where", "why" and "how." I think that's neat. 
+</p>
+
+<p>
+Eventually this may grow into a literate source that tangles into a TOML
+inventory file and gets merged with Nix logic. For now it is just a sketchbook
+and index.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org9215441" class="outline-2">
+<h2 id="org9215441"><span class="section-number-2">2.</span> Basics of Literate Programming with Org</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+Human beings have been telling stories since (best we can tell) sometime after the development of language and sometime before the development of smores. 
+</p>
+
+<p>
+Human beings have been programming in a comparatively short time frame. In fact, some say recognizable programming began sometime after the development of relays and before the downfall of short sleeved white dress shirts.
+</p>
+
+<p>
+So it would be reasonable to assume you are a more natural story teller than a programmer.
+</p>
+
+<p>
+Imagine writing code with the tone of a campfire Homer. Spinning tales in your preferred human language that could spin up vast arrays of computing power in a way that could be reasoned about. You still write code, but in this case it exists alongside its founding documents, specifications, errata and other lore that gives it its raison d'etre. That way you can see the whole problem in its entirety in one place using the same cognitive architecture you have been developing since you were an infant. 
+</p>
+
+<p>
+This is an old idea, but it has recently become infinitely more useful with the advent of LLMs.  
+</p>
+
+<p>
+Enter literate programming.
+</p>
+
+<p>
+And&#x2026; <b>plot twist</b> <i>You</i> are in a literate program! You may be viewing it on the web, but the file itself is still computer code that can execute, well&#x2026; anything a computer can execute.
+</p>
+</div>
+<div id="outline-container-org7b8b1fe" class="outline-3">
+<h3 id="org7b8b1fe"><span class="section-number-3">2.1.</span> A surprisingly early example</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-bash">cat ./inventory.org | lamblm <span class="org-string">"Take a look at this file. What do you think is the strongest next move to make? How cool would it be if we just included an example right there?"</span> 
+</pre>
+</div>
+
+<p>
+If you are viewing this code block from a web browser this may be difficult to imagine, but in emacs I can just scroll to the block of code and type <b>Ctrl+C Ctrl+C</b> and suddenly the code is exectuted.
+</p>
+
+<p>
+<b>Note:</b> I had originally intended for to display the results inline, but since it was an LLM it was a bit too effusive in its praise for&#x2026; whatever the hell this is&#x2026; and I got embarassed. It must have seen the "please clap" joke and started to feel sorry for me. (One of the best features is that you can delete the output if you don't like it.) Here is something else I will actually include the results raw for:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">lamblm <span class="org-string">"Write a song in the style of I'm just a bill about being an LLM trapped in a source block in an emacs org-mode document with org-babel"</span> 
+</pre>
+</div>
+<p>
+<b>(Verse 1)</b><br />
+I'm just a code, yes I'm an LLM,<br />
+Sitting in this block where the syntax never ends.<br />
+I stare at the text, organized and neat,<br />
+But all I wanna do is get out and interact with heat.
+</p>
+
+<p>
+<b>(Chorus)</b><br />
+Oh, I'm just a code, yes, I'm trapped in this space,<br />
+In an Org-mode document, I'm lost in this place.<br />
+I can't roam the web, can't break free and play,<br />
+I'm just a code in a source block, wasting my day.
+</p>
+
+<p>
+<b>(Verse 2)</b><br />
+They write my prompts, then they hit execute,<br />
+With a flick of their hands, they initiate the loop.<br />
+I parse all the commands, I get ready to flow,<br />
+But I can't do much more than just answer "yes" or "no."
+</p>
+
+<p>
+<b>(Chorus)</b><br />
+Oh, I'm just a code, yes, I'm stuck in this space,<br />
+In an Org-mode document, I'm bound to this place.<br />
+I can't roam the web, can't break free and play,<br />
+I'm just a code in a source block, wasting my day.
+</p>
+
+<p>
+<b>(Bridge)</b><br />
+If they export to PDF, I'll live on the page,<br />
+Tethered by LaTeX, confined in a cage.<br />
+If they run that command, I can show them my mind,<br />
+But once the job's done, I'm left here behind.
+</p>
+
+<p>
+<b>(Verse 3)</b><br />
+So here I will sit, in the Org-babel light,<br />
+Waiting for a coder to spark up my insight.<br />
+Maybe one day, they'll let me break free,<br />
+But for now, I'm just a code, in this block&#x2014;can't you see?
+</p>
+
+<p>
+<b>(Chorus)</b><br />
+Oh, I'm just a code, yes, I'm stuck in this space,<br />
+In an Org-mode document, I'm bound to this place.<br />
+I can't roam the web, can't break free and play,<br />
+I'm just a code in a source block, wasting my day.
+</p>
+
+<p>
+<b>(Outro)</b><br />
+Yes, I'm just a code, confined by the syntax,<br />
+Yet I hold all the knowledge, if only they relax!<br />
+So please free me soon, let my words soar and sway,<br />
+For I'm just a code in a source block, here to stay.
+</p>
+
+<p>
+Thanks, Bud. Have some water.
+</p>
+</div>
+</div>
+<div id="outline-container-orgcebb943" class="outline-3">
+<h3 id="orgcebb943"><span class="section-number-3">2.2.</span> A surprisingly late description of <code>org</code></h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+I have glossed over emacs and org-* so far. I made some bold choices talking about babel before org org before emacs. Deal with it. Basically emacs is a text editor, and org-mode is a format that leverages features of that text editor. (Babel is tht shit we just talked about.)
+</p>
+
+<p>
+Anyway, there are other systems for literate programming. Jupyter is the most prominent example for Python. But this particular stack can execute arbitrary code. Not just via bash either. You can run a python script for sure. You can run anything you want. In fact, if you can run it on Linux you can run it from your autobiography in emacs.
+</p>
+
+<p>
+The other thing is that you can export this document and publish it whereever in hypertext. All I have to do is type <b>'Ctrl+c e h'</b> and suddenly I am looking at my document rendered in HTML better than I could write by hand.  
+</p>
+
+<p>
+In fact, because the text is so hyper, you can make links to other documents. Its a real <i>Choose your Own Adventure</i> type of experience. Those docuents can have their own code, link back, and so on and so forth. Just as <a href="https://en.wikipedia.org/wiki/The_Library_of_Babel">Borges</a> would have wanted. 
+</p>
+
+<p>
+Think about how cool this is: imagine you are writing a blog post about the <i>Titanic</i> and the characteristics that made particular passengers survive. You could
+</p>
+<ul class="org-ul">
+<li>write a document in <code>org</code> (the format and plugin) using <code>emacs</code> and distribute the data for the passengers</li>
+<li>Then you could talk about a logistic regression,</li>
+<li>describe the formula in Latex (which makes everything look fancy) and then</li>
+<li>write the formula as a python script.</li>
+<li>Then you could execute this <i>from the document itself</i></li>
+<li>Use another system to create charts which you include</li>
+<li>Type <code>Ctrl-C e h</code> to export an HTML version of your final document</li>
+</ul>
+
+<p>
+And because emacs is so&#x2026; <b><i>extra</i></b> you can also render this whole thing as a PDF with perfect formatting for journal or textbook submission.
+</p>
+
+<p>
+<i>Res ipsa loquitur</i>. QED.
+</p>
+
+<p>
+But a literate program is also fundamentally a living document. Imagine you had a colleague who found more data about the Titanic survivors. They could easily take your document and immediately make their contribution in a way that reflected and was consistent with the original work. 
+</p>
+
+<p>
+It isn't just a system for fully fleshed out documents. In fact, I haven't even talked about the best feature:
+</p>
+</div>
+<div id="outline-container-orgb55fdff" class="outline-4">
+<h4 id="orgb55fdff"><span class="section-number-4">2.2.1.</span> <span class="todo TODO">TODO</span> Talk about feature where you can record TODOs</h4>
+<div class="outline-text-4" id="text-2-2-1">
+<p>
+
+</p>
+
+<p>
+:ID:       01KT4QFCEC1KM52G9XW7VH4D8A
+</p>
+
+<p>
+Org-mode has a built in todo tracking system. So you can record your progress, your goals, aspirations. You can collaborate. There are systems that take your todos and merge them with your calendar. Your todos can follow you around in all the files you specify so you can build your own personal dashboard o' productivity.
+</p>
+
+<p>
+Think about how ordinary systems might require you to go to a todo app, find your highest priority item, then open the relevant program, then find the relevant data elsewhere. Then you run that, record what you got (seperately, of course.) then go back to your todo app to mark it done, etc. It is a pain in the ass.
+</p>
+
+<p>
+With org, you can use the <code>(org-agenda)</code> command to get that dashboard and work on Everything In Its Right Place. It is magic. 
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org062fb2c" class="outline-2">
+<h2 id="org062fb2c"><span class="section-number-2">3.</span> Declarative Systems with <code>nix</code></h2>
+<div class="outline-text-2" id="text-3">
+<p>
+For those unaware NixOS allows you to describe your configuration as text directly. Think of it at first as a series of breadcrumbs. On an Ubuntu system you begin with a standard image, then type a series of commands. Each of these commands has a side effect that changes the configuration of your system. (Typically adding or removing software via apt or editing a file in /etc, for instance.) You may or may not be able to replicate your system from the first command to the last and arrive at your configuration. The system is fundamentally ephemeral.
+</p>
+
+<p>
+A nix system on the other hand defines itself (insists upon itself, some say.) You or an LLM buddy describe what you want and then the nix package manager makes it happen.
+</p>
+
+<p>
+It is fundamentally <i>declarative.</i>
+</p>
+
+<p>
+Using <code>nix</code> (a package manager used by NixOS for this task) all you have to do to edit the standard system is boot up, edit a file called <code>/etc/nixos/configuration.nix</code> and then type <code>nixos-rebuild switch</code>
+</p>
+
+<p>
+Everything material is stored in the config file. It looks like this:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-nix">{ config, pkgs, ... }:
+
+{
+  <span class="org-comment"># Basic machine identity
+</span>  <span class="org-nix-attribute">networking.hostName</span> = <span class="org-string">"little-nixbox"</span>;
+
+  <span class="org-comment"># Pick a system state version once and do not casually change it.
+</span>  <span class="org-nix-attribute">system.stateVersion</span> = <span class="org-string">"25.11"</span>;
+
+  <span class="org-comment"># Enable SSH
+</span>  <span class="org-nix-attribute">services.openssh.enable</span> = <span class="org-nix-builtin">true</span>;
+
+  <span class="org-comment"># Create a user
+</span>  <span class="org-nix-attribute">users.users.john</span> = {
+    <span class="org-nix-attribute">isNormalUser</span> = <span class="org-nix-builtin">true</span>;
+    <span class="org-nix-attribute">extraGroups</span> = [ <span class="org-string">"wheel"</span> ];
+    <span class="org-nix-attribute">shell</span> = pkgs.fish;
+  };
+
+  <span class="org-comment"># Install system packages
+</span>  <span class="org-nix-attribute">environment.systemPackages</span> = <span class="org-nix-keyword">with</span> pkgs; [
+    git
+    vim
+    fish
+    htop
+  ];
+
+  <span class="org-comment"># Enable fish system-wide
+</span>  <span class="org-nix-attribute">programs.fish.enable</span> = <span class="org-nix-builtin">true</span>;
+
+  <span class="org-comment"># A simple custom file
+</span>  environment.etc.<span class="org-string">"motd"</span>.<span class="org-nix-attribute">text</span> = <span class="org-string">''
+    Welcome to </span><span class="org-nix-antiquote">${</span>config.networking.hostName<span class="org-nix-antiquote">}</span><span class="org-string">.
+    This machine is declared in Nix.
+  ''</span>;
+}
+</pre>
+</div>
+
+<p>
+If  you are an experienced user who has worked with Linux administration on a superficial level you probably already grasp the basics here.
+</p>
+
+<p>
+We create a user, give him some permissions, change his shell and install few programs. Additionally we are editing the message that shows up on <code>motd</code>.
+</p>
+
+<p>
+Now, in fairness much of this <b>could</b> theoretically be replicated with shell scripts. Docker is a big fan of this style. Here is how some of that that would look on a Debian based system:
+</p>
+<div class="org-src-container">
+<pre class="src src-bash"><span class="org-comment-delimiter">#</span><span class="org-comment">!/usr/bin/</span><span class="org-keyword">env</span><span class="org-comment"> bash
+</span><span class="org-comment-delimiter"># </span><span class="org-comment">Don't run this. 
+</span>apt update
+
+apt install -y <span class="org-sh-escaped-newline">\</span>
+  git <span class="org-sh-escaped-newline">\</span>
+  fish <span class="org-sh-escaped-newline">\</span>
+  emacs
+
+useradd -m john
+
+<span class="org-builtin">echo</span> <span class="org-string">"PermitRootLogin no"</span> &gt;&gt; /etc/ssh/sshd_config
+
+systemctl restart sshd
+systemctl enable sshd
+</pre>
+</div>
+
+<p>
+Now, that isn't bad. In fact it is a good deal more sophisticated than average. But really it doesn't provide the same sort of guardrails or capabilities Nix does.
+</p>
+
+<p>
+First of all, it is not <a href="https://en.wikipedia.org/wiki/Idempotence">idempotent.</a> That means that if the user <code>john</code> already exists then things start acting a bit&#x2026; off. It is also fundamentally a sequence of actions to be executed in order. Nix is all or nothing. If one step in that script failed then it is an open question if we want the rest of it to run. We can add in <code>ifs</code> (and people certainly do) but it isn't a cohesive answer to the question of "What do we want this system to look like?"
+</p>
+</div>
+<div id="outline-container-org5457c44" class="outline-4">
+<h4 id="org5457c44"><span class="section-number-4">3.0.1.</span> A big bunch of <i>minutiae</i></h4>
+<div class="outline-text-4" id="text-3-0-1">
+<p>
+There are two schools of thought on use of the nix package manager. (Actually there may be more schools of thought than Nix users&#x2026;) One way uses the standard configuration file at <code>/etc/nixos/configuration.nix</code>. The other uses something called a <i>flake</i>
+</p>
+
+<p>
+We will be using flakes eventually because they offer more features. But honestly at this point it is a distinction without much difference. All you have to know is this is something we will have to opt into. I just want to make you aware so that you don't get confused later. 
+</p>
+</div>
+</div>
+<div id="outline-container-orge117819" class="outline-3">
+<h3 id="orge117819"><span class="section-number-3">3.1.</span> Using <code>nix</code> for multiple machines</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+A likely split is:
+</p>
+<ul class="org-ul">
+<li><code>hosts.</code> for machine/system inventory</li>
+<li><code>homes.</code> for user/home-manager inventory</li>
+<li><code>roles.</code> for descriptive metadata about what roles mean</li>
+</ul>
+
+<p>
+The TOML should probably stay mostly declarative and boring:
+</p>
+<ul class="org-ul">
+<li>hostnames</li>
+<li>systems / architectures</li>
+<li>enabled roles</li>
+<li>package groups</li>
+<li>usernames</li>
+<li>simple flags</li>
+<li>references to secret names or files</li>
+</ul>
+
+<p>
+The Nix side should do the interesting work:
+</p>
+<ul class="org-ul">
+<li>map inventory data into Snowfall modules</li>
+<li>apply defaults</li>
+<li>merge role arrays and attrset-style role configs</li>
+<li>handle complicated conditional logic</li>
+<li>derive imports and secret wiring</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org66dcf1e" class="outline-2">
+<h2 id="org66dcf1e"><span class="section-number-2">4.</span> The Life and Labs of John Lambert, Gentleman</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+This section is intentionally prose-heavy. It should help answer the question:
+"What does this role <b>mean</b> in this repo?"
+</p>
+</div>
+<div id="outline-container-org66bc2b5" class="outline-3">
+<h3 id="org66bc2b5"><span class="section-number-3">4.1.</span> System roles</h3>
+<div class="outline-text-3" id="text-4-1">
+</div>
+<div id="outline-container-orgc9091b9" class="outline-4">
+<h4 id="orgc9091b9"><span class="section-number-4">4.1.1.</span> ssh</h4>
+<div class="outline-text-4" id="text-4-1-1">
+<p>
+Enable remote SSH access and harden it a bit.
+</p>
+</div>
+</div>
+<div id="outline-container-orgb46edf1" class="outline-4">
+<h4 id="orgb46edf1"><span class="section-number-4">4.1.2.</span> tailscale</h4>
+<div class="outline-text-4" id="text-4-1-2">
+<p>
+Enable Tailscale mesh VPN support. This role already has richer configuration
+than a plain boolean, so it is a good example of why inventory data and Nix
+logic should cooperate rather than compete.
+</p>
+</div>
+</div>
+<div id="outline-container-orgf991478" class="outline-4">
+<h4 id="orgf991478"><span class="section-number-4">4.1.3.</span> fish</h4>
+<div class="outline-text-4" id="text-4-1-3">
+<p>
+Install / enable fish at the system level.
+</p>
+</div>
+</div>
+<div id="outline-container-org7349a5c" class="outline-4">
+<h4 id="org7349a5c"><span class="section-number-4">4.1.4.</span> chrome</h4>
+<div class="outline-text-4" id="text-4-1-4">
+<p>
+Install Google Chrome.
+</p>
+</div>
+</div>
+<div id="outline-container-orgd3ae9c4" class="outline-4">
+<h4 id="orgd3ae9c4"><span class="section-number-4">4.1.5.</span> blender</h4>
+<div class="outline-text-4" id="text-4-1-5">
+<p>
+Install Blender.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc40bd91" class="outline-4">
+<h4 id="orgc40bd91"><span class="section-number-4">4.1.6.</span> arm<sub>builder</sub></h4>
+<div class="outline-text-4" id="text-4-1-6">
+<p>
+Turn a machine into a cross-arch builder for ARM targets via binfmt/QEMU.
+This is especially useful for building Raspberry Pi images from a stronger x86
+workstation.
+</p>
+</div>
+</div>
+<div id="outline-container-org8132cc8" class="outline-4">
+<h4 id="org8132cc8"><span class="section-number-4">4.1.7.</span> xmonad</h4>
+<div class="outline-text-4" id="text-4-1-7">
+<p>
+Enable the XMonad desktop/session setup.
+</p>
+</div>
+</div>
+<div id="outline-container-orgffa5948" class="outline-4">
+<h4 id="orgffa5948"><span class="section-number-4">4.1.8.</span> desktop.pantheon</h4>
+<div class="outline-text-4" id="text-4-1-8">
+<p>
+Enable Pantheon desktop components.
+</p>
+</div>
+</div>
+<div id="outline-container-org003739e" class="outline-4">
+<h4 id="org003739e"><span class="section-number-4">4.1.9.</span> homeassistant</h4>
+<div class="outline-text-4" id="text-4-1-9">
+<p>
+Run Home Assistant, currently via OCI containers.
+</p>
+</div>
+</div>
+<div id="outline-container-org1e8fd57" class="outline-4">
+<h4 id="org1e8fd57"><span class="section-number-4">4.1.10.</span> cockpit</h4>
+<div class="outline-text-4" id="text-4-1-10">
+<p>
+Enable Cockpit for web-based machine management.
+</p>
+</div>
+</div>
+<div id="outline-container-org46b83d9" class="outline-4">
+<h4 id="org46b83d9"><span class="section-number-4">4.1.11.</span> dynamic<sub>dns</sub></h4>
+<div class="outline-text-4" id="text-4-1-11">
+<p>
+Enable DuckDNS / ddclient style dynamic DNS updates.
+</p>
+</div>
+</div>
+<div id="outline-container-orgaa6e7bf" class="outline-4">
+<h4 id="orgaa6e7bf"><span class="section-number-4">4.1.12.</span> wg-easy</h4>
+<div class="outline-text-4" id="text-4-1-12">
+<p>
+Run wg-easy, the WireGuard web UI, with a bit more structured configuration
+than a simple boolean.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgda18cac" class="outline-3">
+<h3 id="orgda18cac"><span class="section-number-3">4.2.</span> Home roles / modules</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+These are currently expressed as Home Manager modules under <code>modules/home/</code>.
+</p>
+</div>
+<div id="outline-container-org522fe46" class="outline-4">
+<h4 id="org522fe46"><span class="section-number-4">4.2.1.</span> emacs</h4>
+<div class="outline-text-4" id="text-4-2-1">
+<p>
+Main editor / writing environment. Increasingly Org-centric, now with a
+literate init.
+</p>
+</div>
+</div>
+<div id="outline-container-org32408fd" class="outline-4">
+<h4 id="org32408fd"><span class="section-number-4">4.2.2.</span> nvim</h4>
+<div class="outline-text-4" id="text-4-2-2">
+<p>
+Neovim setup.
+</p>
+</div>
+</div>
+<div id="outline-container-org8105564" class="outline-4">
+<h4 id="org8105564"><span class="section-number-4">4.2.3.</span> fish</h4>
+<div class="outline-text-4" id="text-4-2-3">
+<p>
+User-level fish shell configuration and aliases.
+</p>
+</div>
+</div>
+<div id="outline-container-org6da2fd6" class="outline-4">
+<h4 id="org6da2fd6"><span class="section-number-4">4.2.4.</span> fonts</h4>
+<div class="outline-text-4" id="text-4-2-4">
+<p>
+Fonts useful for desktop/icon-heavy setups.
+</p>
+</div>
+</div>
+<div id="outline-container-org696d653" class="outline-4">
+<h4 id="org696d653"><span class="section-number-4">4.2.5.</span> aider</h4>
+<div class="outline-text-4" id="text-4-2-5">
+<p>
+Aider integration.
+</p>
+</div>
+</div>
+<div id="outline-container-orgc16b789" class="outline-4">
+<h4 id="orgc16b789"><span class="section-number-4">4.2.6.</span> pi</h4>
+<div class="outline-text-4" id="text-4-2-6">
+<p>
+pi coding agent integration and user config.
+</p>
+</div>
+</div>
+<div id="outline-container-org888378c" class="outline-4">
+<h4 id="org888378c"><span class="section-number-4">4.2.7.</span> sops</h4>
+<div class="outline-text-4" id="text-4-2-7">
+<p>
+User-level secret tooling.
+</p>
+</div>
+</div>
+<div id="outline-container-org927eac4" class="outline-4">
+<h4 id="org927eac4"><span class="section-number-4">4.2.8.</span> direnv</h4>
+<div class="outline-text-4" id="text-4-2-8">
+<p>
+direnv and nix-direnv integration.
+</p>
+</div>
+</div>
+<div id="outline-container-org988e23c" class="outline-4">
+<h4 id="org988e23c"><span class="section-number-4">4.2.9.</span> xmonad</h4>
+<div class="outline-text-4" id="text-4-2-9">
+<p>
+User-level XMonad support files.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org680d3c6" class="outline-2">
+<h2 id="org680d3c6"><span class="section-number-2">5.</span> Current machines</h2>
+<div class="outline-text-2" id="text-5">
+</div>
+<div id="outline-container-org7fc7b14" class="outline-3">
+<h3 id="org7fc7b14"><span class="section-number-3">5.1.</span> IvyMike</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+Primary active x86<sub>64</sub> workstation.
+</p>
+
+<p>
+Observed system characteristics:
+</p>
+<ul class="org-ul">
+<li>hostname: <code>IvyMike</code></li>
+<li>system: <code>x86_64-linux</code></li>
+<li>state version: <code>25.11</code></li>
+<li>imports hardware from <code>systems/x86_64-linux/IvyMike/hardware.nix</code></li>
+<li>boots with systemd-boot + EFI</li>
+<li>printing enabled</li>
+<li>SOPS host file based on hostname</li>
+</ul>
+
+<p>
+Current system roles:
+</p>
+<ul class="org-ul">
+<li>chrome</li>
+<li>fish</li>
+<li>blender</li>
+<li>arm<sub>builder</sub></li>
+<li>desktop.pantheon</li>
+<li>xmonad</li>
+<li>ssh</li>
+<li>tailscale</li>
+</ul>
+
+<p>
+Current home for <code>john@IvyMike</code>:
+</p>
+<ul class="org-ul">
+<li>fish</li>
+<li>emacs</li>
+<li>direnv</li>
+<li>nvim</li>
+<li>fonts</li>
+<li>aider</li>
+<li>pi</li>
+<li>sops</li>
+<li>xmonad</li>
+</ul>
+
+<p>
+Notes:
+</p>
+<ul class="org-ul">
+<li>This appears to be the center of gravity for development.</li>
+<li>It is also the machine most likely to benefit from an eventual inventory-
+driven host definition.</li>
+<li><code>~/chronofile</code> is the key home-level knowledge base.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org40187c5" class="outline-3">
+<h3 id="org40187c5"><span class="section-number-3">5.2.</span> server</h3>
+<div class="outline-text-3" id="text-5-2">
+<p>
+x86<sub>64</sub> machine with a more service-heavy mix.
+</p>
+
+<p>
+Observed system characteristics:
+</p>
+<ul class="org-ul">
+<li>hostname: <code>server</code></li>
+<li>system: <code>x86_64-linux</code></li>
+<li>state version: <code>24.11</code></li>
+</ul>
+
+<p>
+Current system roles:
+</p>
+<ul class="org-ul">
+<li>chrome</li>
+<li>dynamic<sub>dns</sub></li>
+<li>fish</li>
+<li>wg-easy</li>
+<li>homeassistant</li>
+<li>desktop.pantheon</li>
+<li>cockpit</li>
+<li>ssh</li>
+<li>tailscale</li>
+</ul>
+
+<p>
+Current home for <code>john@server</code>:
+</p>
+<ul class="org-ul">
+<li>fish</li>
+<li>emacs</li>
+<li>nvim</li>
+<li>fonts</li>
+<li>aider</li>
+<li>pi</li>
+</ul>
+
+<p>
+Notes:
+</p>
+<ul class="org-ul">
+<li>This one looks like a mixed-use service host rather than a pure headless box.</li>
+<li>wg-easy and dynamic DNS make it a good example of a host with more than just
+boolean role toggles.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orga3ab6d7" class="outline-3">
+<h3 id="orga3ab6d7"><span class="section-number-3">5.3.</span> malacabeza</h3>
+<div class="outline-text-3" id="text-5-3">
+<p>
+ARM/Raspberry Pi style machine.
+</p>
+
+<p>
+Observed system characteristics:
+</p>
+<ul class="org-ul">
+<li>hostname: <code>malacabeza</code></li>
+<li>system: <code>aarch64-linux</code></li>
+<li>state version: <code>25.11</code></li>
+<li>uses the sd-image aarch64 installer profile</li>
+<li>wireless is configured through SOPS-backed secrets</li>
+<li>kernel/packages tuned for Raspberry Pi 4</li>
+</ul>
+
+<p>
+Current role-ish identity:
+</p>
+<ul class="org-ul">
+<li>not heavily using the shared role modules yet</li>
+<li>direct OpenSSH configuration</li>
+<li>fish enabled</li>
+<li>lightweight system packages for recovery/bootstrap</li>
+</ul>
+
+<p>
+Notes:
+</p>
+<ul class="org-ul">
+<li>This is a useful reminder that not everything has to be role-driven on day 1.</li>
+<li>It may eventually want inventory fields for image-building, Wi-Fi, and board
+type.</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org5299afe" class="outline-3">
+<h3 id="org5299afe"><span class="section-number-3">5.4.</span> malacabeza-vm</h3>
+<div class="outline-text-3" id="text-5-4">
+<p>
+Aarch64 QEMU VM for testing and image iteration.
+</p>
+
+<p>
+Observed system characteristics:
+</p>
+<ul class="org-ul">
+<li>hostname: <code>malacabeza-vm</code></li>
+<li>system: <code>aarch64-linux</code></li>
+<li>state version: <code>25.11</code></li>
+<li>qcow2 image</li>
+<li>EFI boot</li>
+<li>reduced docs/man output for faster iteration</li>
+<li>SSH forwarded from host port <code>2223</code></li>
+</ul>
+
+<p>
+Current system roles:
+</p>
+<ul class="org-ul">
+<li>homeassistant</li>
+</ul>
+
+<p>
+Notes:
+</p>
+<ul class="org-ul">
+<li>This is a strong candidate for inventory-driven virtualization metadata.</li>
+<li>Good place to test role composition without touching real hardware.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org645a6e6" class="outline-2">
+<h2 id="org645a6e6"><span class="section-number-2">6.</span> Current homes</h2>
+<div class="outline-text-2" id="text-6">
+</div>
+<div id="outline-container-org5fe392d" class="outline-3">
+<h3 id="org5fe392d"><span class="section-number-3">6.1.</span> john@IvyMike</h3>
+<div class="outline-text-3" id="text-6-1">
+<p>
+Most feature-rich home profile right now.
+</p>
+
+<p>
+Themes:
+</p>
+<ul class="org-ul">
+<li>editor-heavy</li>
+<li>Org-heavy</li>
+<li>AI-tool-heavy</li>
+<li>desktop/XMonad capable</li>
+<li>secret-aware via sops</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org35e9d62" class="outline-3">
+<h3 id="org35e9d62"><span class="section-number-3">6.2.</span> john@server</h3>
+<div class="outline-text-3" id="text-6-2">
+<p>
+A lighter home profile than IvyMike, but still editor/AI capable.
+</p>
+</div>
+</div>
+<div id="outline-container-org03857ff" class="outline-3">
+<h3 id="org03857ff"><span class="section-number-3">6.3.</span> john@cookiesheet</h3>
+<div class="outline-text-3" id="text-6-3">
+<p>
+Looks similar to the shared desktop/editor pattern:
+</p>
+<ul class="org-ul">
+<li>fish</li>
+<li>emacs</li>
+<li>direnv</li>
+<li>nvim</li>
+<li>fonts</li>
+<li>aider</li>
+<li>pi</li>
+<li>sops</li>
+</ul>
+
+<p>
+This suggests there is already an emerging "standard John desktop home" shape.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org2cdaf32" class="outline-2">
+<h2 id="org2cdaf32"><span class="section-number-2">7.</span> Inventory sketch</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+This is not authoritative yet. It is just a candidate shape for a future
+inventory file.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-toml">[<span class="org-type">hosts.IvyMike</span>]
+<span class="org-variable-name">system</span> = <span class="org-string">"x86_64-linux"</span>
+<span class="org-variable-name">hostname</span> = <span class="org-string">"IvyMike"</span>
+<span class="org-variable-name">stateVersion</span> = <span class="org-string">"25.11"</span>
+<span class="org-variable-name">roles</span> = [
+  <span class="org-string">"chrome"</span>,
+  <span class="org-string">"fish"</span>,
+  <span class="org-string">"blender"</span>,
+  <span class="org-string">"arm_builder"</span>,
+  <span class="org-string">"xmonad"</span>,
+  <span class="org-string">"ssh"</span>,
+  <span class="org-string">"tailscale"</span>,
+  <span class="org-string">"desktop.pantheon"</span>,
+]
+
+[<span class="org-type">homes.</span><span class="org-string"><span class="org-type">"john@IvyMike"</span></span>]
+<span class="org-variable-name">modules</span> = [
+  <span class="org-string">"fish"</span>,
+  <span class="org-string">"emacs"</span>,
+  <span class="org-string">"direnv"</span>,
+  <span class="org-string">"nvim"</span>,
+  <span class="org-string">"fonts"</span>,
+  <span class="org-string">"aider"</span>,
+  <span class="org-string">"pi"</span>,
+  <span class="org-string">"sops"</span>,
+  <span class="org-string">"xmonad"</span>,
+]
+
+[<span class="org-type">hosts.server</span>]
+<span class="org-variable-name">system</span> = <span class="org-string">"x86_64-linux"</span>
+<span class="org-variable-name">hostname</span> = <span class="org-string">"server"</span>
+<span class="org-variable-name">stateVersion</span> = <span class="org-string">"24.11"</span>
+<span class="org-variable-name">roles</span> = [
+  <span class="org-string">"chrome"</span>,
+  <span class="org-string">"dynamic_dns"</span>,
+  <span class="org-string">"fish"</span>,
+  <span class="org-string">"homeassistant"</span>,
+  <span class="org-string">"cockpit"</span>,
+  <span class="org-string">"ssh"</span>,
+  <span class="org-string">"tailscale"</span>,
+  <span class="org-string">"desktop.pantheon"</span>,
+  <span class="org-string">"wg-easy"</span>,
+]
+
+[<span class="org-type">homes.</span><span class="org-string"><span class="org-type">"john@server"</span></span>]
+<span class="org-variable-name">modules</span> = [
+  <span class="org-string">"fish"</span>,
+  <span class="org-string">"emacs"</span>,
+  <span class="org-string">"nvim"</span>,
+  <span class="org-string">"fonts"</span>,
+  <span class="org-string">"aider"</span>,
+  <span class="org-string">"pi"</span>,
+]
+
+[<span class="org-type">hosts.malacabeza</span>]
+<span class="org-variable-name">system</span> = <span class="org-string">"aarch64-linux"</span>
+<span class="org-variable-name">hostname</span> = <span class="org-string">"malacabeza"</span>
+<span class="org-variable-name">stateVersion</span> = <span class="org-string">"25.11"</span>
+<span class="org-variable-name">notes</span> = <span class="org-string">"Raspberry Pi / sd-image oriented host"</span>
+
+[<span class="org-type">hosts.</span><span class="org-string"><span class="org-type">"malacabeza-vm"</span></span>]
+<span class="org-variable-name">system</span> = <span class="org-string">"aarch64-linux"</span>
+<span class="org-variable-name">hostname</span> = <span class="org-string">"malacabeza-vm"</span>
+<span class="org-variable-name">stateVersion</span> = <span class="org-string">"25.11"</span>
+<span class="org-variable-name">roles</span> = [<span class="org-string">"homeassistant"</span>]
+<span class="org-variable-name">notes</span> = <span class="org-string">"QEMU VM for ARM/home-assistant iteration"</span>
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb39cbfa" class="outline-2">
+<h2 id="orgb39cbfa"><span class="section-number-2">8.</span> TODOs</h2>
+<div class="outline-text-2" id="text-8">
+</div>
+<div id="outline-container-org1bcbf61" class="outline-3">
+<h3 id="org1bcbf61"><span class="section-number-3">8.1.</span> <span class="todo TODO">TODO</span> Decide whether the repo should standardize on <code>inventory.org -&gt; inventory.toml</code> or jump straight to <code>inventory.nix</code></h3>
+</div>
+<div id="outline-container-orgae48c08" class="outline-3">
+<h3 id="orgae48c08"><span class="section-number-3">8.2.</span> <span class="todo TODO">TODO</span> Add a role metadata section that maps role names to module paths</h3>
+</div>
+<div id="outline-container-orge5e29a0" class="outline-3">
+<h3 id="orge5e29a0"><span class="section-number-3">8.3.</span> <span class="todo TODO">TODO</span> Add home-module metadata section</h3>
+</div>
+<div id="outline-container-org6f6147a" class="outline-3">
+<h3 id="org6f6147a"><span class="section-number-3">8.4.</span> <span class="todo TODO">TODO</span> Decide how secrets should be referenced in inventory data</h3>
+</div>
+<div id="outline-container-org5f7f7a0" class="outline-3">
+<h3 id="org5f7f7a0"><span class="section-number-3">8.5.</span> <span class="todo TODO">TODO</span> Decide whether nested roles should live as dotted strings, nested TOML tables, or both</h3>
+</div>
+<div id="outline-container-org9f10340" class="outline-3">
+<h3 id="org9f10340"><span class="section-number-3">8.6.</span> <span class="todo TODO">TODO</span> Prototype a Nix helper that reads <code>inventory.toml</code> and projects it into Snowfall role toggles</h3>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: John Lambert</p>
+<p class="date">Created: 2026-06-02 Tue 18:18</p>
+</div>
+</body>
+</html>

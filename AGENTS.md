@@ -24,13 +24,13 @@ This repository is John Lambert's Nix/Home Manager setup built with Snowfall.
 - `systems/<system>/<host>/default.nix` - host system configs
 - `modules/home/*` - reusable Home Manager modules
 - `modules/nixos/*` - reusable NixOS modules
-- `modules/home/emacs/` - Emacs package list and `init.el`
+- `modules/home/emacs/` - Emacs package list and literate `init.org`
 - `modules/home/pi/` - pi agent config deployed into `~/.pi/agent/`
 - `secrets/` - separate secrets repo used as a flake input; treat as sensitive
 
 ## Emacs / Org notes
 
-- Emacs config lives in `modules/home/emacs/init.el`.
+- Emacs config lives in `modules/home/emacs/init.org`.
 - Home Manager wiring for Emacs lives in `modules/home/emacs/default.nix`.
 - `org-directory` is set to `~/chronofile` in the Emacs init.
 - Emacs now also installs `eat` and the `dnouri/pi-coding-agent` frontend declaratively via Nix.

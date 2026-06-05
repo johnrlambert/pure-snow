@@ -4,7 +4,7 @@ with lib;
 with lib.homelab;
 
 let
-  enabled = config.homelab.roles.xmonad or false;
+  enabled = hasRole "xmonad" config.homelab.roles;
 in
 {
   options.homelab.roles.xmonad = mkEnableOption "XMonad window manager";

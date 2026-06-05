@@ -169,7 +169,7 @@ EOF
     enable = true;
     shellAliases = {
       ls = "exa -lah --icons=always --hyperlink";
-      vim = "nvim";
+      vim = "emacsclient -c -a \"\"";
     };
     interactiveShellInit = ''
       # Make OpenAI-backed CLI tools (llm, aider, gptel, etc.) work in fish.

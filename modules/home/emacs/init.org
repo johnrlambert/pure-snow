@@ -5,7 +5,7 @@
 #+property: header-args:emacs-lisp :tangle init.el :results none :comments no
 
 * Overview
-** Will the real init.el please stand up?
+** Will the real init.org please stand up?
 :PROPERTIES:
 :ID:       01KT47Z8NX9E82FSJAMM1JC2AJ
 :END:
@@ -25,9 +25,11 @@ Home Manager build. That gives me three nice properties at once:
 2. The reasoning for each section can live right next to the code.
 3. The TODOs can live right alongside the code itself. That means that I can create something like:
 *** TODO Write a sample todo :nix-config: :example-todo:
+
 :PROPERTIES:
 :ID:       01KT4816KR4EVKS5Y1CZANCFA7
 :END:
+
 and it will just transparently live with the code /in situ/ but also be managed by globally by org-agenda.
 ** Evil Mode   
 Luckily for vim refugees like myself there are all sorts of interesting ways to accomodate the years we spent trying to figure out how to exit it. Emacs provides the very appropriately named 'evil-mode' for this purpose.
@@ -131,6 +133,10 @@ A few noteworthy choices:
 - =org-startup-indented= and hidden leading stars make files look cleaner.
 - =org-ellipsis= uses a custom fold marker.
 - =org-return-follows-link= makes =RET= more link-friendly.
+- a small GTD-ish TODO workflow gives tasks a little more structure than a
+  single =TODO/DONE= pair.
+- logging completion / cancellation into drawers keeps historical metadata
+  without cluttering the visible outline too badly.
 - source block settings make Babel editing behave more like a real code editor.
 - the HTML export header injects Bulma and some small custom CSS.
 
@@ -147,6 +153,10 @@ A few noteworthy choices:
   (setq org-hide-leading-stars t)
   (setq org-ellipsis " ▾")
   (setq org-return-follows-link t)
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "NEXT(n)" "PROJECT(p)" "WAITING(w@/!)" "SOMEDAY(s)" "|" "DONE(d!)" "CANCELLED(c@)")))
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
   (setq org-src-fontify-natively t)
   (setq org-src-tab-acts-natively t)
   (setq org-edit-src-content-indentation 0)
@@ -192,6 +202,11 @@ A few noteworthy choices:
   :ensure t
   :config
   (setq org-babel-coffee-command "coffee"))
+
+(use-package ob-mermaid
+  :ensure t
+  :config
+  (setq ob-mermaid-cli-path "mmdc"))
 #+end_src
 
 * Indentation policy
@@ -346,11 +361,58 @@ The Babel section enables a modest set of languages:
 - Python
 - Nix
 - JavaScript
-- CoffeeScript
+- CoffeeScript (really)
+- Mermaid for charting
 
 Given the repository, the Nix support is especially relevant.
 
 #+begin_src emacs-lisp
+(defun my/org-export-asset-files ()
+  "Collect local file assets referenced by the current Org buffer."
+  (let ((base-dir (file-name-directory (or (buffer-file-name) default-directory)))
+        assets)
+    (org-element-map (org-element-parse-buffer) 'link
+      (lambda (link)
+        (when (string= (org-element-property :type link) "file")
+          (let* ((path (org-link-unescape (org-element-property :path link)))
+                 (file (expand-file-name path base-dir)))
+            (when (file-regular-p file)
+              (push file assets))))))
+    (org-element-map (org-element-parse-buffer) 'src-block
+      (lambda (src)
+        (let* ((params (org-babel-parse-header-arguments (or (org-element-property :parameters src) "")))
+               (path (cdr (assq :file params)))
+               (file (and path (expand-file-name path base-dir))))
+          (when (and file (file-regular-p file))
+            (push file assets)))))
+    (delete-dups assets)))
+
+(defun my/org-copy-export-assets (export-dir)
+  "Copy local Org asset files into EXPORT-DIR, preserving relative paths when possible."
+  (let ((base-dir (file-name-directory (or (buffer-file-name) default-directory))))
+    (dolist (file (my/org-export-asset-files))
+      (let* ((relative (file-relative-name file base-dir))
+             (target (expand-file-name
+                      (if (string-prefix-p "../" relative)
+                          (file-name-nondirectory file)
+                        relative)
+                      export-dir)))
+        (make-directory (file-name-directory target) t)
+        (copy-file file target t)))))
+
+(defun my/org-render-mermaid-blocks ()
+  "Render all Mermaid source blocks in the current Org buffer."
+  (require 'ob-mermaid)
+  (org-babel-map-src-blocks nil
+    (let* ((info (org-babel-get-src-block-info 'light))
+           (lang (car info))
+           (params (nth 2 info))
+           (file (cdr (assq :file params))))
+      (when (string= lang "mermaid")
+        (when file
+          (make-directory (file-name-directory (expand-file-name file default-directory)) t))
+        (org-babel-execute-src-block)))))
+
 (defun my/org-export-to-html ()
   "Export the current Org buffer to HTML in an exports directory and open it."
   (interactive)
@@ -362,13 +424,17 @@ Given the repository, the Nix support is especially relevant.
          (output-file (expand-file-name
                        (concat (file-name-base source-file) ".html")
                        export-dir))
-         (org-export-show-temporary-export-buffer nil))
+         (org-export-show-temporary-export-buffer nil)
+         (org-confirm-babel-evaluate nil))
     (make-directory export-dir t)
+    (my/org-render-mermaid-blocks)
+    (my/org-copy-export-assets export-dir)
     (org-export-to-file 'html output-file)
     (browse-url-of-file output-file)
     (message "Exported HTML to %s" output-file)))
 
 (with-eval-after-load 'org
+  (require 'ob-mermaid)
   (setq org-babel-python-command "python3")
   (setq org-babel-js-cmd "node")
   (add-hook 'org-insert-heading-hook #'my/org-add-id-to-new-heading)
@@ -380,7 +446,8 @@ Given the repository, the Nix support is especially relevant.
      (python . t)
      (nix . t)
      (js . t)
-     (coffee . t))))
+     (coffee . t)
+     (mermaid . t))))
 
 (add-hook 'org-mode-hook 'my-org-mode-banner)
 #+end_src
@@ -559,6 +626,22 @@ These are the expected quality-of-life defaults for a keyboard-first setup:
 (global-visual-line-mode t)
 #+end_src
 
+* Undo / redo sanity
+
+Emacs absolutely does ship with undo, but the default ergonomics are eccentric
+enough that it can feel like it does not. Since this setup is already heavily
+Evil-flavored, it makes sense to be explicit here.
+
+This keeps two worlds reasonably sane:
+- in Evil buffers, use Emacs' built-in modern undo/redo backend so =u= and
+  =C-r= behave more like a Vim refugee would hope,
+- in non-Evil / Emacs-style contexts, make =C-/= undo and =C-?= redo.
+
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-/") #'undo-only)
+(global-set-key (kbd "C-?") #'undo-redo)
+#+end_src
+
 * Chronofile-centric Org workflow
 
 This section is where the Emacs configuration and the repository's larger
@@ -628,6 +711,7 @@ This is the modal editing section.
 The configuration does a few careful things here:
 
 - ensures Evil is installed even in a package.el world,
+- tells Evil to use Emacs' built-in undo/redo backend,
 - enables Evil globally,
 - reinforces =C-h/j/k/l= window movement inside Evil states,
 - gives Org buffers sane normal-state bindings for folding and link opening,
@@ -642,6 +726,7 @@ The hooks below encode those preferences.
   (package-install 'evil))
 
 (require 'evil)
+(setq evil-undo-system 'undo-redo)
 (evil-mode 1)
 
 (dolist (state '(normal motion visual))

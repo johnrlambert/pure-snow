@@ -84,11 +84,11 @@ let
   } ''
     export HOME="$TMPDIR"
     mkdir -p "$HOME" "$out"
-    EMACS=${pkgs.emacs}/bin/emacs ${tangleInit} ${./init.el} "$out/init.el"
+    EMACS=${pkgs.emacs}/bin/emacs ${tangleInit} ${./init.org} "$out/init.el"
   '';
 in
 {
-  options.homelab.emacs.enable = lib.mkEnableOption "Enable emacs with literate init.el";
+  options.homelab.emacs.enable = lib.mkEnableOption "Enable emacs with literate init.org";
 
   config = lib.mkIf enabled {
     home.packages = with pkgs; [
@@ -104,9 +104,17 @@ in
       python3
       nodejs
       nodePackages.coffee-script
+      mermaid-cli
     ];
 
+    services.emacs = {
+      enable = true;
+      package = pkgs.emacs;
+      client.enable = true;
+      startWithUserSession = true;
+    };
+
     home.file.".emacs.d/init.el".source = "${tangledInit}/init.el";
-    home.file.".emacs.d/init.org".source = ./init.el;
+    home.file.".emacs.d/init.org".source = ./init.org;
   };
 }

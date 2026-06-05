@@ -42,6 +42,14 @@ in
         source = outOfStore "extensions/README.txt";
         force = true;
       };
+      ".pi/agent/extensions/org-context.ts" = {
+        source = outOfStore "extensions/org-context.ts";
+        force = true;
+      };
+      ".pi/agent/bin/org-context" = {
+        source = outOfStore "bin/org-context";
+        force = true;
+      };
       ".pi/agent/prompts/README.txt" = {
         source = outOfStore "prompts/README.txt";
         force = true;

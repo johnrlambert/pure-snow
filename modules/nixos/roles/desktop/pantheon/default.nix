@@ -3,7 +3,7 @@
 with lib;
 with lib.homelab;
 let
-  enabled = config.homelab.roles.desktop.pantheon or false;
+  enabled = hasRole [ "desktop" "pantheon" ] config.homelab.roles;
 in
 {
   options.homelab.roles.desktop.pantheon = mkEnableOption "Pantheon desktop environment";

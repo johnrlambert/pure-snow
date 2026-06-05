@@ -1,9 +1,10 @@
 { config, lib, pkgs, ... }:
 
 with lib;
+with lib.homelab;
 
 let
-  enabled = config.homelab.roles.ssh or false;
+  enabled = hasRole "ssh" config.homelab.roles;
 in
 {
   options.homelab.roles.ssh =

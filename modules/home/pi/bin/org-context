@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+read -r -d '' elisp <<'EOF' || true
+(let* ((f (or (catch 'x (dolist (fr (frame-list)) (when (frame-focus-state fr) (throw 'x fr)))) (selected-frame)))
+       (w (frame-selected-window f))
+       (b (window-buffer w)))
+  (with-current-buffer b
+    (save-excursion
+      (goto-char (window-point w))
+      (let (heading todo tags outline)
+        (when (derived-mode-p 'org-mode)
+          (ignore-errors
+            (unless (org-at-heading-p) (org-back-to-heading t))
+            (setq heading (org-no-properties (org-get-heading t t t t)) todo (and (org-get-todo-state) (org-no-properties (org-get-todo-state))) tags (org-get-tags) outline (mapcar #'org-no-properties (org-get-outline-path t)))))
+        (mapconcat #'identity
+                   (append (list (format "buffer=%s" (buffer-name b))
+                                 (format "file=%s" (or (buffer-file-name b) ""))
+                                 (format "line=%s" (line-number-at-pos))
+                                 (format "heading=%s" (or heading ""))
+                                 (format "todo=%s" (or todo ""))
+                                 (format "tags=%s" (mapconcat #'identity tags ","))
+                                 (format "outline=%s" (mapconcat #'identity outline " > "))
+                                 (format "clock=%s" (or (and (bound-and-true-p org-clock-current-task) (org-no-properties org-clock-current-task)) "")))
+                           (mapcar (lambda (f) (format "open_file=%s" f)) (delq nil (mapcar #'buffer-file-name (buffer-list)))))
+                   "\n")))))
+EOF
+raw=$(emacsclient --eval "$elisp")
+if [[ ${raw:0:1} == '"' && ${raw: -1} == '"' ]]; then printf '%b\n' "${raw:1:${#raw}-2}"; else printf '%s\n' "$raw"; fi

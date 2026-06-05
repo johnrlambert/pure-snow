@@ -1,8 +1,9 @@
 { config, lib, ... }:
 
 with lib;
+with lib.homelab;
 let
-  enabled = config.homelab.roles.homeassistant or false;
+  enabled = hasRole "homeassistant" config.homelab.roles;
 in
 {
   options.homelab.roles.homeassistant = mkEnableOption "Home Assistant";
