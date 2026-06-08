@@ -1,0 +1,15 @@
+* TODO %^{Task} %^g
+SCHEDULED: %(let* ((time (org-read-date nil t nil "First occurrence: "))
+                   (repeater (completing-read
+                              "Repeater: "
+                              '(".+1d" ".+1w" ".+2w" ".+1m" ".+1y" "+1d" "+1w" "+1m")
+                              nil t ".+1w"))
+                   (stamp (format-time-string "<%Y-%m-%d %a>" time)))
+              (concat (substring stamp 0 -1) " " repeater ">"))
+:PROPERTIES:
+:CREATED: %U
+:STYLE:    habit
+:END:
+%i
+
+%a

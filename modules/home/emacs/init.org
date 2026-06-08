@@ -653,6 +653,8 @@ The intention is clear and good:
 - discover agenda files recursively,
 - exclude obvious transient junk,
 - provide convenience commands for agenda and todo views,
+- keep capture templates as separate Org snippet files rather than burying
+  long template strings inside Lisp,
 - capture new tasks into =~/chronofile/inbox.org=.
 
 This is a nice match for an Org-first workflow without requiring a large extra
@@ -668,6 +670,14 @@ framework such as Org-roam.
 
 (setq org-directory "~/chronofile")
 (setq org-default-notes-file (concat org-directory "/notes.org"))
+
+(defconst my/org-capture-template-directory
+  (expand-file-name "capture-templates/" user-emacs-directory)
+  "Directory containing reusable Org capture template snippets.")
+
+(defun my/org-capture-template-file (name)
+  "Return the absolute path for capture template snippet NAME."
+  (expand-file-name name my/org-capture-template-directory))
 
 (defun my/org-chronofile-files ()
   "Return usable Org files under `org-directory'."
@@ -700,8 +710,21 @@ framework such as Org-roam.
 (my/org-refresh-agenda-files)
 
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/chronofile/inbox.org" "Tasks")
-         "* TODO %?\n  %i\n  %a")))
+      `(("t" "Todo" entry
+         (file+headline "~/chronofile/inbox.org" "Tasks")
+         (file ,(my/org-capture-template-file "todo.org")))
+        ("r" "Recurring task" entry
+         (file+headline "~/chronofile/inbox.org" "Tasks")
+         (file ,(my/org-capture-template-file "recurring.org")))
+        ("p" "Project" entry
+         (file+headline "~/chronofile/inbox.org" "Projects")
+         (file ,(my/org-capture-template-file "project.org")))
+        ("n" "Note" entry
+         (file+headline "~/chronofile/inbox.org" "Notes")
+         (file ,(my/org-capture-template-file "note.org")))
+        ("j" "Journal" entry
+         (file+olp+datetree "~/chronofile/journal.org")
+         (file ,(my/org-capture-template-file "journal.org")))))
 #+end_src
 
 * Evil mode

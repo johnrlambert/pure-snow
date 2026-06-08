@@ -1,0 +1,4 @@
+* %?
+Entered on %U
+%i
+%a

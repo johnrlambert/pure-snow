@@ -1,0 +1,8 @@
+* TODO %^{Task} %^g
+DEADLINE: %(format-time-string "<%Y-%m-%d %a>" (time-add (current-time) (days-to-time 1)))
+:PROPERTIES:
+:CREATED: %U
+:END:
+%i
+
+%a

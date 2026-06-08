@@ -116,5 +116,6 @@ in
 
     home.file.".emacs.d/init.el".source = "${tangledInit}/init.el";
     home.file.".emacs.d/init.org".source = ./init.org;
+    home.file.".emacs.d/capture-templates".source = ./capture-templates;
   };
 }

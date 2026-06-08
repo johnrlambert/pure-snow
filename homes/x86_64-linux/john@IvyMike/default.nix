@@ -129,6 +129,40 @@ EOF
           | ${pkgs.pandoc}/bin/pandoc --wrap=none -f gfm -t org
       fi
     '')
+    (writeShellScriptBin "reapply-config" ''
+      #!${pkgs.bash}/bin/bash
+      set -euo pipefail
+
+      repo="${config.home.homeDirectory}/pure-snow"
+      host="$(hostname)"
+      user="${config.home.username}"
+
+      if [ ! -d "$repo" ]; then
+        echo "reapply-config: repo not found at $repo" >&2
+        exit 1
+      fi
+
+      cd "$repo"
+
+      echo "==> Rebuilding NixOS for $host"
+      sudo nixos-rebuild switch --flake "$repo#$host"
+
+      echo "==> Reapplying Home Manager for $user@$host"
+      home-manager switch --flake "$repo#$user@$host" -b backup
+
+      printf 'Restart emacs daemon now? [y/N] '
+      read -r answer
+      case "$answer" in
+        y|Y|yes|YES)
+          echo "==> Restarting emacs.service"
+          systemctl --user daemon-reload
+          systemctl --user restart emacs.service
+          ;;
+        *)
+          echo "==> Leaving emacs.service alone"
+          ;;
+      esac
+    '')
   ];
 
   programs.git = {

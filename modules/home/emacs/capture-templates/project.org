@@ -1,0 +1,6 @@
+* PROJECT %?
+:PROPERTIES:
+:CREATED: %U
+:END:
+%i
+%a
