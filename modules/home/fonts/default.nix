@@ -18,8 +18,14 @@ in
     home.packages = with pkgs; [
       nerd-fonts.symbols-only
       nerd-fonts.jetbrains-mono
+      gyre-fonts
       helvetica-neue-lt-std
+      inter
+      jost
+      libertinus
 
+      # TeX Gyre Schola gives us a Century Schoolbook-like serif for legal docs.
+      # Jost supplies the slightly more geometric / Bauhaus-ish headings.
       # If your nixpkgs doesn't support override above, try:
       # nerd-fonts-symbols
     ];

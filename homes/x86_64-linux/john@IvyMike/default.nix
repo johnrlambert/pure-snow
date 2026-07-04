@@ -135,7 +135,6 @@ EOF
 
       repo="${config.home.homeDirectory}/pure-snow"
       host="$(hostname)"
-      user="${config.home.username}"
 
       if [ ! -d "$repo" ]; then
         echo "reapply-config: repo not found at $repo" >&2
@@ -144,11 +143,8 @@ EOF
 
       cd "$repo"
 
-      echo "==> Rebuilding NixOS for $host"
+      echo "==> Rebuilding full NixOS + Home Manager config for $host"
       sudo nixos-rebuild switch --flake "$repo#$host"
-
-      echo "==> Reapplying Home Manager for $user@$host"
-      home-manager switch --flake "$repo#$user@$host" -b backup
 
       printf 'Restart emacs daemon now? [y/N] '
       read -r answer

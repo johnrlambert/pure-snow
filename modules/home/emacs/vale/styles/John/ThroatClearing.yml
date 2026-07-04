@@ -1,0 +1,13 @@
+extends: existence
+message: "'%s' is throat-clearing. Cut it unless it earns its keep."
+ignorecase: true
+level: error
+tokens:
+  - as a matter of fact
+  - for all intents and purposes
+  - it is important to note that
+  - it should be noted that
+  - needless to say
+  - note that
+  - of course
+  - the fact that

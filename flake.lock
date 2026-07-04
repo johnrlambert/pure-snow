@@ -102,8 +102,8 @@
     },
     "secrets": {
       "locked": {
-        "lastModified": 1774657147,
-        "narHash": "sha256-AT+Lb3p5wKVq4BrstedTTzABetRS5KGso1m60Yhu0BE=",
+        "lastModified": 1781012209,
+        "narHash": "sha256-ww8t3C+t0OgEBUOqjCSHty9TM8FcUGWldDHpnCl6xks=",
         "path": "/home/john/pure-snow/secrets",
         "type": "path"
       },

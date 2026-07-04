@@ -1,50 +1,92 @@
+# This file is generated from README.org. Edit README.org and retangle.
 { pkgs, lib, config, inputs, ... }:
-with lib;
-with lib.homelab;
+let
+  spec = lib.importTOML ./machine.toml;
 
-{
-  imports = [ ./hardware.nix ];
- # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  pkgByName = name: builtins.getAttr name pkgs;
 
-  networking.hostName = "IvyMike";
-  system.stateVersion = "25.11";
+  roleAttrs =
+    lib.foldl'
+      lib.recursiveUpdate
+      { }
+      (map
+        (role:
+          lib.setAttrByPath
+            ([ "homelab" "roles" ] ++ lib.splitString "." role)
+            true)
+        spec.system.roles);
+in
+lib.recursiveUpdate
+  {
+    imports = [ ./hardware.nix ];
 
-  homelab.roles.chrome = true;
-  homelab.roles.fish = true;
-  homelab.roles.blender = true;
-  homelab.roles.arm_builder = true;
-  homelab.roles.desktop.pantheon = true;
-  homelab.roles.xmonad = true;
-  homelab.roles.ssh = true;
-  homelab.roles.tailscale.enable = true;
+    boot.loader.systemd-boot.enable = true;
+    boot.loader.efi.canTouchEfiVariables = true;
 
-  users.mutableUsers = true;
-  services.printing.enable = true;
-  services.printing.drivers = [ pkgs.hplip ];
+    networking.hostName = spec.system.hostname;
+    time.timeZone = spec.system.timeZone;
+    system.stateVersion = spec.system.stateVersion;
 
-  environment.systemPackages = with pkgs; [
-    sops
-    age
-    ssh-to-age
-  ];
+    users.mutableUsers = spec.users.mutable;
 
-  sops = {
-    defaultSopsFile = "${inputs.secrets}/${config.networking.hostName}.yaml";
-    defaultSopsFormat = "yaml";
-    age.keyFile = "/home/john/.config/sops/age/keys.txt";
-  };
-  users.users.john = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
-    shell = pkgs.fish;
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINN9vMs23mK242aEaHuwwTqcVoABjY4f82PicdnnnFqy john@wef"
-    ];
-  };
+    services.printing.enable = spec.printing.enable;
+    services.printing.drivers = map pkgByName spec.printing.drivers;
 
-  # System-wide fish config (optional but common)
-  programs.fish.enable = true;
-}
+    services.webdav = {
+      enable = spec.webdav.enable;
+      user = spec.webdav.user;
+      group = spec.webdav.group;
+      environmentFile = config.sops.templates."webdav.env".path;
+      settings = {
+        address = spec.webdav.address;
+        port = spec.webdav.port;
+        directory = spec.webdav.directory;
+        permissions = spec.webdav.permissions;
+        log.format = spec.webdav.logFormat;
+        users = spec.webdav.users;
+      };
+    };
 
+    networking.firewall.interfaces.tailscale0.allowedTCPPorts =
+      spec.firewall.tailscaleTCPPorts;
+
+    systemd.services.webdav = {
+      requires = [ "sops-install-secrets.service" ];
+      after = [ "sops-install-secrets.service" ];
+    };
+
+    environment.systemPackages = map pkgByName spec.packages.system;
+
+    sops = {
+      useSystemdActivation = spec.sops.useSystemdActivation;
+      environment.SOPS_AGE_SSH_PRIVATE_KEY_FILE = spec.sops.sshPrivateKeyFile;
+      defaultSopsFile = "${inputs.secrets}/${config.networking.hostName}.yaml";
+      defaultSopsFormat = spec.sops.defaultSopsFormat;
+      age.keyFile = spec.sops.ageKeyFile;
+      age.sshKeyPaths = spec.sops.ageSshKeyPaths;
+
+      secrets.webdav_username.sopsFile = "${inputs.secrets}/${spec.sops.sharedSecretsFile}";
+      secrets.webdav_password.sopsFile = "${inputs.secrets}/${spec.sops.sharedSecretsFile}";
+
+      templates."webdav.env" = {
+        content = ''
+          WEBDAV_USERNAME=${config.sops.placeholder.webdav_username}
+          WEBDAV_PASSWORD=${config.sops.placeholder.webdav_password}
+        '';
+        owner = "root";
+        group = "root";
+        mode = "0400";
+        restartUnits = [ "webdav.service" ];
+      };
+    };
+
+    users.users.john = {
+      isNormalUser = spec.users.john.isNormalUser;
+      extraGroups = spec.users.john.extraGroups;
+      shell = pkgByName spec.users.john.shell;
+      openssh.authorizedKeys.keys = spec.users.john.authorizedKeys;
+    };
+
+    programs.fish.enable = spec.programs.fish.enable;
+  }
+  roleAttrs

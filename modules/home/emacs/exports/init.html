@@ -3,21 +3,171 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2026-06-05 Fri 16:13 -->
+<!-- 2026-06-22 Mon 08:56 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Literate Emacs configuration</title>
 <meta name="author" content="John Lambert" />
 <meta name="generator" content="Org Mode" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 <style>
-body { background: #fff; }
-#content.content { max-width: 72ch; margin: 3rem auto; padding: 0 1.5rem; }
-#table-of-contents { margin-bottom: 2rem; }
-.title { margin-bottom: 0.75rem; }
-.subtitle { color: #666; }
-pre.src { overflow-x: auto; padding: 1rem; }
-code { white-space: pre-wrap; }
+/* Minimal Org HTML export styling */
+
+:root {
+  --page-bg: #fcfbf7;
+  --panel-bg: #f3efe6;
+  --text: #222222;
+  --muted: #5f6368;
+  --rule: #ddd6c8;
+  --link: #1f5fa8;
+  --code-bg: #f5f5f5;
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.7;
+}
+
+#content {
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+  width: 100%;
+  max-width: 78ch;
+}
+
+@media (min-width: 1100px) {
+  #content {
+    width: 50vw;
+    max-width: 90ch;
+  }
+}
+
+p,
+ul,
+ol,
+dl,
+blockquote,
+pre,
+table,
+figure,
+.details,
+.footdef,
+.org-src-container {
+  margin: 0 0 1.5rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.25;
+  margin: 2.5rem 0 0.9rem;
+  font-weight: 700;
+}
+
+h1.title {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.subtitle,
+.author,
+.date {
+  color: var(--muted);
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+#table-of-contents {
+  background: var(--panel-bg);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin: 0 0 2.5rem;
+}
+
+#table-of-contents h2 {
+  margin-top: 0;
+}
+
+#table-of-contents ul {
+  margin-bottom: 0;
+}
+
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img,
+figure img {
+  display: block;
+  margin: 2rem auto;
+  width: 70%;
+  max-width: 100%;
+  height: auto;
+}
+
+figure {
+  text-align: center;
+}
+
+pre,
+code {
+  font-family: "JetBrains Mono", "Iosevka", "Fira Code", monospace;
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+}
+
+code {
+  white-space: pre-wrap;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid var(--rule);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+blockquote {
+  border-left: 4px solid var(--rule);
+  padding-left: 1rem;
+  color: var(--muted);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 2.5rem 0;
+}
+
 </style>
 </head>
 <body>
@@ -27,43 +177,45 @@ code { white-space: pre-wrap; }
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge47eab4">1. Overview</a>
+<li><a href="#org212875e">1. Overview</a>
 <ul>
-<li><a href="#org20af236">1.1. Will the real init.org please stand up?</a>
+<li><a href="#org9657dc8">1.1. Will the real init.org please stand up?</a>
 <ul>
-<li><a href="#orge7b5d5b">1.1.1. <span class="todo TODO">TODO</span> Write a sample todo :nix-config: :example-todo:</a></li>
+<li><a href="#org21d4aa4">1.1.1. <span class="todo TODO">TODO</span> Write a sample todo :nix-config: :example-todo:</a></li>
 </ul>
 </li>
-<li><a href="#org8e484cb">1.2. Evil Mode</a></li>
-<li><a href="#orga834c32">1.3. Note system</a></li>
+<li><a href="#orge41d225">1.2. Evil Mode</a></li>
+<li><a href="#orgecb3108">1.3. Note system</a></li>
 </ul>
 </li>
-<li><a href="#orge3958e0">2. Package bootstrap</a></li>
-<li><a href="#org9303beb">3. Theme</a></li>
-<li><a href="#org07e9fb7">4. Org mode foundation</a></li>
-<li><a href="#org9087f6e">5. Indentation policy</a></li>
-<li><a href="#org68ef6d7">6. ULID support for Org headings</a></li>
-<li><a href="#org58f5da8">7. Org export and Babel execution</a></li>
-<li><a href="#org542264c">8. AI helpers</a></li>
-<li><a href="#org4c51a81">9. Window movement and in-buffer discoverability</a></li>
-<li><a href="#orgbd97ef1">10. General packages</a></li>
-<li><a href="#org42c9905">11. Local terminal helper</a></li>
-<li><a href="#org4c63dc7">12. Journal and note capture</a></li>
-<li><a href="#org5587451">13. Basic UI defaults</a></li>
-<li><a href="#org16aee04">14. Undo / redo sanity</a></li>
-<li><a href="#org8ce93b4">15. Chronofile-centric Org workflow</a></li>
-<li><a href="#org9ef1382">16. Evil mode</a></li>
-<li><a href="#orge9e8084">17. Final global bindings</a></li>
-<li><a href="#org86a7ce1">18. Notes for future cleanup</a></li>
+<li><a href="#orga45fb90">2. Package bootstrap</a></li>
+<li><a href="#orgb8e5674">3. Theme</a></li>
+<li><a href="#org7c60fea">4. Typography, pitch, and an overly earnest Org art direction pass</a></li>
+<li><a href="#org1451709">5. Org mode foundation</a></li>
+<li><a href="#org00f209b">6. Indentation policy</a></li>
+<li><a href="#org3d40b57">7. ULID support for Org headings</a></li>
+<li><a href="#org80ed0bd">8. Org export and Babel execution</a></li>
+<li><a href="#org781eb72">9. Clipboard and rich paste</a></li>
+<li><a href="#org93c6dd3">10. AI helpers</a></li>
+<li><a href="#org801b907">11. Window movement and in-buffer discoverability</a></li>
+<li><a href="#org7d10286">12. General packages</a></li>
+<li><a href="#org7c23a45">13. Local terminal helper</a></li>
+<li><a href="#orga024866">14. Journal and note capture</a></li>
+<li><a href="#orgcefb5ce">15. Basic UI defaults</a></li>
+<li><a href="#org4145415">16. Undo / redo sanity</a></li>
+<li><a href="#org620799b">17. Chronofile-centric Org workflow</a></li>
+<li><a href="#orgece9561">18. Evil mode</a></li>
+<li><a href="#org2f89566">19. Final global bindings</a></li>
+<li><a href="#org43d5732">20. Notes for future cleanup</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orge47eab4" class="outline-2">
-<h2 id="orge47eab4"><span class="section-number-2">1.</span> Overview</h2>
+<div id="outline-container-org212875e" class="outline-2">
+<h2 id="org212875e"><span class="section-number-2">1.</span> Overview</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-org20af236" class="outline-3">
-<h3 id="org20af236"><span class="section-number-3">1.1.</span> Will the real init.org please stand up?</h3>
+<div id="outline-container-org9657dc8" class="outline-3">
+<h3 id="org9657dc8"><span class="section-number-3">1.1.</span> Will the real init.org please stand up?</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 After years of vim/neovim use I finally took the plunge and decided to switch to emacs. This was something I agonized over. (Seriously. I am a loser.) I have years and years of experience and muscle memory with vim. Even though I probably took advantage of very few of its advanced features I still made my brain fit its paradigm.
@@ -92,17 +244,21 @@ Home Manager build. That gives me three nice properties at once:
 <li>The TODOs can live right alongside the code itself. That means that I can create something like:</li>
 </ol>
 </div>
-<div id="outline-container-orge7b5d5b" class="outline-4">
-<h4 id="orge7b5d5b"><span class="section-number-4">1.1.1.</span> <span class="todo TODO">TODO</span> Write a sample todo :nix-config: :example-todo:</h4>
+<div id="outline-container-org21d4aa4" class="outline-4">
+<h4 id="org21d4aa4"><span class="section-number-4">1.1.1.</span> <span class="todo TODO">TODO</span> Write a sample todo :nix-config: :example-todo:</h4>
 <div class="outline-text-4" id="text-1-1-1">
+<p>
+:ID:       01KT4816KR4EVKS5Y1CZANCFA7
+</p>
+
 <p>
 and it will just transparently live with the code <i>in situ</i> but also be managed by globally by org-agenda.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org8e484cb" class="outline-3">
-<h3 id="org8e484cb"><span class="section-number-3">1.2.</span> Evil Mode</h3>
+<div id="outline-container-orge41d225" class="outline-3">
+<h3 id="orge41d225"><span class="section-number-3">1.2.</span> Evil Mode</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 Luckily for vim refugees like myself there are all sorts of interesting ways to accomodate the years we spent trying to figure out how to exit it. Emacs provides the very appropriately named 'evil-mode' for this purpose.
@@ -113,8 +269,8 @@ I am sure I have fallen into several anti patterns here. I will definitely alway
 </p>
 </div>
 </div>
-<div id="outline-container-orga834c32" class="outline-3">
-<h3 id="orga834c32"><span class="section-number-3">1.3.</span> Note system</h3>
+<div id="outline-container-orgecb3108" class="outline-3">
+<h3 id="orgecb3108"><span class="section-number-3">1.3.</span> Note system</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 I will be storing the majority of my notes in a directory I call ~/chronofile. This is an homage to the great <a href="https://en.wikipedia.org/wiki/Buckminster_Fuller">Buckminster Fuller</a> and his 63 year project the <a href="https://en.wikipedia.org/wiki/Dymaxion_Chronofile">Dymaxion Chronofile.</a>
@@ -142,8 +298,8 @@ Anyway, here's 'Wonderwall&#x2026;'
 </div>
 </div>
 </div>
-<div id="outline-container-orge3958e0" class="outline-2">
-<h2 id="orge3958e0"><span class="section-number-2">2.</span> Package bootstrap</h2>
+<div id="outline-container-orga45fb90" class="outline-2">
+<h2 id="orga45fb90"><span class="section-number-2">2.</span> Package bootstrap</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 This first block does the minimum work needed to talk to Emacs package
@@ -203,8 +359,8 @@ BTW kids I remember before we had all these fancy language specific repositories
 </div>
 </div>
 </div>
-<div id="outline-container-org9303beb" class="outline-2">
-<h2 id="org9303beb"><span class="section-number-2">3.</span> Theme</h2>
+<div id="outline-container-orgb8e5674" class="outline-2">
+<h2 id="orgb8e5674"><span class="section-number-2">3.</span> Theme</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The theme choice is straightforward: load a Gruvbox variant and aggressively
@@ -232,9 +388,116 @@ stacking and weird face inheritance.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-org07e9fb7" class="outline-2">
-<h2 id="org07e9fb7"><span class="section-number-2">4.</span> Org mode foundation</h2>
+<div id="outline-container-org7c60fea" class="outline-2">
+<h2 id="org7c60fea"><span class="section-number-2">4.</span> Typography, pitch, and an overly earnest Org art direction pass</h2>
 <div class="outline-text-2" id="text-4">
+<p>
+This is where things get a little more editorial.
+</p>
+
+<p>
+A lot of Emacs setups assume a single monospace font everywhere. That is a
+very reasonable default for programming, terminals, logs, and anything else
+where columns matter.
+</p>
+
+<p>
+But Org mode is only <b>sometimes</b> code. A big part of my use of Org is closer
+to writing, outlining, note-making, and publishing than it is to editing
+source files. In those buffers, a tasteful proportional typeface can feel less
+like a terminal emulator wearing a fake moustache and more like an actual
+writing environment.
+</p>
+
+<p>
+The package <code>fixed-pitch-mode</code> is interesting precisely because it flips the
+usual Emacs assumption:
+</p>
+
+<ul class="org-ul">
+<li>the <b>default</b> face can be proportional,</li>
+<li>code-oriented buffers can opt back into monospace automatically,</li>
+<li>and Org can become a mixed-pitch environment where prose is pleasant but
+tables, code blocks, and metadata still line up.</li>
+</ul>
+
+<p>
+That is the basic plan here.
+</p>
+
+<p>
+For the actual type choices, I am going for a vaguely Bauhaus / modernist
+editorial vibe without turning Org into a design student crime scene:
+</p>
+
+<ul class="org-ul">
+<li><b><b>Inter</b></b> for body text and general UI readability,</li>
+<li><b><b>Jost</b></b> for headings, because it has a geometric, poster-ish, Futura-adjacent
+flavor that nudges things in a Bauhaus direction,</li>
+<li><b><b>JetBrains Mono Nerd Font Mono</b></b> for code, tables, src blocks, and all the
+places where character alignment still matters.</li>
+</ul>
+
+<p>
+The key thing to keep in mind is that <code>fixed-pitch-mode</code> is <b>not</b> being used to
+make Org itself monospaced. Instead, it gives me a good global baseline for
+code-ish buffers, while Org gets a custom mixed-pitch treatment of its own.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">defconst</span> <span class="org-variable-name">my/font-body</span> <span class="org-string">"Inter"</span>
+  <span class="org-doc">"Primary proportional typeface for prose and general UI text."</span>)
+
+(<span class="org-keyword">defconst</span> <span class="org-variable-name">my/font-headings</span> <span class="org-string">"Jost"</span>
+  <span class="org-doc">"Geometric sans face used for Org headings and titles."</span>)
+
+(<span class="org-keyword">defconst</span> <span class="org-variable-name">my/font-mono</span> <span class="org-string">"JetBrainsMono Nerd Font Mono"</span>
+  <span class="org-doc">"Monospace face used where character alignment matters."</span>)
+
+(add-to-list 'load-path (expand-file-name <span class="org-string">"site-lisp"</span> user-emacs-directory))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/apply-base-typography</span> ()
+  <span class="org-doc">"Apply the global font baseline used across frames."</span>
+  (<span class="org-keyword">setq</span> default-frame-alist
+        (assq-delete-all 'font default-frame-alist))
+  (add-to-list 'default-frame-alist `(font . ,(format <span class="org-string">"%s-12"</span> my/font-body)))
+  (set-face-attribute 'default nil <span class="org-builtin">:family</span> my/font-body <span class="org-builtin">:height</span> 115 <span class="org-builtin">:weight</span> 'regular)
+  (set-face-attribute 'variable-pitch nil <span class="org-builtin">:family</span> my/font-body <span class="org-builtin">:height</span> 1.0 <span class="org-builtin">:weight</span> 'regular)
+  (set-face-attribute 'fixed-pitch nil <span class="org-builtin">:family</span> my/font-mono <span class="org-builtin">:height</span> 105 <span class="org-builtin">:weight</span> 'regular)
+  (set-face-attribute 'mode-line nil <span class="org-builtin">:family</span> my/font-body <span class="org-builtin">:height</span> 0.95)
+  (set-face-attribute 'mode-line-inactive nil <span class="org-builtin">:family</span> my/font-body <span class="org-builtin">:height</span> 0.95)
+  (set-face-attribute 'header-line nil <span class="org-builtin">:family</span> my/font-body <span class="org-builtin">:height</span> 0.95)
+  (set-face-attribute 'tab-bar nil <span class="org-builtin">:family</span> my/font-body <span class="org-builtin">:height</span> 0.95)
+  (set-face-attribute 'tab-line nil <span class="org-builtin">:family</span> my/font-body <span class="org-builtin">:height</span> 0.95)
+  (set-face-attribute 'minibuffer-prompt nil <span class="org-builtin">:family</span> my/font-body <span class="org-builtin">:weight</span> 'semibold))
+
+(my/apply-base-typography)
+
+(<span class="org-keyword">use-package</span> fixed-pitch
+  <span class="org-builtin">:ensure</span> nil
+  <span class="org-builtin">:init</span>
+  <span class="org-comment-delimiter">;; </span><span class="org-comment">The package installs its hooks at load time, so the customization that
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">decides *which* buffers become monospace needs to be in place before the
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">package itself is required.
+</span>  (<span class="org-keyword">setq</span> fixed-pitch-dont-change-cursor t)
+  (<span class="org-keyword">setq</span> fixed-pitch-use-extended-default t)
+  (<span class="org-keyword">setq</span> fixed-pitch-whitelist-hooks
+        '(conf-mode-hook
+          yaml-mode-hook))
+  (<span class="org-keyword">setq</span> fixed-pitch-blacklist-hooks
+        '(org-mode-hook))
+  <span class="org-builtin">:config</span>
+  <span class="org-comment-delimiter">;; </span><span class="org-comment">`</span><span class="org-comment"><span class="org-constant">fixed-pitch-mode</span></span><span class="org-comment">' gives prog-mode, comint, dired, Magit, and friends a
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">reliable monospaced baseline while letting the rest of Emacs breathe a
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">bit more typographically.
+</span>  (message <span class="org-string">"fixed-pitch-mode loaded: code buffers stay monospace, prose can relax"</span>))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org1451709" class="outline-2">
+<h2 id="org1451709"><span class="section-number-2">5.</span> Org mode foundation</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 This is the heart of the setup.
 </p>
@@ -263,13 +526,105 @@ single <code>TODO/DONE</code> pair.</li>
 <li>logging completion / cancellation into drawers keeps historical metadata
 without cluttering the visible outline too badly.</li>
 <li>source block settings make Babel editing behave more like a real code editor.</li>
-<li>the HTML export header injects Bulma and some small custom CSS.</li>
+<li>Org gets its own mixed-pitch typography pass so headings can feel a little
+more like a page layout and a little less like a man page.</li>
+<li><code>svg-tag-mode</code> is used as a small ornamental layer for TODO states and
+priorities because apparently regular Emacs was not yet Emacs enough.</li>
+<li>the HTML export header uses a local stylesheet for a cleaner, self-contained export.</li>
 </ul>
 
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">(<span class="org-keyword">defun</span> <span class="org-function-name">my-org-mode-banner</span> ()
   <span class="org-doc">"Display a banner message in the minibuffer for org-mode."</span>
   (message <span class="org-string">"Reminder: Toggle tasks with C-c C-t"</span>))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-apply-bauhaus-faces</span> ()
+  <span class="org-doc">"Give Org a geometric-headings / readable-body treatment."</span>
+  <span class="org-comment-delimiter">;; </span><span class="org-comment">The guiding principle here is: prose should read like prose, but code and
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">alignment-sensitive structures should remain resolutely monospaced.
+</span>  (set-face-attribute 'org-document-title nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'bold <span class="org-builtin">:height</span> 1.9)
+  (set-face-attribute 'org-level-1 nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'bold <span class="org-builtin">:height</span> 1.50)
+  (set-face-attribute 'org-level-2 nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'semibold <span class="org-builtin">:height</span> 1.30)
+  (set-face-attribute 'org-level-3 nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'semibold <span class="org-builtin">:height</span> 1.18)
+  (set-face-attribute 'org-level-4 nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'medium <span class="org-builtin">:height</span> 1.10)
+  (set-face-attribute 'org-level-5 nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'medium <span class="org-builtin">:height</span> 1.05)
+  (set-face-attribute 'org-level-6 nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'medium <span class="org-builtin">:height</span> 1.02)
+  (set-face-attribute 'org-level-7 nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'medium <span class="org-builtin">:height</span> 1.0)
+  (set-face-attribute 'org-level-8 nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'medium <span class="org-builtin">:height</span> 1.0)
+  (<span class="org-keyword">dolist</span> (face '(org-block
+                  org-block-begin-line
+                  org-block-end-line
+                  org-code
+                  org-checkbox
+                  org-date
+                  org-document-info-keyword
+                  org-drawer
+                  org-formula
+                  org-meta-line
+                  org-property-value
+                  org-special-keyword
+                  org-table
+                  org-tag
+                  org-verbatim
+                  line-number
+                  line-number-current-line))
+    (<span class="org-keyword">when</span> (facep face)
+      (set-face-attribute face nil <span class="org-builtin">:inherit</span> '(fixed-pitch))))
+  (<span class="org-keyword">when</span> (facep 'org-indent)
+    (set-face-attribute 'org-indent nil <span class="org-builtin">:inherit</span> '(org-hide fixed-pitch)))
+  (set-face-attribute 'org-ellipsis nil <span class="org-builtin">:family</span> my/font-headings <span class="org-builtin">:weight</span> 'bold)
+  (set-face-attribute 'org-table nil <span class="org-builtin">:family</span> my/font-mono <span class="org-builtin">:height</span> 1.0)
+  (set-face-attribute 'org-block nil <span class="org-builtin">:family</span> my/font-mono <span class="org-builtin">:height</span> 1.0)
+  (set-face-attribute 'org-code nil <span class="org-builtin">:family</span> my/font-mono <span class="org-builtin">:height</span> 1.0)
+  (set-face-attribute 'org-verbatim nil <span class="org-builtin">:family</span> my/font-mono <span class="org-builtin">:height</span> 1.0))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-setup-typography</span> ()
+  <span class="org-doc">"Enable the mixed-pitch Org presentation I want for notes and prose."</span>
+  <span class="org-comment-delimiter">;; </span><span class="org-comment">This is the local piece of the experiment: prose becomes proportional,
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">code stays mono, and headings get the more geometric display face.
+</span>  (variable-pitch-mode 1)
+  (<span class="org-keyword">setq-local</span> line-spacing 0.18)
+  (display-line-numbers-mode 0)
+  (visual-line-mode 1))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/svg-tag-make-status</span> (label bg fg)
+  <span class="org-doc">"Create a status LABEL tag with background BG and foreground FG."</span> 
+  (svg-tag-make label
+                <span class="org-builtin">:face</span> `(<span class="org-builtin">:family</span> ,my/font-headings <span class="org-builtin">:weight</span> bold <span class="org-builtin">:foreground</span> ,fg)
+                <span class="org-builtin">:background</span> bg
+                <span class="org-builtin">:foreground</span> fg
+                <span class="org-builtin">:radius</span> 4
+                <span class="org-builtin">:margin</span> 0
+                <span class="org-builtin">:padding</span> 1
+                <span class="org-builtin">:height</span> 0.95))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/svg-tag-make-priority</span> (label)
+  <span class="org-doc">"Create a priority tag for LABEL."</span>
+  (svg-tag-make label
+                <span class="org-builtin">:face</span> `(<span class="org-builtin">:family</span> ,my/font-headings <span class="org-builtin">:weight</span> semibold <span class="org-builtin">:foreground</span> <span class="org-string">"#282828"</span>)
+                <span class="org-builtin">:background</span> <span class="org-string">"#fabd2f"</span>
+                <span class="org-builtin">:foreground</span> <span class="org-string">"#282828"</span>
+                <span class="org-builtin">:radius</span> 4
+                <span class="org-builtin">:margin</span> 0
+                <span class="org-builtin">:padding</span> 1
+                <span class="org-builtin">:height</span> 0.90))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-enable-svg-tags</span> ()
+  <span class="org-doc">"Turn on SVG tag rendering for Org buffers."</span>
+  (<span class="org-keyword">setq-local</span> svg-tag-tags
+              `((<span class="org-string">"\\_&lt;</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">TODO</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">\\_&gt;"</span> . ((<span class="org-keyword">lambda</span> (tag) (my/svg-tag-make-status tag <span class="org-string">"#cc241d"</span> <span class="org-string">"#fbf1c7"</span>))))
+                (<span class="org-string">"\\_&lt;</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">NEXT</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">\\_&gt;"</span> . ((<span class="org-keyword">lambda</span> (tag) (my/svg-tag-make-status tag <span class="org-string">"#458588"</span> <span class="org-string">"#fbf1c7"</span>))))
+                (<span class="org-string">"\\_&lt;</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">PROJECT</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">\\_&gt;"</span> . ((<span class="org-keyword">lambda</span> (tag) (my/svg-tag-make-status tag <span class="org-string">"#b16286"</span> <span class="org-string">"#fbf1c7"</span>))))
+                (<span class="org-string">"\\_&lt;</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">WAITING</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">\\_&gt;"</span> . ((<span class="org-keyword">lambda</span> (tag) (my/svg-tag-make-status tag <span class="org-string">"#d79921"</span> <span class="org-string">"#282828"</span>))))
+                (<span class="org-string">"\\_&lt;</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">SOMEDAY</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">\\_&gt;"</span> . ((<span class="org-keyword">lambda</span> (tag) (my/svg-tag-make-status tag <span class="org-string">"#7c6f64"</span> <span class="org-string">"#fbf1c7"</span>))))
+                (<span class="org-string">"\\_&lt;</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">DONE</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">\\_&gt;"</span> . ((<span class="org-keyword">lambda</span> (tag) (my/svg-tag-make-status tag <span class="org-string">"#98971a"</span> <span class="org-string">"#fbf1c7"</span>))))
+                (<span class="org-string">"\\_&lt;</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">CANCELLED</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">\\_&gt;"</span> . ((<span class="org-keyword">lambda</span> (tag) (my/svg-tag-make-status tag <span class="org-string">"#928374"</span> <span class="org-string">"#fbf1c7"</span>))))
+                (<span class="org-string">"</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">(</span></span><span class="org-string">\\[#[A-C]\\]</span><span class="org-string"><span class="org-regexp-grouping-backslash">\\</span></span><span class="org-string"><span class="org-regexp-grouping-construct">)</span></span><span class="org-string">"</span> . ((<span class="org-keyword">lambda</span> (tag) (my/svg-tag-make-priority tag))))))
+  (svg-tag-mode 1))
+
+(<span class="org-keyword">use-package</span> svg-tag-mode
+  <span class="org-builtin">:ensure</span> nil
+  <span class="org-builtin">:commands</span> (svg-tag-mode svg-tag-make))
 
 (<span class="org-keyword">use-package</span> org
   <span class="org-builtin">:ensure</span> t
@@ -298,22 +653,23 @@ without cluttering the visible outline too badly.</li>
                 org-src-lang-modes))
   (<span class="org-keyword">setq</span> org-export-with-toc t)
   (<span class="org-keyword">setq</span> org-export-with-section-numbers t)
+  (<span class="org-keyword">setq</span> org-hide-emphasis-markers t)
+  (<span class="org-keyword">setq</span> org-pretty-entities t)
+  (<span class="org-keyword">setq</span> org-fontify-quote-and-verse-blocks t)
   (<span class="org-keyword">setq</span> org-html-htmlize-output-type 'css)
   (<span class="org-keyword">setq</span> org-html-validation-link nil)
   (<span class="org-keyword">setq</span> org-html-head-include-default-style nil)
   (<span class="org-keyword">setq</span> org-html-head-include-scripts nil)
   (<span class="org-keyword">setq</span> org-html-head
-        (concat
-         <span class="org-string">"&lt;link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css\"&gt;\n"</span>
-         <span class="org-string">"&lt;style&gt;\n"</span>
-         <span class="org-string">"body { background: #fff; }\n"</span>
-         <span class="org-string">"#content.content { max-width: 72ch; margin: 3rem auto; padding: 0 1.5rem; }\n"</span>
-         <span class="org-string">"#table-of-contents { margin-bottom: 2rem; }\n"</span>
-         <span class="org-string">".title { margin-bottom: 0.75rem; }\n"</span>
-         <span class="org-string">".subtitle { color: #666; }\n"</span>
-         <span class="org-string">"pre.src { overflow-x: auto; padding: 1rem; }\n"</span>
-         <span class="org-string">"code { white-space: pre-wrap; }\n"</span>
-         <span class="org-string">"&lt;/style&gt;"</span>)))
+        (<span class="org-keyword">let</span> ((css-file (locate-user-emacs-file <span class="org-string">"custom.css"</span>)))
+          (<span class="org-keyword">if</span> (file-exists-p css-file)
+              (<span class="org-keyword">with-temp-buffer</span>
+                (insert-file-contents css-file)
+                (format <span class="org-string">"&lt;style&gt;\n%s\n&lt;/style&gt;\n"</span> (buffer-string)))
+            <span class="org-string">""</span>)))
+  (my/org-apply-bauhaus-faces)
+  (add-hook 'org-mode-hook #'my/org-setup-typography)
+  (add-hook 'org-mode-hook #'my/org-enable-svg-tags))
 
 (<span class="org-keyword">use-package</span> htmlize
   <span class="org-builtin">:ensure</span> t)
@@ -337,9 +693,9 @@ without cluttering the visible outline too badly.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-org9087f6e" class="outline-2">
-<h2 id="org9087f6e"><span class="section-number-2">5.</span> Indentation policy</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-org00f209b" class="outline-2">
+<h2 id="org00f209b"><span class="section-number-2">6.</span> Indentation policy</h2>
+<div class="outline-text-2" id="text-6">
 <p>
 This section standardizes indentation across a handful of languages.
 </p>
@@ -389,9 +745,9 @@ you expect.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-org68ef6d7" class="outline-2">
-<h2 id="org68ef6d7"><span class="section-number-2">6.</span> ULID support for Org headings</h2>
-<div class="outline-text-2" id="text-6">
+<div id="outline-container-org3d40b57" class="outline-2">
+<h2 id="org3d40b57"><span class="section-number-2">7.</span> ULID support for Org headings</h2>
+<div class="outline-text-2" id="text-7">
 <p>
 This is one of the more distinctive custom pieces.
 </p>
@@ -499,9 +855,9 @@ Existing IDs are preserved."</span>
 </div>
 </div>
 </div>
-<div id="outline-container-org58f5da8" class="outline-2">
-<h2 id="org58f5da8"><span class="section-number-2">7.</span> Org export and Babel execution</h2>
-<div class="outline-text-2" id="text-7">
+<div id="outline-container-org80ed0bd" class="outline-2">
+<h2 id="org80ed0bd"><span class="section-number-2">8.</span> Org export and Babel execution</h2>
+<div class="outline-text-2" id="text-8">
 <p>
 This configuration treats Org as both a writing format and an executable
 notebook format.
@@ -523,7 +879,8 @@ The Babel section enables a modest set of languages:
 <li>Python</li>
 <li>Nix</li>
 <li>JavaScript</li>
-<li>CoffeeScript</li>
+<li>CoffeeScript (really)</li>
+<li>Mermaid for charting</li>
 </ul>
 
 <p>
@@ -562,7 +919,28 @@ Given the repository, the Nix support is especially relevant.
                         relative)
                       export-dir)))
         (make-directory (file-name-directory target) t)
-        (copy-file file target t)))))
+        (copy-file file target t)))
+    (copy-file (locate-user-emacs-file <span class="org-string">"custom.css"</span>)
+               (expand-file-name <span class="org-string">"custom.css"</span> export-dir)
+               t)))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-inline-export-css</span> (backend)
+  <span class="org-doc">"Inline custom CSS for HTML BACKEND exports."</span>
+  (<span class="org-keyword">when</span> (org-export-derived-backend-p backend 'html)
+    (<span class="org-keyword">let</span> ((css-file (locate-user-emacs-file <span class="org-string">"custom.css"</span>)))
+      (<span class="org-keyword">setq-local</span> org-html-head
+                  (<span class="org-keyword">if</span> (file-exists-p css-file)
+                      (<span class="org-keyword">with-temp-buffer</span>
+                        (insert-file-contents css-file)
+                        (format <span class="org-string">"&lt;style&gt;\n%s\n&lt;/style&gt;\n"</span> (buffer-string)))
+                    <span class="org-string">""</span>)))))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-export-ensure-support-files</span> (orig backend file <span class="org-type">&amp;rest</span> args)
+  <span class="org-doc">"Export with ORIG, then ensure support files exist beside HTML output FILE."</span>
+  (<span class="org-keyword">let</span> ((result (apply orig backend file args)))
+    (<span class="org-keyword">when</span> (eq backend 'html)
+      (my/org-copy-export-assets (file-name-directory file)))
+    result))
 
 (<span class="org-keyword">defun</span> <span class="org-function-name">my/org-render-mermaid-blocks</span> ()
   <span class="org-doc">"Render all Mermaid source blocks in the current Org buffer."</span>
@@ -592,7 +970,6 @@ Given the repository, the Nix support is especially relevant.
          (org-confirm-babel-evaluate nil))
     (make-directory export-dir t)
     (my/org-render-mermaid-blocks)
-    (my/org-copy-export-assets export-dir)
     (org-export-to-file 'html output-file)
     (browse-url-of-file output-file)
     (message <span class="org-string">"Exported HTML to %s"</span> output-file)))
@@ -603,6 +980,7 @@ Given the repository, the Nix support is especially relevant.
   (<span class="org-keyword">setq</span> org-babel-js-cmd <span class="org-string">"node"</span>)
   (add-hook 'org-insert-heading-hook #'my/org-add-id-to-new-heading)
   (advice-add 'org-return <span class="org-builtin">:before</span> #'my/org-return-stamp-id-before)
+  (advice-add 'org-export-to-file <span class="org-builtin">:around</span> #'my/org-export-ensure-support-files)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -618,9 +996,112 @@ Given the repository, the Nix support is especially relevant.
 </div>
 </div>
 </div>
-<div id="outline-container-org542264c" class="outline-2">
-<h2 id="org542264c"><span class="section-number-2">8.</span> AI helpers</h2>
-<div class="outline-text-2" id="text-8">
+<div id="outline-container-org781eb72" class="outline-2">
+<h2 id="org781eb72"><span class="section-number-2">9.</span> Clipboard and rich paste</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+This section is an attempt to make Org feel a little more like a document
+editor without giving up plain text.
+</p>
+
+<p>
+The desired behavior is roughly:
+</p>
+
+<ul class="org-ul">
+<li>if the X clipboard contains an image, save it locally and insert an Org file
+link,</li>
+<li>if the clipboard contains HTML, convert it into Org syntax before inserting,</li>
+<li>otherwise fall back to an ordinary text paste.</li>
+</ul>
+
+<p>
+That creates a smoother path from browsers, chat apps, and other GUI tools into
+an Org note.
+</p>
+
+<p>
+The implementation below is intentionally modest and X11-specific:
+</p>
+
+<ul class="org-ul">
+<li>it queries clipboard MIME targets with <code>xclip</code>,</li>
+<li>saves pasted images into an <code>images/</code> directory next to the current file,</li>
+<li>uses <code>pandoc</code> to convert <code>text/html</code> clipboard data into Org markup,</li>
+<li>falls back to <code>yank</code> when no richer path is available.</li>
+</ul>
+
+<p>
+This is not the final word on rich paste, but it is a good foundation.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">(<span class="org-keyword">defun</span> <span class="org-function-name">my/clipboard-targets</span> ()
+  <span class="org-doc">"Return available X clipboard targets as a list of MIME types."</span>
+  (<span class="org-keyword">when</span> (executable-find <span class="org-string">"xclip"</span>)
+    (split-string
+     (shell-command-to-string
+      <span class="org-string">"xclip -selection clipboard -t TARGETS -o 2&gt;/dev/null || true"</span>)
+     <span class="org-string">"\n"</span> t)))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/clipboard-has-target-p</span> (target)
+  <span class="org-doc">"Return non-nil when the X clipboard advertises TARGET."</span>
+  (member target (my/clipboard-targets)))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-paste-image-from-clipboard</span> ()
+  <span class="org-doc">"Save a PNG image from the clipboard and insert an Org file link."</span>
+  (<span class="org-keyword">interactive</span>)
+  (<span class="org-keyword">unless</span> (my/clipboard-has-target-p <span class="org-string">"image/png"</span>)
+    (<span class="org-warning">user-error</span> <span class="org-string">"Clipboard does not contain image/png"</span>))
+  (<span class="org-keyword">let*</span> ((base-dir (file-name-directory (<span class="org-keyword">or</span> (buffer-file-name) default-directory)))
+         (image-dir (expand-file-name <span class="org-string">"images"</span> base-dir))
+         (filename (format-time-string <span class="org-string">"paste-%Y%m%d-%H%M%S.png"</span>))
+         (full-path (expand-file-name filename image-dir))
+         (relative-path (file-relative-name full-path base-dir))
+         (command (format <span class="org-string">"xclip -selection clipboard -t image/png -o &gt; %s"</span>
+                          (shell-quote-argument full-path))))
+    (make-directory image-dir t)
+    (<span class="org-keyword">unless</span> (zerop (shell-command command))
+      (<span class="org-warning">user-error</span> <span class="org-string">"Failed to save image from clipboard"</span>))
+    (insert (format <span class="org-string">"[[file:%s]]"</span> relative-path))
+    (<span class="org-keyword">when</span> (derived-mode-p 'org-mode)
+      (org-display-inline-images))
+    full-path))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-paste-html-as-org</span> ()
+  <span class="org-doc">"Convert HTML clipboard contents to Org and insert the result."</span>
+  (<span class="org-keyword">interactive</span>)
+  (<span class="org-keyword">unless</span> (executable-find <span class="org-string">"pandoc"</span>)
+    (<span class="org-warning">user-error</span> <span class="org-string">"pandoc is not available"</span>))
+  (<span class="org-keyword">unless</span> (my/clipboard-has-target-p <span class="org-string">"text/html"</span>)
+    (<span class="org-warning">user-error</span> <span class="org-string">"Clipboard does not contain text/html"</span>))
+  (<span class="org-keyword">let*</span> ((command <span class="org-string">"xclip -selection clipboard -t text/html -o | pandoc --wrap=none -f html -t org"</span>)
+         (org-text (shell-command-to-string command)))
+    (insert (replace-regexp-in-string <span class="org-string">"\n\\'"</span> <span class="org-string">""</span> org-text))))
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-paste-dwim</span> ()
+  <span class="org-doc">"Paste clipboard content into Org, preferring images and HTML when available."</span>
+  (<span class="org-keyword">interactive</span>)
+  (<span class="org-keyword">cond</span>
+   ((not (derived-mode-p 'org-mode))
+    (yank))
+   ((my/clipboard-has-target-p <span class="org-string">"image/png"</span>)
+    (my/org-paste-image-from-clipboard))
+   ((<span class="org-keyword">and</span> (my/clipboard-has-target-p <span class="org-string">"text/html"</span>)
+         (executable-find <span class="org-string">"pandoc"</span>))
+    (my/org-paste-html-as-org))
+   (t
+    (yank))))
+
+(<span class="org-keyword">with-eval-after-load</span> 'org
+  (define-key org-mode-map (kbd <span class="org-string">"C-c y"</span>) #'my/org-paste-dwim))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org93c6dd3" class="outline-2">
+<h2 id="org93c6dd3"><span class="section-number-2">10.</span> AI helpers</h2>
+<div class="outline-text-2" id="text-10">
 <p>
 This section pulls in a small collection of AI-adjacent packages.
 </p>
@@ -665,9 +1146,9 @@ intentional experimentation.
 </div>
 </div>
 </div>
-<div id="outline-container-org4c51a81" class="outline-2">
-<h2 id="org4c51a81"><span class="section-number-2">9.</span> Window movement and in-buffer discoverability</h2>
-<div class="outline-text-2" id="text-9">
+<div id="outline-container-org801b907" class="outline-2">
+<h2 id="org801b907"><span class="section-number-2">11.</span> Window movement and in-buffer discoverability</h2>
+<div class="outline-text-2" id="text-11">
 <p>
 These bindings repurpose <code>C-h/j/k/l</code> for pane movement.
 </p>
@@ -695,9 +1176,9 @@ not being reachable via the stock Emacs help prefix.
 </div>
 </div>
 </div>
-<div id="outline-container-orgbd97ef1" class="outline-2">
-<h2 id="orgbd97ef1"><span class="section-number-2">10.</span> General packages</h2>
-<div class="outline-text-2" id="text-10">
+<div id="outline-container-org7d10286" class="outline-2">
+<h2 id="org7d10286"><span class="section-number-2">12.</span> General packages</h2>
+<div class="outline-text-2" id="text-12">
 <p>
 This is the miscellaneous toolbox section.
 </p>
@@ -707,6 +1188,8 @@ This is the miscellaneous toolbox section.
 <li><code>neotree</code> provides a file sidebar that feels familiar to users coming from
 tools like NERDTree.</li>
 <li><code>which-key</code> improves discoverability by showing possible key continuations.</li>
+<li><code>xhair</code> gives a stronger visual cue for the current line / column when I
+want a little more spatial orientation.</li>
 <li><code>magit</code> is the Git workhorse.</li>
 <li><code>nix-mode</code> is essential in this repository.</li>
 <li><code>eat</code> is a terminal emulator installed through Nix rather than MELPA.</li>
@@ -727,6 +1210,15 @@ tools like NERDTree.</li>
 (<span class="org-keyword">use-package</span> which-key
   <span class="org-builtin">:config</span>
   (which-key-mode))
+
+(<span class="org-keyword">use-package</span> xhair
+  <span class="org-builtin">:commands</span> (xhair-mode xhair xhair-flash)
+  <span class="org-builtin">:init</span>
+  <span class="org-comment-delimiter">;; </span><span class="org-comment">Keep this opt-in rather than always-on so it can be summoned when I want
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">extra visual guidance without permanently cluttering calmer writing modes.
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">`</span><span class="org-comment"><span class="org-constant">xhair-mode</span></span><span class="org-comment">' is the persistent toggle; the package also offers one-shot
+</span>  <span class="org-comment-delimiter">;; </span><span class="org-comment">variants if I decide I only want a temporary flash of orientation.
+</span>  (global-set-key (kbd <span class="org-string">"&lt;f7&gt;"</span>) #'xhair-mode))
 
 (<span class="org-keyword">use-package</span> magit
   <span class="org-builtin">:commands</span> magit-status)
@@ -749,9 +1241,9 @@ tools like NERDTree.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-org42c9905" class="outline-2">
-<h2 id="org42c9905"><span class="section-number-2">11.</span> Local terminal helper</h2>
-<div class="outline-text-2" id="text-11">
+<div id="outline-container-org7c23a45" class="outline-2">
+<h2 id="org7c23a45"><span class="section-number-2">13.</span> Local terminal helper</h2>
+<div class="outline-text-2" id="text-13">
 <p>
 This helper opens Eat in the current project root when possible.
 </p>
@@ -776,9 +1268,9 @@ workflow, that is almost always the desired behavior.
 </div>
 </div>
 </div>
-<div id="outline-container-org4c63dc7" class="outline-2">
-<h2 id="org4c63dc7"><span class="section-number-2">12.</span> Journal and note capture</h2>
-<div class="outline-text-2" id="text-12">
+<div id="outline-container-orga024866" class="outline-2">
+<h2 id="orga024866"><span class="section-number-2">14.</span> Journal and note capture</h2>
+<div class="outline-text-2" id="text-14">
 <p>
 This repository strongly suggests that <code>~/chronofile</code> is the main note store, so the journal is rooted there as well.
 </p>
@@ -810,9 +1302,9 @@ The journal configuration is intentionally minimal:
 </div>
 </div>
 </div>
-<div id="outline-container-org5587451" class="outline-2">
-<h2 id="org5587451"><span class="section-number-2">13.</span> Basic UI defaults</h2>
-<div class="outline-text-2" id="text-13">
+<div id="outline-container-orgcefb5ce" class="outline-2">
+<h2 id="orgcefb5ce"><span class="section-number-2">15.</span> Basic UI defaults</h2>
+<div class="outline-text-2" id="text-15">
 <p>
 These are the expected quality-of-life defaults for a keyboard-first setup:
 </p>
@@ -843,9 +1335,9 @@ These are the expected quality-of-life defaults for a keyboard-first setup:
 </div>
 </div>
 </div>
-<div id="outline-container-org16aee04" class="outline-2">
-<h2 id="org16aee04"><span class="section-number-2">14.</span> Undo / redo sanity</h2>
-<div class="outline-text-2" id="text-14">
+<div id="outline-container-org4145415" class="outline-2">
+<h2 id="org4145415"><span class="section-number-2">16.</span> Undo / redo sanity</h2>
+<div class="outline-text-2" id="text-16">
 <p>
 Emacs absolutely does ship with undo, but the default ergonomics are eccentric
 enough that it can feel like it does not. Since this setup is already heavily
@@ -868,9 +1360,9 @@ This keeps two worlds reasonably sane:
 </div>
 </div>
 </div>
-<div id="outline-container-org8ce93b4" class="outline-2">
-<h2 id="org8ce93b4"><span class="section-number-2">15.</span> Chronofile-centric Org workflow</h2>
-<div class="outline-text-2" id="text-15">
+<div id="outline-container-org620799b" class="outline-2">
+<h2 id="org620799b"><span class="section-number-2">17.</span> Chronofile-centric Org workflow</h2>
+<div class="outline-text-2" id="text-17">
 <p>
 This section is where the Emacs configuration and the repository's larger
 personal knowledge management story really meet.
@@ -885,6 +1377,8 @@ The intention is clear and good:
 <li>discover agenda files recursively,</li>
 <li>exclude obvious transient junk,</li>
 <li>provide convenience commands for agenda and todo views,</li>
+<li>keep capture templates as separate Org snippet files rather than burying
+long template strings inside Lisp,</li>
 <li>capture new tasks into <code>~/chronofile/inbox.org</code>.</li>
 </ul>
 
@@ -903,6 +1397,14 @@ framework such as Org-roam.
 
 (<span class="org-keyword">setq</span> org-directory <span class="org-string">"~/chronofile"</span>)
 (<span class="org-keyword">setq</span> org-default-notes-file (concat org-directory <span class="org-string">"/notes.org"</span>))
+
+(<span class="org-keyword">defconst</span> <span class="org-variable-name">my/org-capture-template-directory</span>
+  (expand-file-name <span class="org-string">"capture-templates/"</span> user-emacs-directory)
+  <span class="org-doc">"Directory containing reusable Org capture template snippets."</span>)
+
+(<span class="org-keyword">defun</span> <span class="org-function-name">my/org-capture-template-file</span> (name)
+  <span class="org-doc">"Return the absolute path for capture template snippet NAME."</span>
+  (expand-file-name name my/org-capture-template-directory))
 
 (<span class="org-keyword">defun</span> <span class="org-function-name">my/org-chronofile-files</span> ()
   <span class="org-doc">"Return usable Org files under `</span><span class="org-doc"><span class="org-constant">org-directory</span></span><span class="org-doc">'."</span>
@@ -935,15 +1437,28 @@ framework such as Org-roam.
 (my/org-refresh-agenda-files)
 
 (<span class="org-keyword">setq</span> org-capture-templates
-      '((<span class="org-string">"t"</span> <span class="org-string">"Todo"</span> entry (file+headline <span class="org-string">"~/chronofile/inbox.org"</span> <span class="org-string">"Tasks"</span>)
-         <span class="org-string">"* TODO %?\n  %i\n  %a"</span>)))
+      `((<span class="org-string">"t"</span> <span class="org-string">"Todo"</span> entry
+         (file+headline <span class="org-string">"~/chronofile/inbox.org"</span> <span class="org-string">"Tasks"</span>)
+         (file ,(my/org-capture-template-file <span class="org-string">"todo.org"</span>)))
+        (<span class="org-string">"r"</span> <span class="org-string">"Recurring task"</span> entry
+         (file+headline <span class="org-string">"~/chronofile/inbox.org"</span> <span class="org-string">"Tasks"</span>)
+         (file ,(my/org-capture-template-file <span class="org-string">"recurring.org"</span>)))
+        (<span class="org-string">"p"</span> <span class="org-string">"Project"</span> entry
+         (file+headline <span class="org-string">"~/chronofile/inbox.org"</span> <span class="org-string">"Projects"</span>)
+         (file ,(my/org-capture-template-file <span class="org-string">"project.org"</span>)))
+        (<span class="org-string">"n"</span> <span class="org-string">"Note"</span> entry
+         (file+headline <span class="org-string">"~/chronofile/inbox.org"</span> <span class="org-string">"Notes"</span>)
+         (file ,(my/org-capture-template-file <span class="org-string">"note.org"</span>)))
+        (<span class="org-string">"j"</span> <span class="org-string">"Journal"</span> entry
+         (file+olp+datetree <span class="org-string">"~/chronofile/journal.org"</span>)
+         (file ,(my/org-capture-template-file <span class="org-string">"journal.org"</span>)))))
 </pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org9ef1382" class="outline-2">
-<h2 id="org9ef1382"><span class="section-number-2">16.</span> Evil mode</h2>
-<div class="outline-text-2" id="text-16">
+<div id="outline-container-orgece9561" class="outline-2">
+<h2 id="orgece9561"><span class="section-number-2">18.</span> Evil mode</h2>
+<div class="outline-text-2" id="text-18">
 <p>
 This is the modal editing section.
 </p>
@@ -1029,9 +1544,9 @@ The hooks below encode those preferences.
 </div>
 </div>
 </div>
-<div id="outline-container-orge9e8084" class="outline-2">
-<h2 id="orge9e8084"><span class="section-number-2">17.</span> Final global bindings</h2>
-<div class="outline-text-2" id="text-17">
+<div id="outline-container-org2f89566" class="outline-2">
+<h2 id="org2f89566"><span class="section-number-2">19.</span> Final global bindings</h2>
+<div class="outline-text-2" id="text-19">
 <p>
 This last bit is tiny, but it is worth leaving separate because it reads like
 "top-level finish work": a dedicated key for sending the current gptel prompt.
@@ -1043,9 +1558,9 @@ This last bit is tiny, but it is worth leaving separate because it reads like
 </div>
 </div>
 </div>
-<div id="outline-container-org86a7ce1" class="outline-2">
-<h2 id="org86a7ce1"><span class="section-number-2">18.</span> Notes for future cleanup</h2>
-<div class="outline-text-2" id="text-18">
+<div id="outline-container-org43d5732" class="outline-2">
+<h2 id="org43d5732"><span class="section-number-2">20.</span> Notes for future cleanup</h2>
+<div class="outline-text-2" id="text-20">
 <p>
 A few things could be rationalized later if desired:
 </p>
@@ -1061,13 +1576,15 @@ own writable <code>custom-file</code>,</li>
 <p>
 But for now the point of this file is not ideological purity. The point is to
 make the current setup readable, explainable, and tanglable.
+s not ideological purity. The point is to
+make the current setup readable, explainable, and tanglable.
 </p>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: John Lambert</p>
-<p class="date">Created: 2026-06-05 Fri 16:13</p>
+<p class="date">Created: 2026-06-22 Mon 08:56</p>
 </div>
 </body>
 </html>

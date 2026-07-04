@@ -1,0 +1,64 @@
+# This file is generated from README.org. Edit README.org and retangle.
+
+[system]
+hostname = "IvyMike"
+timeZone = "America/New_York"
+stateVersion = "25.11"
+roles = [
+  "chrome",
+  "fish",
+  "blender",
+  "gimp",
+  "qgis",
+  "arm_builder",
+  "desktop.pantheon",
+  "xmonad",
+  "ssh",
+  "tailscale.enable",
+]
+
+[printing]
+enable = true
+drivers = ["hplip"]
+
+[webdav]
+enable = true
+user = "john"
+group = "users"
+address = "0.0.0.0"
+port = 6065
+directory = "/home/john/chronofile"
+permissions = "CRUD"
+logFormat = "console"
+
+[[webdav.users]]
+username = "{env}WEBDAV_USERNAME"
+password = "{env}WEBDAV_PASSWORD"
+
+[firewall]
+tailscaleTCPPorts = [6065]
+
+[packages]
+system = ["sops", "age", "ssh-to-age"]
+
+[sops]
+useSystemdActivation = true
+sshPrivateKeyFile = "/home/john/id_ed25519"
+ageKeyFile = "/home/john/.config/sops/age/keys.txt"
+ageSshKeyPaths = ["/home/john/id_ed25519"]
+defaultSopsFormat = "yaml"
+sharedSecretsFile = "common.yaml"
+
+[users]
+mutable = true
+
+[users.john]
+isNormalUser = true
+extraGroups = ["wheel", "networkmanager"]
+shell = "fish"
+authorizedKeys = [
+  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINN9vMs23mK242aEaHuwwTqcVoABjY4f82PicdnnnFqy john@wef",
+]
+
+[programs.fish]
+enable = true

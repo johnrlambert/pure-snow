@@ -50,6 +50,7 @@ in
       feh
       ghc
       xclip
+      scrot
     ];
   };
 }

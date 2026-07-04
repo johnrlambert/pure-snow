@@ -1,0 +1,38 @@
+#+TITLE: __TITLE__
+#+AUTHOR: John Lambert
+#+OPTIONS: title:nil toc:nil num:nil
+#+STARTUP: overview
+#+LATEX_CLASS: minimal-memo
+#+MACRO: meta (eval (save-excursion (goto-char (point-min)) (re-search-forward "^\\* Metadata\\b") (or (org-entry-get nil "$1") "")))
+#+MACRO: today (eval (format-time-string "%B %d, %Y"))
+
+* Metadata :noexport:
+:PROPERTIES:
+:MEMO_TITLE: Memorandum
+:ORGANIZATION: Lambert Research Notes
+:TO: __TO__
+:FROM: John Lambert
+:ROLE: Research and drafting
+:DATE: __DATE__
+:SUBJECT: __SUBJECT__
+:STATUS: Draft
+:LEFT_CONTACT_NAME: Lambert Research Notes
+:LEFT_CONTACT_LINE1: 123 Example Lane
+:LEFT_CONTACT_LINE2: Mount Vernon, KY 40456
+:LEFT_CONTACT_LINE3: USA
+:CENTER_CONTACT_NAME: Contact
+:CENTER_CONTACT_LINE1: John Lambert
+:CENTER_CONTACT_LINE2: Research and drafting
+:END:
+
+* Purpose
+%?
+
+* Background
+
+* Analysis
+
+* Recommendation
+
+* Next Steps
+- [ ]

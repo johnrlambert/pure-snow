@@ -11,3 +11,4 @@ result-*
 *.img.zst
 *.qcow2
 *-efi-vars.fd
+daily_stretch.org

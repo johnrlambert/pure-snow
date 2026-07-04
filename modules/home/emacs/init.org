@@ -117,6 +117,92 @@ My read of this is:
   (mapc #'disable-theme custom-enabled-themes)
   (load-theme 'gruvbox-dark-medium t))
 #+end_src
+* Typography, pitch, and an overly earnest Org art direction pass
+
+This is where things get a little more editorial.
+
+A lot of Emacs setups assume a single monospace font everywhere. That is a
+very reasonable default for programming, terminals, logs, and anything else
+where columns matter.
+
+But Org mode is only *sometimes* code. A big part of my use of Org is closer
+to writing, outlining, note-making, and publishing than it is to editing
+source files. In those buffers, a tasteful proportional typeface can feel less
+like a terminal emulator wearing a fake moustache and more like an actual
+writing environment.
+
+The package =fixed-pitch-mode= is interesting precisely because it flips the
+usual Emacs assumption:
+
+- the *default* face can be proportional,
+- code-oriented buffers can opt back into monospace automatically,
+- and Org can become a mixed-pitch environment where prose is pleasant but
+  tables, code blocks, and metadata still line up.
+
+That is the basic plan here.
+
+For the actual type choices, I am going for a vaguely Bauhaus / modernist
+editorial vibe without turning Org into a design student crime scene:
+
+- **Inter** for body text and general UI readability,
+- **Jost** for headings, because it has a geometric, poster-ish, Futura-adjacent
+  flavor that nudges things in a Bauhaus direction,
+- **JetBrains Mono Nerd Font Mono** for code, tables, src blocks, and all the
+  places where character alignment still matters.
+
+The key thing to keep in mind is that =fixed-pitch-mode= is *not* being used to
+make Org itself monospaced. Instead, it gives me a good global baseline for
+code-ish buffers, while Org gets a custom mixed-pitch treatment of its own.
+
+#+begin_src emacs-lisp
+(defconst my/font-body "Inter"
+  "Primary proportional typeface for prose and general UI text.")
+
+(defconst my/font-headings "Jost"
+  "Geometric sans face used for Org headings and titles.")
+
+(defconst my/font-mono "JetBrainsMono Nerd Font Mono"
+  "Monospace face used where character alignment matters.")
+
+(add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
+
+(defun my/apply-base-typography ()
+  "Apply the global font baseline used across frames."
+  (setq default-frame-alist
+        (assq-delete-all 'font default-frame-alist))
+  (add-to-list 'default-frame-alist `(font . ,(format "%s-12" my/font-body)))
+  (set-face-attribute 'default nil :family my/font-body :height 115 :weight 'regular)
+  (set-face-attribute 'variable-pitch nil :family my/font-body :height 1.0 :weight 'regular)
+  (set-face-attribute 'fixed-pitch nil :family my/font-mono :height 105 :weight 'regular)
+  (set-face-attribute 'mode-line nil :family my/font-body :height 0.95)
+  (set-face-attribute 'mode-line-inactive nil :family my/font-body :height 0.95)
+  (set-face-attribute 'header-line nil :family my/font-body :height 0.95)
+  (set-face-attribute 'tab-bar nil :family my/font-body :height 0.95)
+  (set-face-attribute 'tab-line nil :family my/font-body :height 0.95)
+  (set-face-attribute 'minibuffer-prompt nil :family my/font-body :weight 'semibold))
+
+(my/apply-base-typography)
+
+(use-package fixed-pitch
+  :ensure nil
+  :init
+  ;; The package installs its hooks at load time, so the customization that
+  ;; decides *which* buffers become monospace needs to be in place before the
+  ;; package itself is required.
+  (setq fixed-pitch-dont-change-cursor t)
+  (setq fixed-pitch-use-extended-default t)
+  (setq fixed-pitch-whitelist-hooks
+        '(conf-mode-hook
+          yaml-mode-hook))
+  (setq fixed-pitch-blacklist-hooks
+        '(org-mode-hook))
+  :config
+  ;; `fixed-pitch-mode' gives prog-mode, comint, dired, Magit, and friends a
+  ;; reliable monospaced baseline while letting the rest of Emacs breathe a
+  ;; bit more typographically.
+  (message "fixed-pitch-mode loaded: code buffers stay monospace, prose can relax"))
+#+end_src
+
 * Org mode foundation
 
 This is the heart of the setup.
@@ -138,17 +224,362 @@ A few noteworthy choices:
 - logging completion / cancellation into drawers keeps historical metadata
   without cluttering the visible outline too badly.
 - source block settings make Babel editing behave more like a real code editor.
-- the HTML export header injects Bulma and some small custom CSS.
+- Org gets its own mixed-pitch typography pass so headings can feel a little
+  more like a page layout and a little less like a man page.
+- =svg-tag-mode= is used as a small ornamental layer for TODO states and
+  priorities because apparently regular Emacs was not yet Emacs enough.
+- the HTML export header uses a local stylesheet for a cleaner, self-contained export.
 
 #+begin_src emacs-lisp
 (defun my-org-mode-banner ()
   "Display a banner message in the minibuffer for org-mode."
   (message "Reminder: Toggle tasks with C-c C-t"))
 
+(defun my/org-apply-bauhaus-faces ()
+  "Give Org a geometric-headings / readable-body treatment."
+  ;; The guiding principle here is: prose should read like prose, but code and
+  ;; alignment-sensitive structures should remain resolutely monospaced.
+  (set-face-attribute 'org-document-title nil :family my/font-headings :weight 'bold :height 1.9)
+  (set-face-attribute 'org-level-1 nil :family my/font-headings :weight 'bold :height 1.50)
+  (set-face-attribute 'org-level-2 nil :family my/font-headings :weight 'semibold :height 1.30)
+  (set-face-attribute 'org-level-3 nil :family my/font-headings :weight 'semibold :height 1.18)
+  (set-face-attribute 'org-level-4 nil :family my/font-headings :weight 'medium :height 1.10)
+  (set-face-attribute 'org-level-5 nil :family my/font-headings :weight 'medium :height 1.05)
+  (set-face-attribute 'org-level-6 nil :family my/font-headings :weight 'medium :height 1.02)
+  (set-face-attribute 'org-level-7 nil :family my/font-headings :weight 'medium :height 1.0)
+  (set-face-attribute 'org-level-8 nil :family my/font-headings :weight 'medium :height 1.0)
+  (dolist (face '(org-block
+                  org-block-begin-line
+                  org-block-end-line
+                  org-code
+                  org-checkbox
+                  org-date
+                  org-document-info-keyword
+                  org-drawer
+                  org-formula
+                  org-meta-line
+                  org-property-value
+                  org-special-keyword
+                  org-table
+                  org-tag
+                  org-verbatim
+                  line-number
+                  line-number-current-line))
+    (when (facep face)
+      (set-face-attribute face nil :inherit '(fixed-pitch))))
+  (when (facep 'org-indent)
+    (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch)))
+  (set-face-attribute 'org-ellipsis nil :family my/font-headings :weight 'bold)
+  (set-face-attribute 'org-table nil :family my/font-mono :height 1.0)
+  (set-face-attribute 'org-block nil :family my/font-mono :height 1.0)
+  (set-face-attribute 'org-code nil :family my/font-mono :height 1.0)
+  (set-face-attribute 'org-verbatim nil :family my/font-mono :height 1.0))
+
+(defun my/org-setup-typography ()
+  "Enable the mixed-pitch Org presentation I want for notes and prose."
+  ;; This is the local piece of the experiment: prose becomes proportional,
+  ;; code stays mono, and headings get the more geometric display face.
+  (variable-pitch-mode 1)
+  (setq-local line-spacing 0.18)
+  (display-line-numbers-mode 0)
+  (visual-line-mode 1))
+
+(defun my/svg-tag-make-status (label bg fg)
+  "Create a status LABEL tag with background BG and foreground FG." 
+  (svg-tag-make label
+                :face `(:family ,my/font-headings :weight bold :foreground ,fg)
+                :background bg
+                :foreground fg
+                :radius 4
+                :margin 0
+                :padding 1
+                :height 0.95))
+
+(defun my/svg-tag-make-priority (label)
+  "Create a priority tag for LABEL."
+  (svg-tag-make label
+                :face `(:family ,my/font-headings :weight semibold :foreground "#282828")
+                :background "#fabd2f"
+                :foreground "#282828"
+                :radius 4
+                :margin 0
+                :padding 1
+                :height 0.90))
+
+(defun my/org-enable-svg-tags ()
+  "Turn on SVG tag rendering for Org buffers."
+  (setq-local svg-tag-tags
+              `(("\\_<\\(TODO\\)\\_>" . ((lambda (tag) (my/svg-tag-make-status tag "#cc241d" "#fbf1c7"))))
+                ("\\_<\\(NEXT\\)\\_>" . ((lambda (tag) (my/svg-tag-make-status tag "#458588" "#fbf1c7"))))
+                ("\\_<\\(PROJECT\\)\\_>" . ((lambda (tag) (my/svg-tag-make-status tag "#b16286" "#fbf1c7"))))
+                ("\\_<\\(WAITING\\)\\_>" . ((lambda (tag) (my/svg-tag-make-status tag "#d79921" "#282828"))))
+                ("\\_<\\(SOMEDAY\\)\\_>" . ((lambda (tag) (my/svg-tag-make-status tag "#7c6f64" "#fbf1c7"))))
+                ("\\_<\\(DONE\\)\\_>" . ((lambda (tag) (my/svg-tag-make-status tag "#98971a" "#fbf1c7"))))
+                ("\\_<\\(CANCELLED\\)\\_>" . ((lambda (tag) (my/svg-tag-make-status tag "#928374" "#fbf1c7"))))
+                ("\\(\\[#[A-C]\\]\\)" . ((lambda (tag) (my/svg-tag-make-priority tag))))))
+  (svg-tag-mode 1))
+
+(use-package svg-tag-mode
+  :ensure nil
+  :commands (svg-tag-mode svg-tag-make))
+
 (use-package org
   :ensure t
   :config
   (require 'ox-html)
+  (require 'ox-latex)
+  (add-to-list 'org-latex-packages-alist '("" "microtype" t))
+  (add-to-list 'org-latex-classes
+               '("scrartcl"
+                 "\\documentclass[11pt,oneside]{scrartcl}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("legal-pleading"
+                 "\\documentclass[11pt,oneside]{scrartcl}
+\\usepackage{contract}
+\\newcounter{pleadpar}
+\\newenvironment{pleadpara}{%
+\\par\\refstepcounter{pleadpar}\\noindent%
+\\hangindent=2.8em\\hangafter=1%
+\\makebox[2.5em][l]{\\textbf{\\arabic{pleadpar}.}}%
+}{\\par\\addvspace{\\baselineskip}}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("scrlttr2"
+                 "\\documentclass[11pt,letterpaper]{scrlttr2}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("minimal-memo"
+                 "\\documentclass[letterpaper,10pt]{CSMinimalMemo}
+\\AtBeginDocument{\\outputheader}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("makoto-technical-report"
+                 "\\documentclass[letterpaper]{CSMakotoTechnicalReport}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("lawbrief"
+                 "\\documentclass[12pt]{lawbrief}
+\\newcounter{pleadpar}
+\\newenvironment{pleadpara}{%
+\\par\\refstepcounter{pleadpar}\\noindent%
+\\hangindent=2.8em\\hangafter=1%
+\\makebox[2.5em][l]{\\textbf{\\arabic{pleadpar}.}}%
+}{\\par\\addvspace{\\baselineskip}}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("lawmemo"
+                 "\\documentclass[12pt]{lawmemo}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("arbitrationbrief"
+                 "\\documentclass[12pt]{arbitrationbrief}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("scrartcl-2col"
+                 "\\documentclass[11pt,twocolumn]{scrartcl}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("scrreprt"
+                 "\\documentclass[11pt,oneside,openany]{scrreprt}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("scrbook"
+                 "\\documentclass[11pt,oneside,openany]{scrbook}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("IEEEtran"
+                 "\\documentclass[11pt,conference]{IEEEtran}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+  (add-to-list 'org-latex-classes
+               '("revtex4-1"
+                 "\\documentclass[reprint]{revtex4-1}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")))
+
+  (defun my/org-find-metadata-drawer ()
+    "Move point to the Metadata heading and return non-nil when found."
+    (goto-char (point-min))
+    (re-search-forward "^\\* Metadata\\b" nil t))
+
+  (defun my/org-metadata-value (key)
+    "Return property KEY from the top-level Metadata heading."
+    (save-excursion
+      (when (my/org-find-metadata-drawer)
+        (let ((value (org-entry-get nil key)))
+          (when value
+            (setq value
+                  (replace-regexp-in-string
+                   "{{{today}}}"
+                   (format-time-string "%B %d, %Y")
+                   value t t)))
+          value))))
+
+  (defun my/org-latex-escape (text)
+    "Escape a small set of LaTeX-special characters in TEXT."
+    (let ((value (or text "")))
+      (dolist (pair '(("\\" . "\\textbackslash{}")
+                      ("&" . "\\&")
+                      ("%" . "\\%")
+                      ("$" . "\\$")
+                      ("#" . "\\#")
+                      ("_" . "\\_")
+                      ("{" . "\\{")
+                      ("}" . "\\}")))
+        (setq value (replace-regexp-in-string
+                     (regexp-quote (car pair))
+                     (cdr pair)
+                     value t t)))
+      value))
+
+  (defun my/org-minimal-memo-header-string ()
+    "Build the LaTeX header lines for the minimal memo class."
+    (let* ((title (my/org-metadata-value "MEMO_TITLE"))
+           (date (my/org-metadata-value "DATE"))
+           (to (my/org-metadata-value "TO"))
+           (from (my/org-metadata-value "FROM"))
+           (status (my/org-metadata-value "STATUS"))
+           (subject (my/org-metadata-value "SUBJECT"))
+           (left-name (my/org-metadata-value "LEFT_CONTACT_NAME"))
+           (left-1 (my/org-metadata-value "LEFT_CONTACT_LINE1"))
+           (left-2 (my/org-metadata-value "LEFT_CONTACT_LINE2"))
+           (left-3 (my/org-metadata-value "LEFT_CONTACT_LINE3"))
+           (center-name (my/org-metadata-value "CENTER_CONTACT_NAME"))
+           (center-1 (my/org-metadata-value "CENTER_CONTACT_LINE1"))
+           (center-2 (my/org-metadata-value "CENTER_CONTACT_LINE2")))
+      (mapconcat
+       #'identity
+       (list
+        (format "#+LATEX_HEADER: \\memotitle{%s}" (my/org-latex-escape (or title "Memorandum")))
+        (format "#+LATEX_HEADER: \\memodate{%s}" (my/org-latex-escape date))
+        (format "#+LATEX_HEADER: \\memoinfotable{\\memoinfotablerow{To:}{%s}\\memoinfotablerow{From:}{%s}\\memoinfotablerow{Status:}{%s}\\memoinfotablerow{Subject:}{%s}}"
+                (my/org-latex-escape to)
+                (my/org-latex-escape from)
+                (my/org-latex-escape status)
+                (my/org-latex-escape subject))
+        (format "#+LATEX_HEADER: \\leftcontactinfo{\\textbf{\\textit{%s}}\\\\%s\\\\%s\\\\%s\\\\}"
+                (my/org-latex-escape left-name)
+                (my/org-latex-escape left-1)
+                (my/org-latex-escape left-2)
+                (my/org-latex-escape left-3))
+        (format "#+LATEX_HEADER: \\centercontactinfo{\\textbf{\\textit{%s}}\\\\%s\\\\%s\\\\}"
+                (my/org-latex-escape center-name)
+                (my/org-latex-escape center-1)
+                (my/org-latex-escape center-2))
+        "#+LATEX_HEADER: \\rightcontactinfo{}")
+       "\n")))
+
+  (defun my/org-minimal-memo-export-setup (backend)
+    "Inject memo-class header commands from Metadata before LaTeX export."
+    (when (org-export-derived-backend-p backend 'latex)
+      (save-excursion
+        (goto-char (point-min))
+        (when (re-search-forward "^#\\+LATEX_CLASS:[[:space:]]*minimal-memo[[:space:]]*$" nil t)
+          (org-macro-replace-all (org-macro-initialize-templates))
+          (goto-char (point-min))
+          (insert (my/org-minimal-memo-header-string) "\n")))))
+
+  (add-hook 'org-export-before-processing-hook #'my/org-minimal-memo-export-setup)
+
+  (defun my/org-latex-pleading-class-p (info)
+    "Return non-nil when INFO is exporting a pleading-style LaTeX class."
+    (member (plist-get info :latex-class)
+            '("lawbrief" "legal-pleading")))
+
+  (defun my/org-latex-pleading-paragraph-p (paragraph info)
+    "Return non-nil when PARAGRAPH should export as a numbered pleading paragraph."
+    (and (my/org-latex-pleading-class-p info)
+         (let ((parent (org-export-get-parent paragraph)))
+           (not (memq (org-element-type parent)
+                      '(item
+                        footnote-definition
+                        table-cell
+                        center-block
+                        quote-block
+                        verse-block
+                        special-block))))))
+
+  (defun my/org-latex-paragraph-around (orig paragraph contents info)
+    "Wrap ordinary pleading paragraphs in a numbered LaTeX pleading environment."
+    (if (my/org-latex-pleading-paragraph-p paragraph info)
+        (format "\\begin{pleadpara}\n%s\\end{pleadpara}" contents)
+      (funcall orig paragraph contents info)))
+
+  (advice-add 'org-latex-paragraph :around #'my/org-latex-paragraph-around)
   (setq org-startup-indented t)
   (setq org-hide-leading-stars t)
   (setq org-ellipsis " ▾")
@@ -166,28 +597,32 @@ A few noteworthy choices:
                   ("coffee" . coffee)
                   ("js" . javascript)
                   ("javascript" . javascript)
+                  ("json" . json)
+                  ("yaml" . yaml)
+                  ("toml" . toml)
                   ("sh" . shell)
                   ("bash" . shell)
                   ("elisp" . emacs-lisp))
                 org-src-lang-modes))
   (setq org-export-with-toc t)
   (setq org-export-with-section-numbers t)
+  (setq org-hide-emphasis-markers t)
+  (setq org-pretty-entities t)
+  (setq org-fontify-quote-and-verse-blocks t)
   (setq org-html-htmlize-output-type 'css)
   (setq org-html-validation-link nil)
   (setq org-html-head-include-default-style nil)
   (setq org-html-head-include-scripts nil)
   (setq org-html-head
-        (concat
-         "<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css\">\n"
-         "<style>\n"
-         "body { background: #fff; }\n"
-         "#content.content { max-width: 72ch; margin: 3rem auto; padding: 0 1.5rem; }\n"
-         "#table-of-contents { margin-bottom: 2rem; }\n"
-         ".title { margin-bottom: 0.75rem; }\n"
-         ".subtitle { color: #666; }\n"
-         "pre.src { overflow-x: auto; padding: 1rem; }\n"
-         "code { white-space: pre-wrap; }\n"
-         "</style>")))
+        (let ((css-file (locate-user-emacs-file "custom.css")))
+          (if (file-exists-p css-file)
+              (with-temp-buffer
+                (insert-file-contents css-file)
+                (format "<style>\n%s\n</style>\n" (buffer-string)))
+            "")))
+  (my/org-apply-bauhaus-faces)
+  (add-hook 'org-mode-hook #'my/org-setup-typography)
+  (add-hook 'org-mode-hook #'my/org-enable-svg-tags))
 
 (use-package htmlize
   :ensure t)
@@ -207,13 +642,20 @@ A few noteworthy choices:
   :ensure t
   :config
   (setq ob-mermaid-cli-path "mmdc"))
+
+(use-package ob-json
+  :ensure nil)
+
+(use-package ob-yaml
+  :ensure nil)
+
+(use-package ob-toml
+  :ensure nil)
 #+end_src
 
 * Indentation policy
 
 This section standardizes indentation across a handful of languages.
-
-The intent seems practical rather than ideological:
 
 - use 4 spaces for most programming languages,
 - use 2 spaces for CoffeeScript,
@@ -258,12 +700,6 @@ This is one of the more distinctive custom pieces.
 
 The idea is to assign stable IDs to Org headings, but to do it with ULIDs
 instead of the more common random UUIDs or Org's own =org-id= helpers.
-
-Why might this exist?
-
-- ULIDs are sortable by time.
-- They are shorter and friendlier than many UUID renderings.
-- Stable heading IDs make linking and refiling safer over time.
 
 The code below:
 
@@ -361,6 +797,9 @@ The Babel section enables a modest set of languages:
 - Python
 - Nix
 - JavaScript
+- JSON
+- YAML
+- TOML
 - CoffeeScript (really)
 - Mermaid for charting
 
@@ -398,7 +837,28 @@ Given the repository, the Nix support is especially relevant.
                         relative)
                       export-dir)))
         (make-directory (file-name-directory target) t)
-        (copy-file file target t)))))
+        (copy-file file target t)))
+    (copy-file (locate-user-emacs-file "custom.css")
+               (expand-file-name "custom.css" export-dir)
+               t)))
+
+(defun my/org-inline-export-css (backend)
+  "Inline custom CSS for HTML BACKEND exports."
+  (when (org-export-derived-backend-p backend 'html)
+    (let ((css-file (locate-user-emacs-file "custom.css")))
+      (setq-local org-html-head
+                  (if (file-exists-p css-file)
+                      (with-temp-buffer
+                        (insert-file-contents css-file)
+                        (format "<style>\n%s\n</style>\n" (buffer-string)))
+                    "")))))
+
+(defun my/org-export-ensure-support-files (orig backend file &rest args)
+  "Export with ORIG, then ensure support files exist beside HTML output FILE."
+  (let ((result (apply orig backend file args)))
+    (when (eq backend 'html)
+      (my/org-copy-export-assets (file-name-directory file)))
+    result))
 
 (defun my/org-render-mermaid-blocks ()
   "Render all Mermaid source blocks in the current Org buffer."
@@ -428,17 +888,20 @@ Given the repository, the Nix support is especially relevant.
          (org-confirm-babel-evaluate nil))
     (make-directory export-dir t)
     (my/org-render-mermaid-blocks)
-    (my/org-copy-export-assets export-dir)
     (org-export-to-file 'html output-file)
     (browse-url-of-file output-file)
     (message "Exported HTML to %s" output-file)))
 
 (with-eval-after-load 'org
   (require 'ob-mermaid)
+  (require 'ob-json)
+  (require 'ob-yaml)
+  (require 'ob-toml)
   (setq org-babel-python-command "python3")
   (setq org-babel-js-cmd "node")
   (add-hook 'org-insert-heading-hook #'my/org-add-id-to-new-heading)
   (advice-add 'org-return :before #'my/org-return-stamp-id-before)
+  (advice-add 'org-export-to-file :around #'my/org-export-ensure-support-files)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -446,10 +909,99 @@ Given the repository, the Nix support is especially relevant.
      (python . t)
      (nix . t)
      (js . t)
+     (json . t)
+     (yaml . t)
+     (toml . t)
      (coffee . t)
      (mermaid . t))))
 
 (add-hook 'org-mode-hook 'my-org-mode-banner)
+#+end_src
+
+* Clipboard and rich paste
+
+This section is an attempt to make Org feel a little more like a document
+editor without giving up plain text.
+
+The desired behavior is roughly:
+
+- if the X clipboard contains an image, save it locally and insert an Org file
+  link,
+- if the clipboard contains HTML, convert it into Org syntax before inserting,
+- otherwise fall back to an ordinary text paste.
+
+That creates a smoother path from browsers, chat apps, and other GUI tools into
+an Org note.
+
+The implementation below is intentionally modest and X11-specific:
+
+- it queries clipboard MIME targets with =xclip=,
+- saves pasted images into an =images/= directory next to the current file,
+- uses =pandoc= to convert =text/html= clipboard data into Org markup,
+- falls back to =yank= when no richer path is available.
+
+This is not the final word on rich paste, but it is a good foundation.
+
+#+begin_src emacs-lisp
+(defun my/clipboard-targets ()
+  "Return available X clipboard targets as a list of MIME types."
+  (when (executable-find "xclip")
+    (split-string
+     (shell-command-to-string
+      "xclip -selection clipboard -t TARGETS -o 2>/dev/null || true")
+     "\n" t)))
+
+(defun my/clipboard-has-target-p (target)
+  "Return non-nil when the X clipboard advertises TARGET."
+  (member target (my/clipboard-targets)))
+
+(defun my/org-paste-image-from-clipboard ()
+  "Save a PNG image from the clipboard and insert an Org file link."
+  (interactive)
+  (unless (my/clipboard-has-target-p "image/png")
+    (user-error "Clipboard does not contain image/png"))
+  (let* ((base-dir (file-name-directory (or (buffer-file-name) default-directory)))
+         (image-dir (expand-file-name "images" base-dir))
+         (filename (format-time-string "paste-%Y%m%d-%H%M%S.png"))
+         (full-path (expand-file-name filename image-dir))
+         (relative-path (file-relative-name full-path base-dir))
+         (command (format "xclip -selection clipboard -t image/png -o > %s"
+                          (shell-quote-argument full-path))))
+    (make-directory image-dir t)
+    (unless (zerop (shell-command command))
+      (user-error "Failed to save image from clipboard"))
+    (insert (format "[[file:%s]]" relative-path))
+    (when (derived-mode-p 'org-mode)
+      (org-display-inline-images))
+    full-path))
+
+(defun my/org-paste-html-as-org ()
+  "Convert HTML clipboard contents to Org and insert the result."
+  (interactive)
+  (unless (executable-find "pandoc")
+    (user-error "pandoc is not available"))
+  (unless (my/clipboard-has-target-p "text/html")
+    (user-error "Clipboard does not contain text/html"))
+  (let* ((command "xclip -selection clipboard -t text/html -o | pandoc --wrap=none -f html -t org")
+         (org-text (shell-command-to-string command)))
+    (insert (replace-regexp-in-string "\n\\'" "" org-text))))
+
+(defun my/org-paste-dwim ()
+  "Paste clipboard content into Org, preferring images and HTML when available."
+  (interactive)
+  (cond
+   ((not (derived-mode-p 'org-mode))
+    (yank))
+   ((my/clipboard-has-target-p "image/png")
+    (my/org-paste-image-from-clipboard))
+   ((and (my/clipboard-has-target-p "text/html")
+         (executable-find "pandoc"))
+    (my/org-paste-html-as-org))
+   (t
+    (yank))))
+
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c y") #'my/org-paste-dwim))
 #+end_src
 
 * AI helpers
@@ -509,6 +1061,55 @@ not being reachable via the stock Emacs help prefix.
 (global-set-key (kbd "C-c h") 'help-command)
 #+end_src
 
+* Live Vale annotations
+
+This keeps the prose linting integration deliberately narrow:
+
+- only Vale is enabled,
+- only in text-oriented buffers,
+- and only through Flycheck's normal on-save / idle-change workflow.
+
+That should get you live annotations without bringing back the broader stack
+that caused confusion earlier.
+
+#+begin_src emacs-lisp
+(use-package flycheck
+  :ensure nil
+  :commands (flycheck-mode flycheck-buffer flycheck-select-checker))
+
+(use-package flycheck-vale
+  :ensure nil
+  :after flycheck
+  :commands (flycheck-vale-setup)
+  :init
+  (setq flycheck-vale-program
+        (or (executable-find "vale")
+            (expand-file-name "~/.nix-profile/bin/vale")
+            "vale"))
+  :config
+  (flycheck-vale-setup))
+
+(defun my/vale-live-annotations ()
+  "Enable live Vale annotations in prose buffers."
+  (when (and (derived-mode-p 'text-mode)
+             buffer-file-name
+             (file-exists-p (expand-file-name "~/.config/vale/.vale.ini"))
+             (or (executable-find "vale")
+                 (file-executable-p (expand-file-name "~/.nix-profile/bin/vale"))))
+    ;; `flycheck-vale' defines the checker named `vale'. Make sure the package
+    ;; is actually loaded before selecting it, otherwise Flycheck complains
+    ;; that `vale' is not a known syntax checker.
+    (require 'flycheck-vale)
+    (flycheck-vale-setup)
+    (flycheck-mode 1)
+    (flycheck-select-checker 'vale)
+    (setq-local flycheck-check-syntax-automatically '(save idle-change mode-enabled))
+    (setq-local flycheck-idle-change-delay 0.8)))
+
+(add-hook 'text-mode-hook #'my/vale-live-annotations)
+(global-set-key (kbd "C-c v c") #'flycheck-buffer)
+#+end_src
+
 * General packages
 
 This is the miscellaneous toolbox section.
@@ -517,6 +1118,8 @@ This is the miscellaneous toolbox section.
 - =neotree= provides a file sidebar that feels familiar to users coming from
   tools like NERDTree.
 - =which-key= improves discoverability by showing possible key continuations.
+- =xhair= gives a stronger visual cue for the current line / column when I
+  want a little more spatial orientation.
 - =magit= is the Git workhorse.
 - =nix-mode= is essential in this repository.
 - =eat= is a terminal emulator installed through Nix rather than MELPA.
@@ -536,6 +1139,15 @@ This is the miscellaneous toolbox section.
 (use-package which-key
   :config
   (which-key-mode))
+
+(use-package xhair
+  :commands (xhair-mode xhair xhair-flash)
+  :init
+  ;; Keep this opt-in rather than always-on so it can be summoned when I want
+  ;; extra visual guidance without permanently cluttering calmer writing modes.
+  ;; `xhair-mode' is the persistent toggle; the package also offers one-shot
+  ;; variants if I decide I only want a temporary flash of orientation.
+  (global-set-key (kbd "<f7>") #'xhair-mode))
 
 (use-package magit
   :commands magit-status)
@@ -675,9 +1287,50 @@ framework such as Org-roam.
   (expand-file-name "capture-templates/" user-emacs-directory)
   "Directory containing reusable Org capture template snippets.")
 
+(defconst my/org-memo-directory
+  (expand-file-name "memos/" org-directory)
+  "Directory where memo capture files should be stored.")
+
 (defun my/org-capture-template-file (name)
   "Return the absolute path for capture template snippet NAME."
   (expand-file-name name my/org-capture-template-directory))
+
+(defun my/org-slugify (text)
+  "Convert TEXT into a lowercase filesystem-friendly slug."
+  (let* ((downcased (downcase (string-trim (or text ""))))
+         (slug (replace-regexp-in-string "[^a-z0-9]+" "-" downcased)))
+    (string-trim slug "-+" "-+")))
+
+(defun my/org-capture-memo-target ()
+  "Create or visit a new memo file for capture."
+  (let* ((subject (read-string "Memo subject: "))
+         (recipient (read-string "To: "))
+         (slug (my/org-slugify subject))
+         (timestamp (format-time-string "%Y%m%d-%H%M%S"))
+         (file (expand-file-name
+                (format "%s-%s.org" timestamp (if (string-empty-p slug) "memo" slug))
+                my/org-memo-directory)))
+    (org-capture-put :memo-subject subject
+                     :memo-to recipient
+                     :memo-date (format-time-string "%B %d, %Y")
+                     :memo-file file)
+    (make-directory my/org-memo-directory t)
+    (set-buffer (org-capture-target-buffer file))
+    (widen)
+    (goto-char (point-min))))
+
+(defun my/org-capture-memo-template ()
+  "Return a full-file memo template populated from capture prompts."
+  (let* ((template (org-file-contents (my/org-capture-template-file "memo.org")))
+         (subject (or (org-capture-get :memo-subject) "Memo"))
+         (recipient (or (org-capture-get :memo-to) ""))
+         (date (or (org-capture-get :memo-date) (format-time-string "%B %d, %Y")))
+         (title (if (string-empty-p subject) "Memo" subject)))
+    (setq template (replace-regexp-in-string "__TITLE__" title template t t))
+    (setq template (replace-regexp-in-string "__TO__" recipient template t t))
+    (setq template (replace-regexp-in-string "__DATE__" date template t t))
+    (setq template (replace-regexp-in-string "__SUBJECT__" subject template t t))
+    template))
 
 (defun my/org-chronofile-files ()
   "Return usable Org files under `org-directory'."
@@ -724,7 +1377,12 @@ framework such as Org-roam.
          (file ,(my/org-capture-template-file "note.org")))
         ("j" "Journal" entry
          (file+olp+datetree "~/chronofile/journal.org")
-         (file ,(my/org-capture-template-file "journal.org")))))
+         (file ,(my/org-capture-template-file "journal.org")))
+        ("m" "Memo" plain
+         (function my/org-capture-memo-target)
+         (function my/org-capture-memo-template)
+         :immediate-finish nil
+         :empty-lines 1)))
 #+end_src
 
 * Evil mode
@@ -825,3 +1483,7 @@ A few things could be rationalized later if desired:
 
 But for now the point of this file is not ideological purity. The point is to
 make the current setup readable, explainable, and tanglable.
+s not ideological purity. The point is to
+make the current setup readable, explainable, and tanglable.
+* Document reorganization
+I think I may want to reorganize this as a quick introduction to literate code, then a section on prose, then a section on code then a section on tooling and workflows. (The org stuff.)  

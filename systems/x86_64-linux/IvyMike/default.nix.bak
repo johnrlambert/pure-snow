@@ -1,0 +1,96 @@
+{ pkgs, lib, config, inputs, ... }:
+with lib;
+with lib.homelab;
+
+{
+  imports = [ ./hardware.nix ];
+ # Bootloader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  networking.hostName = "IvyMike";
+  time.timeZone = "America/New_York";
+  system.stateVersion = "25.11";
+
+  homelab.roles.chrome = true;
+  homelab.roles.fish = true;
+  homelab.roles.blender = true;
+  homelab.roles.gimp = true;
+  homelab.roles.qgis = true;
+  homelab.roles.arm_builder = true;
+  homelab.roles.desktop.pantheon = true;
+  homelab.roles.xmonad = true;
+  homelab.roles.ssh = true;
+  homelab.roles.tailscale.enable = true;
+
+  users.mutableUsers = true;
+  services.printing.enable = true;
+  services.printing.drivers = [ pkgs.hplip ];
+
+  services.webdav = {
+    enable = true;
+    user = "john";
+    group = "users";
+    environmentFile = config.sops.templates."webdav.env".path;
+    settings = {
+      address = "0.0.0.0";
+      port = 6065;
+      directory = "/home/john/chronofile";
+      permissions = "CRUD";
+      log.format = "console";
+      users = [
+        {
+          username = "{env}WEBDAV_USERNAME";
+          password = "{env}WEBDAV_PASSWORD";
+        }
+      ];
+    };
+  };
+
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 6065 ];
+
+  systemd.services.webdav = {
+    requires = [ "sops-install-secrets.service" ];
+    after = [ "sops-install-secrets.service" ];
+  };
+
+  environment.systemPackages = with pkgs; [
+    sops
+    age
+    ssh-to-age
+  ];
+
+  sops = {
+    useSystemdActivation = true;
+    environment.SOPS_AGE_SSH_PRIVATE_KEY_FILE = "/home/john/id_ed25519";
+    defaultSopsFile = "${inputs.secrets}/${config.networking.hostName}.yaml";
+    defaultSopsFormat = "yaml";
+    age.keyFile = "/home/john/.config/sops/age/keys.txt";
+    age.sshKeyPaths = [ "/home/john/id_ed25519" ];
+
+    secrets.webdav_username.sopsFile = "${inputs.secrets}/common.yaml";
+    secrets.webdav_password.sopsFile = "${inputs.secrets}/common.yaml";
+
+    templates."webdav.env" = {
+      content = ''
+        WEBDAV_USERNAME=${config.sops.placeholder.webdav_username}
+        WEBDAV_PASSWORD=${config.sops.placeholder.webdav_password}
+      '';
+      owner = "root";
+      group = "root";
+      mode = "0400";
+      restartUnits = [ "webdav.service" ];
+    };
+  };
+  users.users.john = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+    shell = pkgs.fish;
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINN9vMs23mK242aEaHuwwTqcVoABjY4f82PicdnnnFqy john@wef"
+    ];
+  };
+
+  # System-wide fish config (optional but common)
+  programs.fish.enable = true;
+}

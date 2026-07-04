@@ -1,0 +1,240 @@
+#+TITLE: IvyMike machine definition
+#+STARTUP: overview
+
+* Overview
+This directory uses a small TOML file as the main machine-specific data source
+for =IvyMike=.
+
+The workflow is:
+- edit the TOML block in this document
+- tangle the document
+- let =default.nix= import =machine.toml= with =lib.importTOML=
+- rebuild the host from the generated Nix
+
+The design goal is to keep the Nix side as thin as possible.
+
+That means:
+- the TOML is the schema
+- the Nix adapter reads it directly
+- we avoid scattered defaults and guard logic
+- if the TOML is wrong or incomplete, Nix should fail loudly
+
+That is fine here because Nix is already good at refusing invalid builds.
+
+* Files generated from this README
+Tangling this file writes:
+- =machine.toml=
+- =default.nix=
+
+A backup of the older hand-written module is kept as:
+- =default.nix.bak=
+
+* Machine data in TOML
+This block is the primary place to edit host-specific data.
+
+#+begin_src toml :tangle machine.toml
+# This file is generated from README.org. Edit README.org and retangle.
+
+[system]
+hostname = "IvyMike"
+timeZone = "America/New_York"
+stateVersion = "25.11"
+roles = [
+  "chrome",
+  "fish",
+  "blender",
+  "gimp",
+  "qgis",
+  "arm_builder",
+  "desktop.pantheon",
+  "xmonad",
+  "ssh",
+  "tailscale.enable",
+]
+
+[printing]
+enable = true
+drivers = ["hplip"]
+
+[webdav]
+enable = true
+user = "john"
+group = "users"
+address = "0.0.0.0"
+port = 6065
+directory = "/home/john/chronofile"
+permissions = "CRUD"
+logFormat = "console"
+
+[[webdav.users]]
+username = "{env}WEBDAV_USERNAME"
+password = "{env}WEBDAV_PASSWORD"
+
+[firewall]
+tailscaleTCPPorts = [6065]
+
+[packages]
+system = ["sops", "age", "ssh-to-age"]
+
+[sops]
+useSystemdActivation = true
+sshPrivateKeyFile = "/home/john/id_ed25519"
+ageKeyFile = "/home/john/.config/sops/age/keys.txt"
+ageSshKeyPaths = ["/home/john/id_ed25519"]
+defaultSopsFormat = "yaml"
+sharedSecretsFile = "common.yaml"
+
+[users]
+mutable = true
+
+[users.john]
+isNormalUser = true
+extraGroups = ["wheel", "networkmanager"]
+shell = "fish"
+authorizedKeys = [
+  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINN9vMs23mK242aEaHuwwTqcVoABjY4f82PicdnnnFqy john@wef",
+]
+
+[programs.fish]
+enable = true
+#+end_src
+
+The =roles= array is interpreted as paths under =homelab.roles=. For example:
+- ="chrome"= becomes =homelab.roles.chrome = true=
+- ="desktop.pantheon"= becomes =homelab.roles.desktop.pantheon = true=
+- ="tailscale.enable"= becomes =homelab.roles.tailscale.enable = true=
+
+Everything else is intended to map directly into the Nix module with minimal
+translation.
+
+* Minimal Nix adapter
+This block stays intentionally small. It imports the TOML, converts package
+names into =pkgs= lookups, and expands role strings into the nested
+=homelab.roles= path.
+
+Beyond that, it reads the TOML directly. Missing attributes should fail during
+Nix evaluation instead of being silently patched up.
+
+#+begin_src nix :tangle default.nix
+# This file is generated from README.org. Edit README.org and retangle.
+{ pkgs, lib, config, inputs, ... }:
+let
+  spec = lib.importTOML ./machine.toml;
+
+  pkgByName = name: builtins.getAttr name pkgs;
+
+  roleAttrs =
+    lib.foldl'
+      lib.recursiveUpdate
+      { }
+      (map
+        (role:
+          lib.setAttrByPath
+            ([ "homelab" "roles" ] ++ lib.splitString "." role)
+            true)
+        spec.system.roles);
+in
+lib.recursiveUpdate
+  {
+    imports = [ ./hardware.nix ];
+
+    boot.loader.systemd-boot.enable = true;
+    boot.loader.efi.canTouchEfiVariables = true;
+
+    networking.hostName = spec.system.hostname;
+    time.timeZone = spec.system.timeZone;
+    system.stateVersion = spec.system.stateVersion;
+
+    users.mutableUsers = spec.users.mutable;
+
+    services.printing.enable = spec.printing.enable;
+    services.printing.drivers = map pkgByName spec.printing.drivers;
+
+    services.webdav = {
+      enable = spec.webdav.enable;
+      user = spec.webdav.user;
+      group = spec.webdav.group;
+      environmentFile = config.sops.templates."webdav.env".path;
+      settings = {
+        address = spec.webdav.address;
+        port = spec.webdav.port;
+        directory = spec.webdav.directory;
+        permissions = spec.webdav.permissions;
+        log.format = spec.webdav.logFormat;
+        users = spec.webdav.users;
+      };
+    };
+
+    networking.firewall.interfaces.tailscale0.allowedTCPPorts =
+      spec.firewall.tailscaleTCPPorts;
+
+    systemd.services.webdav = {
+      requires = [ "sops-install-secrets.service" ];
+      after = [ "sops-install-secrets.service" ];
+    };
+
+    environment.systemPackages = map pkgByName spec.packages.system;
+
+    sops = {
+      useSystemdActivation = spec.sops.useSystemdActivation;
+      environment.SOPS_AGE_SSH_PRIVATE_KEY_FILE = spec.sops.sshPrivateKeyFile;
+      defaultSopsFile = "${inputs.secrets}/${config.networking.hostName}.yaml";
+      defaultSopsFormat = spec.sops.defaultSopsFormat;
+      age.keyFile = spec.sops.ageKeyFile;
+      age.sshKeyPaths = spec.sops.ageSshKeyPaths;
+
+      secrets.webdav_username.sopsFile = "${inputs.secrets}/${spec.sops.sharedSecretsFile}";
+      secrets.webdav_password.sopsFile = "${inputs.secrets}/${spec.sops.sharedSecretsFile}";
+
+      templates."webdav.env" = {
+        content = ''
+          WEBDAV_USERNAME=${config.sops.placeholder.webdav_username}
+          WEBDAV_PASSWORD=${config.sops.placeholder.webdav_password}
+        '';
+        owner = "root";
+        group = "root";
+        mode = "0400";
+        restartUnits = [ "webdav.service" ];
+      };
+    };
+
+    users.users.john = {
+      isNormalUser = spec.users.john.isNormalUser;
+      extraGroups = spec.users.john.extraGroups;
+      shell = pkgByName spec.users.john.shell;
+      openssh.authorizedKeys.keys = spec.users.john.authorizedKeys;
+    };
+
+    programs.fish.enable = spec.programs.fish.enable;
+  }
+  roleAttrs
+#+end_src
+
+* Tangling
+From this file, run:
+
+#+begin_src elisp
+(org-babel-tangle)
+#+end_src
+
+Or interactively:
+- =M-x org-babel-tangle=
+
+* Rebuild
+After tangling, rebuild the machine with a =path:= flake reference so the
+freshly generated =machine.toml= is visible even before anything is committed:
+
+#+begin_src sh
+sudo nixos-rebuild switch --flake path:/home/john/pure-snow#IvyMike
+#+end_src
+
+* Editing guidance
+For normal machine changes, start in the TOML block.
+
+Examples:
+- add another package name under =[packages].system=
+- add or remove a role string in =[system].roles=
+- change the WebDAV port in =[webdav]=
+- update user groups in =[users.john]=
+
+Reach for the Nix block only when the TOML schema itself needs to change.

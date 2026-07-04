@@ -9,6 +9,10 @@ import XMonad.Hooks.ManageDocks
 import qualified XMonad.StackSet as W
 import XMonad.Util.EZConfig (additionalKeys)
 
+screenshotCommand :: String
+screenshotCommand =
+  "mkdir -p \"$HOME/Pictures/Screenshots\" && scrot \"$HOME/Pictures/Screenshots/%Y-%m-%d-%H%M%S.png\""
+
 mySpacing :: Integer -> l a -> ModifiedLayout Spacing l a
 mySpacing i = spacingRaw True (Border i i i i) True (Border i i i i) True
 
@@ -23,6 +27,7 @@ main = xmonad $ docks def
   , ((mod1Mask .|. shiftMask, xK_Tab), windows W.focusUp)
   , ((mod1Mask, xK_F4), kill)
   , ((0, xF86XK_Close), kill)
+  , ((0, xK_Print), spawn screenshotCommand)
   , ((mod4Mask .|. shiftMask, xK_c), kill)
   , ((mod4Mask, xK_f), sendMessage ToggleLayout)
   ]

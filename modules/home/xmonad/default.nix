@@ -73,6 +73,7 @@ in
       kitty
       polybar
       feh
+      scrot
       haskellPackages.xmonad-contrib
     ];
 

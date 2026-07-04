@@ -1,0 +1,24 @@
+extends: existence
+message: "'%s' reads as hedging. Make the claim plainer or sharper."
+ignorecase: true
+level: error
+tokens:
+  - I would argue that
+  - I think
+  - I believe
+  - in many cases
+  - in most cases
+  - in some cases
+  - in general
+  - in order to
+  - kind of
+  - maybe
+  - perhaps
+  - possibly
+  - probably
+  - quite
+  - rather
+  - relatively
+  - seems to
+  - somewhat
+  - sort of

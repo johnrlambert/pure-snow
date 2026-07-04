@@ -1,4 +1,28 @@
-* %?
-Entered on %U
+* %<%H:%M> %^{Entry title|Morning check-in|Evening reflection|Daily notes} %^g
+:PROPERTIES:
+:CREATED: %U
+:END:
 %i
 %a
+
+** What can I do today that will help me enjoy a stress-free evening?
+Make sure to check =todos=. What might success look like?
+
+** What are some things I am grateful for?
+Why am I grateful for them? Why did they happen?
+
+** What will I do this morning?
+Why are these things important?
+
+** What will I do this afternoon?
+Why are those things important?
+
+** What are some things I have been curious about?
+
+** What did I accomplish that I should be proud of?
+
+** What is the very next physical action I need to take to accomplish my highest-priority item for the day?
+
+** Daily log
+Keep this section open for reactive notes, interruptions, surprises, and little status updates as the day unfolds.
+- %<%H:%M> 

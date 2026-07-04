@@ -6,10 +6,7 @@ let
   cfg = config.homelab.roles.tailscale;
   enabled = hasRole "tailscale" config.homelab.roles;
   hostSopsFile = "${inputs.secrets}/${config.networking.hostName}.yaml";
-  defaultSopsFile =
-    if builtins.pathExists hostSopsFile
-    then hostSopsFile
-    else "${inputs.secrets}/common.yaml";
+  defaultSopsFile = hostSopsFile;
   authKeySecret =
     if cfg.authKeySecret != null
     then cfg.authKeySecret
@@ -34,8 +31,8 @@ in
       default = null;
       example = lib.literalExpression ''"${inputs.secrets}/IvyMike.yaml"'';
       description = ''
-        SOPS file containing the auth key. Defaults to ${inputs.secrets}/<hostname>.yaml
-        and falls back to ${inputs.secrets}/common.yaml when the host file does not yet exist.
+        SOPS file containing the auth key. Defaults to ${inputs.secrets}/<hostname>.yaml.
+        Set this explicitly if you want a different secret file.
       '';
     };
 

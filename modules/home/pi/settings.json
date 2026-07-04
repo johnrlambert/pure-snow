@@ -6,5 +6,8 @@
   "packages": [],
   "extensions": [],
   "prompts": [],
-  "skills": []
+  "skills": [],
+  "compaction": {
+    "enabled": true
+  }
 }

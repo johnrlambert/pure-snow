@@ -1,0 +1,11 @@
+extends: existence
+message: "Avoid exclamation points in prose."
+nonword: true
+level: error
+action:
+  name: edit
+  params:
+    - trim_right
+    - "!"
+raw:
+  - '!+'
