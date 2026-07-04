@@ -12,3 +12,24 @@ result-*
 *.qcow2
 *-efi-vars.fd
 daily_stretch.org
+
+# LaTeX build artifacts
+*.aux
+*.bcf
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.xdv
